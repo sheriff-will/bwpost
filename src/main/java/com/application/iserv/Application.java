@@ -27,5 +27,5 @@ public class Application extends SpringBootServletInitializer implements AppShel
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-    
+
 }
