@@ -5,6 +5,7 @@ import com.application.iserv.backend.services.AgentsServices;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.agents.forms.AgentForm;
 import com.application.iserv.ui.agents.models.AgentsModel;
+import com.application.iserv.ui.agents.models.AttendanceModel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -24,6 +25,8 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.*;
 
@@ -61,6 +64,12 @@ public class AgentsView extends VerticalLayout {
 
     // Services
     private final AgentsServices agentsServices;
+
+    // Longs
+    Long statusValue = 0L;
+
+    // ArrayList
+    List<AgentsModel> agentsModelList = new ArrayList<>();
 
     @Autowired
     public AgentsView(AgentsServices agentsServices) {
@@ -111,7 +120,10 @@ public class AgentsView extends VerticalLayout {
         agentForm = new AgentForm(agentsServices);
         agentForm.setWidth("50%");
 
-        agentForm.addListener(AgentForm.CloseEvent.class, e -> closeComponents());
+        agentForm.addListener(AgentForm.CloseEvent.class, e -> {
+            agentsGrid.asSingleSelect().clear();
+            closeComponents();
+        });
         agentForm.addListener(AgentForm.AgentUpdatedEvent.class, e -> {
             Notification notification = new Notification(AGENT_SUCCESSFULLY_UPDATED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
@@ -123,6 +135,40 @@ public class AgentsView extends VerticalLayout {
 
         });
 
+        agentForm.addListener(AgentForm.AgentTerminatedEvent.class, e -> {
+            Notification notification = new Notification(AGENT_SUCCESSFULLY_TERMINATED);
+            notification.setPosition(Notification.Position.BOTTOM_CENTER);
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            notification.setDuration(5000);
+            notification.open();
+
+            updateAgents();
+
+        });
+
+        agentForm.addListener(AgentForm.AgentAddedEvent.class, e -> {
+            Notification notification = new Notification(AGENT_SUCCESSFULLY_ADDED);
+            notification.setPosition(Notification.Position.BOTTOM_CENTER);
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            notification.setDuration(5000);
+            notification.open();
+
+            updateAgents();
+
+            closeComponents();
+
+        });
+
+        agentForm.addListener(AgentForm.CloseAttendanceFormEvent.class, e -> {
+            agentForm.setVisible(false);
+
+            agentsGrid.asSingleSelect().clear();
+
+            removeClassName(ADDING_AGENT);
+            removeClassName(EDITING_AGENTS);
+
+        });
+
     }
 
     private Component getToolbar() {
@@ -130,11 +176,39 @@ public class AgentsView extends VerticalLayout {
         searchAgent.setClearButtonVisible(true);
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
         searchAgent.addClassName(SEARCH_AGENT);
+        searchAgent.addValueChangeListener(searchAgentValueChanged -> {
+
+            if (status.getValue() != null) {
+                if (status.getValue().equalsIgnoreCase(ACTIVE)) {
+                    statusValue = 0L;
+                    agentsModelList = new ArrayList<>();
+                    agentsModelList = agentsServices.searchAgents(searchAgent.getValue(), statusValue);
+                    agentsGrid.setItems(agentsModelList);
+                }
+                else if (status.getValue().equalsIgnoreCase(TERMINATED)) {
+                    statusValue = 1L;
+                    agentsModelList = new ArrayList<>();
+                    agentsModelList = agentsServices.searchAgents(searchAgent.getValue(), statusValue);
+                    agentsGrid.setItems(agentsModelList);
+                }
+            }
+        });
 
         status.setLabel(STATUS);
         status.setItems(ACTIVE, TERMINATED);
         status.setValue(ACTIVE);
         status.addComponents(ACTIVE, new Hr());
+
+        status.addValueChangeListener(statusValueChangeEvent -> {
+            if (statusValueChangeEvent.getValue().equalsIgnoreCase(ACTIVE)) {
+                agentsGrid.setItems(agentsServices.getAllAgents());
+                agentForm.disableButtons(true);
+            }
+            else if (statusValueChangeEvent.getValue().equalsIgnoreCase(TERMINATED)) {
+                agentsGrid.setItems(agentsServices.getAllTerminatedAgents());
+                agentForm.disableButtons(false);
+            }
+        });
 
         attendanceButton.addClassName(ATTENDANCE_BUTTON);
         attendanceButton.addThemeVariants(ButtonVariant.MATERIAL_OUTLINED);
@@ -187,6 +261,8 @@ public class AgentsView extends VerticalLayout {
         datePicker.addValueChangeListener(datePickerValueChangeEvent -> {
             configureAgentsGrid(AGENT_ATTENDANCE);
 
+            addAttendanceToAgents();
+
             isAttendanceOpen = true;
 
             addAgentButton.setEnabled(false);
@@ -194,6 +270,9 @@ public class AgentsView extends VerticalLayout {
             if (agentForm.isVisible()) {
                 agentForm.setVisible(false);
             }
+
+            agentForm.hideAllComponents(true);
+
         });
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(browserWindowResizeEvent -> {
@@ -235,6 +314,23 @@ public class AgentsView extends VerticalLayout {
         return verticalToolbar;
     }
 
+    private void addAttendanceToAgents() {
+        List<AttendanceModel> attendanceModelList = agentsServices.getAttendance(statusValue);
+
+        for (int i = 0; i < attendanceModelList.size(); i++) {
+            String attendance = attendanceModelList.get(i).getStatus();
+            Long participantId = attendanceModelList.get(i).getParticipantId();
+
+            for (int j = 0; j < agentsModelList.size(); j++) {
+                if (participantId == agentsModelList.get(j).getParticipantId()) {
+                    agentsModelList.get(j).setAttendance(attendance);
+                }
+            }
+
+        }
+
+    }
+
     private void configureBackButton() {
 
         removeClassName(EDITING_AGENTS);
@@ -254,6 +350,8 @@ public class AgentsView extends VerticalLayout {
         agentForm.changeLayout(false);
         agentForm.showTab(IDENTIFICATION);
 
+        agentsGrid.asSingleSelect().clear();
+
     }
 
     private void configureAgentsGrid(String columns) {
@@ -272,7 +370,8 @@ public class AgentsView extends VerticalLayout {
     }
 
     private void updateAgents() {
-        agentsGrid.setItems(agentsServices.getAllAgents());
+        agentsModelList = agentsServices.getAllAgents();
+        agentsGrid.setItems(agentsModelList);
     }
 
     private void editAgent(AgentsModel agentsModel) {
@@ -288,6 +387,7 @@ public class AgentsView extends VerticalLayout {
                 agentForm.setVisible(true);
             }
             else {
+                agentForm.setButtonText(false);
                 agentForm.setAgent(agentsModel);
                 agentForm.setVisible(true);
             }
@@ -297,6 +397,7 @@ public class AgentsView extends VerticalLayout {
     private void openAddAgentForm() {
         agentsGrid.asSingleSelect().clear();
         editAgent(new AgentsModel());
+        agentForm.setButtonText(true);
     }
 
 }

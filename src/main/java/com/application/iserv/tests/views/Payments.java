@@ -38,8 +38,11 @@ import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import javax.annotation.security.PermitAll;
+
 @PageTitle("Payments")
 @Route(value = "payments", layout = MainLayout.class)
+@PermitAll
 public class Payments extends SplitViewFrame {
 
 	private Grid<Payment> grid;

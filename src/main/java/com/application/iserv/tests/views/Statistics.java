@@ -30,9 +30,12 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import javax.annotation.security.PermitAll;
+
 @CssImport("./styles/views/statistics.css")
 @PageTitle("Statistics")
 @Route(value = "statistics", layout = MainLayout.class)
+@PermitAll
 public class Statistics extends ViewFrame {
 
 	private static final String CLASS_NAME = "statistics";

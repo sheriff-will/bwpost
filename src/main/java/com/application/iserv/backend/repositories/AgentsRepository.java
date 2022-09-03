@@ -113,6 +113,81 @@ public class AgentsRepository {
         }
     }
 
+    @Modifying
+    public void terminateAgentDetails(Long participantId) {
+        try {
+
+            String updateParticipantSQL = "UPDATE participants SET " +
+                    " is_terminated = '1'" +
+                    " WHERE participant_id = '" + participantId + "'";
+
+            Query updateParticipantQuery = entityManager.createNativeQuery(updateParticipantSQL);
+            updateParticipantQuery.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
+
+    @Modifying
+    public void addNewAgent(AgentsModel agentsModel) {
+        try {
+
+            String insertAgentSQL = "INSERT INTO participants (firstname, lastname, identity_number, " +
+                    "date_of_birth, gender, marital_status, mobile_number, alternate_mobile_number," +
+                    "postal_address, residential_address, education, placement_officer, placement_place, " +
+                    "position, placement_date, completion_date, mobile_wallet_provider, bank_name, branch, " +
+                    "account_number, timestamp, district, village, service, is_terminated) VALUES(" +
+                    "'" + agentsModel.getFirstname() + "','" + agentsModel.getLastname() + "'," +
+                    "'" + agentsModel.getIdentityNumber() + "','" + agentsModel.getDateOfBirth() + "'," +
+                    "'" + agentsModel.getGender() + "','" + agentsModel.getMaritalStatus() + "'," +
+                    "'" + agentsModel.getMobileNumber() + "','" + agentsModel.getAlternateMobileNumber() + "'," +
+                    "'" + agentsModel.getPostalAddress() + "','" + agentsModel.getResidentialAddress() + "'," +
+                    "'" + agentsModel.getEducation() + "','" + agentsModel.getPlacementOfficer() + "'," +
+                    "'" + agentsModel.getPlacementPlace() + "','" + agentsModel.getPosition() + "'," +
+                    "'" + agentsModel.getPlacementDate() + "','" + agentsModel.getCompletionDate() + "'," +
+                    "'" + agentsModel.getMobileWalletProvider() + "','" + agentsModel.getBankName() + "'," +
+                    "'" + agentsModel.getBranch() + "','" + agentsModel.getAccountNumber() + "'," +
+                    "'" + agentsModel.getTimestamp() + "','" + agentsModel.getDistrict() + "'," +
+                    "'" + agentsModel.getVillage() + "','" + agentsModel.getService() + "','0')";
+
+            Query insertAgentQuery = entityManager.createNativeQuery(insertAgentSQL);
+            insertAgentQuery.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
+
+    public List<Object[]> retrieveAllTerminatedAgents() {
+        String sql = "SELECT * FROM participants WHERE is_terminated = '1'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<Object[]> searchForAgents(String agentNames, Long statusValue) {
+        System.err.println(statusValue);
+        String sql = "SELECT * FROM participants WHERE (participants.firstname " +
+                "LIKE '%"+agentNames+"%' OR participants.lastname " +
+                "LIKE '%"+agentNames+"%') AND participants.is_terminated = '"+statusValue+"'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
 
     // Nominee
     @Modifying
@@ -275,5 +350,21 @@ public class AgentsRepository {
 
     }
 
+
+    // Attendance
+    public List<Object[]> retrieveAllAttendance(Long statusValue) {
+        String sql = "SELECT attendance_history.attendance_history_id, attendance_history.date, " +
+                "attendance_history.status, attendance_history.participant_id FROM attendance_history," +
+                " participants WHERE attendance_history.participant_id = participants.participant_id " +
+                "AND participants.is_terminated = '"+statusValue+"'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
 }

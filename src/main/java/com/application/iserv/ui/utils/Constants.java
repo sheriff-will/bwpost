@@ -128,6 +128,8 @@ public class Constants {
     public static final String NOMINEE_ALREADY_EXIST = "Nominee already exist";
     public static final String AGENT_ALREADY_EXIST = "Agent already exist";
     public static final String AGENT_SUCCESSFULLY_UPDATED = "Agent successfully updated";
+    public static final String AGENT_SUCCESSFULLY_TERMINATED = "Agent successfully terminated";
+    public static final String AGENT_SUCCESSFULLY_ADDED = "Agent successfully added";
     public static final String REFERENCE_ALREADY_EXIST = "Reference already exist";
     public static final String NOMINEE_SUCCESSFULLY_UPDATED = "Nominee Successfully Updated";
     public static final String REFERENCE_SUCCESSFULLY_UPDATED = "Reference Successfully Updated";

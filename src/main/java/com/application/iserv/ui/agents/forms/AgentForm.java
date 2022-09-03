@@ -7,7 +7,6 @@ import com.application.iserv.ui.agents.models.NomineesModel;
 import com.application.iserv.ui.agents.models.ReferenceModel;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -43,8 +42,6 @@ import java.util.List;
 import static com.application.iserv.ui.utils.Constants.*;
 
 public class AgentForm extends VerticalLayout {
-
-    // TODO Validate Banking
 
     // Grids
     Grid<NomineesModel> nomineesGrid = new Grid<>(NomineesModel.class);
@@ -109,7 +106,7 @@ public class AgentForm extends VerticalLayout {
     List<ReferenceModel> agentReferencesList = new ArrayList<>();
 
     // Buttons
-    Button updateAgent = new Button(UPDATE);
+    Button updateAddAgent = new Button();
     Button backButton = new Button(BACK);
     Button terminateButton = new Button(TERMINATE);
     Button saveButton = new Button(SAVE);
@@ -215,6 +212,9 @@ public class AgentForm extends VerticalLayout {
         formLayout.setColspan(bankName, 2);
         formLayout.setColspan(branch, 2);
         formLayout.setColspan(accountNumber, 2);
+        formLayout.setColspan(attendance, 2);
+        formLayout.setColspan(startTimePicker, 2);
+        formLayout.setColspan(endTimePicker, 2);
 
         VerticalLayout buttonsVerticalLayout = new VerticalLayout(addAgentButtonsLayout);
         buttonsVerticalLayout.setPadding(false);
@@ -248,7 +248,8 @@ public class AgentForm extends VerticalLayout {
 
         attendance.addValueChangeListener(attendanceValueChangeEvent -> {
             if (attendanceValueChangeEvent.getValue() != null) {
-                if (attendanceValueChangeEvent.getValue().equalsIgnoreCase(HALF_DAY) && attendance.isVisible()) {
+                if (attendanceValueChangeEvent.getValue().equalsIgnoreCase(HALF_DAY)
+                        && attendance.isVisible()) {
                     startTimePicker.setVisible(true);
                     endTimePicker.setVisible(true);
                 }
@@ -319,33 +320,35 @@ public class AgentForm extends VerticalLayout {
             alternateMobileNumber.clear();
         }
 
-        if (!agentsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
-            paymentMethod.setValue(MOBILE_WALLET);
-            bankName.clear();
-            branch.clear();
-            accountNumber.clear();
+        if (agentsModel.getMobileWalletProvider() != null) {
+            if (!agentsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+                paymentMethod.setValue(MOBILE_WALLET);
+                bankName.clear();
+                branch.clear();
+                accountNumber.clear();
 
-        }
-        else if (!agentsModel.getBankName().equalsIgnoreCase("null")) {
-            paymentMethod.setValue(BANK_EFT);
-            mobileWalletProvider.clear();
-        }
-        else if (agentsModel.getBankName().equalsIgnoreCase("null")
-                && agentsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
-            paymentMethod.setValue(CASH);
-            bankName.clear();
-            branch.clear();
-            accountNumber.clear();
-            mobileWalletProvider.clear();
-        }
+            }
+            else if (!agentsModel.getBankName().equalsIgnoreCase("null")) {
+                paymentMethod.setValue(BANK_EFT);
+                mobileWalletProvider.clear();
+            }
+            else if (agentsModel.getBankName().equalsIgnoreCase("null")
+                    && agentsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+                paymentMethod.setValue(CASH);
+                bankName.clear();
+                branch.clear();
+                accountNumber.clear();
+                mobileWalletProvider.clear();
+            }
 
-        if (!selectedTabLabel.equalsIgnoreCase(BANKING)) {
-            paymentMethod.setVisible(false);
-            mobileWalletProvider.setVisible(false);
-            bankName.setVisible(false);
-            branch.setVisible(false);
-            accountNumber.setVisible(false);
+            if (!selectedTabLabel.equalsIgnoreCase(BANKING)) {
+                paymentMethod.setVisible(false);
+                mobileWalletProvider.setVisible(false);
+                bankName.setVisible(false);
+                branch.setVisible(false);
+                accountNumber.setVisible(false);
 
+            }
         }
 
     }
@@ -671,6 +674,88 @@ public class AgentForm extends VerticalLayout {
         }
     }
 
+    public void disableButtons(boolean isEnabled) {
+        if (isEnabled) {
+            updateAddAgent.setEnabled(true);
+            terminateButton.setEnabled(true);
+            addNomineeButton.setEnabled(true);
+            addReferenceButton.setEnabled(true);
+            saveNominee.setEnabled(true);
+            saveReference.setEnabled(true);
+            removeReference.setEnabled(true);
+            removeNominee.setEnabled(true);
+        }
+        else {
+            updateAddAgent.setEnabled(false);
+            terminateButton.setEnabled(false);
+            addNomineeButton.setEnabled(false);
+            addReferenceButton.setEnabled(false);
+            saveNominee.setEnabled(false);
+            saveReference.setEnabled(false);
+            removeNominee.setEnabled(false);
+            removeReference.setEnabled(false);
+        }
+    }
+
+    public void hideAllComponents(boolean isHideAll) {
+        if (isHideAll) {
+            firstname.setVisible(false);
+            lastname.setVisible(false);
+            identityNumber.setVisible(false);
+            dateOfBirth.setVisible(false);
+            gender.setVisible(false);
+            maritalStatus.setVisible(false);
+            mobileNumber.setVisible(false);
+            alternateMobileNumber.setVisible(false);
+            postalAddress.setVisible(false);
+            residentialAddress.setVisible(false);
+
+            education.setVisible(false);
+
+            placementOfficer.setVisible(false);
+            placementPlace.setVisible(false);
+            position.setVisible(false);
+            placementDate.setVisible(false);
+            completionDate.setVisible(false);
+
+            paymentMethod.setVisible(false);
+            mobileWalletProvider.setVisible(false);
+            bankName.setVisible(false);
+            branch.setVisible(false);
+            accountNumber.setVisible(false);
+
+            addButtonGridNomineeLayout.setVisible(false);
+
+            addButtonGridReferenceLayout.setVisible(false);
+
+        }
+    }
+
+    public void setButtonText(boolean isAddAgent) {
+
+        if (isAddAgent) {
+            updateAddAgent.setText(ADD);
+            terminateButton.setVisible(false);
+            nominees.setEnabled(false);
+            references.setEnabled(false);
+
+            tabs.setSelectedTab(identification);
+
+            paymentMethod.clear();
+            mobileWalletProvider.clear();
+            bankName.clear();
+            branch.clear();
+            accountNumber.clear();
+        }
+        else {
+            updateAddAgent.setText(UPDATE);
+            terminateButton.setVisible(true);
+            nominees.setEnabled(true);
+            references.setEnabled(true);
+        }
+
+    }
+
     private void readNomineeModel(NomineesModel nomineesModel) {
         nomineeFirstname.setValue(nomineesModel.getFirstname());
         nomineeLastname.setValue(nomineesModel.getLastname());
@@ -741,89 +826,114 @@ public class AgentForm extends VerticalLayout {
         if (firstname.isEmpty()) {
             firstname.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (lastname.isEmpty()) {
             lastname.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (identityNumber.isEmpty()) {
             identityNumber.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (dateOfBirth.isEmpty()) {
             dateOfBirth.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (gender.getValue() == null) {
             gender.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (maritalStatus.getValue() == null) {
             maritalStatus.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (mobileNumber.isEmpty()) {
             mobileNumber.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (postalAddress.isEmpty()) {
             postalAddress.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (residentialAddress.isEmpty()) {
             residentialAddress.setInvalid(true);
             tabs.setSelectedTab(identification);
+            updateAddAgent.setEnabled(true);
         }
         else if (education.getValue() == null) {
             education.setInvalid(true);
             tabs.setSelectedTab(educationTab);
+            updateAddAgent.setEnabled(true);
         }
         else if (placementOfficer.isEmpty()) {
             placementOfficer.setInvalid(true);
             tabs.setSelectedTab(service);
+            updateAddAgent.setEnabled(true);
         }
         else if (placementPlace.getValue() == null) {
             placementPlace.setInvalid(true);
             tabs.setSelectedTab(service);
+            updateAddAgent.setEnabled(true);
         }
         else if (position.getValue() == null) {
             position.setInvalid(true);
             tabs.setSelectedTab(service);
+            updateAddAgent.setEnabled(true);
         }
         else if (placementDate.isEmpty()) {
             placementDate.setInvalid(true);
             tabs.setSelectedTab(service);
+            updateAddAgent.setEnabled(true);
         }
         else if (completionDate.isEmpty()) {
             completionDate.setInvalid(true);
             tabs.setSelectedTab(service);
+            updateAddAgent.setEnabled(true);
         }
         else if (paymentMethod.getValue() == null) {
             paymentMethod.setInvalid(true);
             tabs.setSelectedTab(banking);
+            updateAddAgent.setEnabled(true);
         }
-        else if (paymentMethod.getValue().equalsIgnoreCase(MOBILE_WALLET)) {
-            if (mobileWalletProvider.isEmpty()) {
-                mobileWalletProvider.setInvalid(true);
-                tabs.setSelectedTab(banking);
-            }
+        else if (paymentMethod.getValue().equalsIgnoreCase(MOBILE_WALLET)
+                && mobileWalletProvider.isEmpty()) {
+            mobileWalletProvider.setInvalid(true);
+            tabs.setSelectedTab(banking);
+            updateAddAgent.setEnabled(true);
         }
-        else if (paymentMethod.getValue().equalsIgnoreCase(BANK_EFT)) {
-            if (bankName.isEmpty()) {
-                bankName.setInvalid(true);
-                tabs.setSelectedTab(banking);
-            }
-            else if (branch.isEmpty()) {
-                branch.setInvalid(true);
-                tabs.setSelectedTab(banking);
-            }
-            else if (accountNumber.isEmpty()) {
-                accountNumber.setInvalid(true);
-                tabs.setSelectedTab(banking);
-            }
+        else if (paymentMethod.getValue().equalsIgnoreCase(BANK_EFT)
+                && bankName.isEmpty()) {
+            bankName.setInvalid(true);
+            tabs.setSelectedTab(banking);
+            updateAddAgent.setEnabled(true);
+        }
+        else if (paymentMethod.getValue().equalsIgnoreCase(BANK_EFT)
+                && branch.isEmpty()) {
+            branch.setInvalid(true);
+            tabs.setSelectedTab(banking);
+            updateAddAgent.setEnabled(true);
+        }
+        else if (paymentMethod.getValue().equalsIgnoreCase(BANK_EFT)
+                && accountNumber.isEmpty()) {
+            accountNumber.setInvalid(true);
+            tabs.setSelectedTab(banking);
+            updateAddAgent.setEnabled(true);
         }
         else {
-            //updateAgentDetails();
+            if (updateAddAgent.getText().equalsIgnoreCase(ADD)) {
+                addAgent();
+            }
+            else if (updateAddAgent.getText().equalsIgnoreCase(UPDATE)) {
+                updateAgentDetails();
+            }
         }
 
     }
@@ -1091,7 +1201,6 @@ public class AgentForm extends VerticalLayout {
 
         });
 
-
         addNomineeButton.addThemeVariants(
                 ButtonVariant.LUMO_PRIMARY,
                 ButtonVariant.LUMO_SMALL
@@ -1121,15 +1230,17 @@ public class AgentForm extends VerticalLayout {
         );
 
         attendanceBackButton.addThemeVariants(
-                ButtonVariant.LUMO_CONTRAST,
-                ButtonVariant.LUMO_SMALL
+                ButtonVariant.LUMO_CONTRAST
         );
 
-        updateAgent.addThemeVariants(
+        attendanceBackButton.addClickListener(click
+                -> fireEvent(new CloseAttendanceFormEvent(this)));
+
+        updateAddAgent.addThemeVariants(
                 ButtonVariant.LUMO_PRIMARY
         );
 
-        updateAgent.addClickListener(click -> validateFields());
+        updateAddAgent.addClickListener(click -> validateFields());
 
         backButton.addThemeVariants(
                 ButtonVariant.LUMO_PRIMARY,
@@ -1143,17 +1254,14 @@ public class AgentForm extends VerticalLayout {
                 ButtonVariant.LUMO_ERROR
         );
 
-        terminateButton.addClickShortcut(Key.DELETE);
-
         terminateButton.addClickListener(click -> {
-            Notification.show(TERMINATE);
+            agentsServices.terminateAgent(participantId);
 
-            nomineesDialog.open();
-
+            fireEvent(new AgentTerminatedEvent(this));
         });
 
         buttonsLayout = new HorizontalLayout(saveButton, attendanceBackButton);
-        addAgentButtonsLayout = new HorizontalLayout(updateAgent, backButton, terminateButton);
+        addAgentButtonsLayout = new HorizontalLayout(updateAddAgent, backButton, terminateButton);
         addAgentButtonsLayout.getStyle()
                 .set("margin-bottom", "var(--lumo-space-xl");
 
@@ -1425,8 +1533,9 @@ public class AgentForm extends VerticalLayout {
 
     }
 
-    private void updateAgentDetails() {
-        updateAgent.setDisableOnClick(true);
+    private void addAgent() {
+
+        updateAddAgent.setDisableOnClick(true);
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
@@ -1458,7 +1567,7 @@ public class AgentForm extends VerticalLayout {
         );
 
         String alternateMobileNumberValue;
-        if (alternateMobileNumber.getValue().isEmpty()) {
+        if (alternateMobileNumber.isEmpty()) {
             alternateMobileNumberValue = "null";
         }
         else {
@@ -1466,7 +1575,7 @@ public class AgentForm extends VerticalLayout {
         }
 
         String mobileWalletProviderValue;
-        if (mobileWalletProvider.getValue().isEmpty()) {
+        if (mobileWalletProvider.isEmpty()) {
             mobileWalletProviderValue = "null";
         }
         else {
@@ -1474,7 +1583,7 @@ public class AgentForm extends VerticalLayout {
         }
 
         String bankNameValue;
-        if (bankName.getValue().isEmpty()) {
+        if (bankName.isEmpty()) {
             bankNameValue = "null";
         }
         else {
@@ -1482,7 +1591,7 @@ public class AgentForm extends VerticalLayout {
         }
 
         String branchValue;
-        if (branch.getValue().isEmpty()) {
+        if (branch.isEmpty()) {
             branchValue = "null";
         }
         else {
@@ -1490,7 +1599,127 @@ public class AgentForm extends VerticalLayout {
         }
 
         String accountNumberValue;
-        if (accountNumber.getValue().isEmpty()) {
+        if (accountNumber.isEmpty()) {
+            accountNumberValue = "null";
+        }
+        else {
+            accountNumberValue = accountNumber.getValue();
+        }
+
+
+        String response = agentsServices.addAgent(new AgentsModel(
+                participantId,
+                LocalDateTime.now(),
+                dateOfBirthLocalDate,
+                placementDateLocalDate,
+                completionDateLocalDate,
+                firstname.getValue(),
+                lastname.getValue(),
+                identityNumber.getValue(),
+                gender.getValue(),
+                maritalStatus.getValue(),
+                mobileNumber.getValue(),
+                alternateMobileNumberValue,
+                postalAddress.getValue(),
+                residentialAddress.getValue(),
+                education.getValue(),
+                placementOfficer.getValue(),
+                placementPlace.getValue(),
+                position.getValue(),
+                mobileWalletProviderValue,
+                bankNameValue,
+                branchValue,
+                accountNumberValue,
+
+                // TODO Configure district and village and service
+                "Kgatleng",
+                "Oodi",
+                IPELEGENG
+
+        ));
+
+
+        updateAddAgent.setEnabled(true);
+
+        if (response.equalsIgnoreCase(AGENT_ALREADY_EXIST)) {
+            Notification notification = new Notification(AGENT_ALREADY_EXIST);
+            notification.setPosition(Notification.Position.BOTTOM_CENTER);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            notification.setDuration(5000);
+            notification.open();
+
+        }
+        else if (response.equalsIgnoreCase(SUCCESSFUL)) {
+            fireEvent(new AgentAddedEvent(this));
+        }
+    }
+
+    private void updateAgentDetails() {
+        updateAddAgent.setDisableOnClick(true);
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+        String dateOfBirth_str = dateOfBirth.getValue().format(dateTimeFormatter);
+        String[] getDateOfBirth = dateOfBirth_str.split("-");
+
+        LocalDate dateOfBirthLocalDate = LocalDate.of(
+                Integer.parseInt(getDateOfBirth[2]),
+                Integer.parseInt(getDateOfBirth[1]),
+                Integer.parseInt(getDateOfBirth[0])
+        );
+
+        String placementDate_str = placementDate.getValue().format(dateTimeFormatter);
+        String[] getPlacementDate = placementDate_str.split("-");
+
+        LocalDate placementDateLocalDate = LocalDate.of(
+                Integer.parseInt(getPlacementDate[2]),
+                Integer.parseInt(getPlacementDate[1]),
+                Integer.parseInt(getPlacementDate[0])
+        );
+
+        String completionDate_str = completionDate.getValue().format(dateTimeFormatter);
+        String[] getCompletionDate = completionDate_str.split("-");
+
+        LocalDate completionDateLocalDate = LocalDate.of(
+                Integer.parseInt(getCompletionDate[2]),
+                Integer.parseInt(getCompletionDate[1]),
+                Integer.parseInt(getCompletionDate[0])
+        );
+
+        String alternateMobileNumberValue;
+        if (alternateMobileNumber.isEmpty()) {
+            alternateMobileNumberValue = "null";
+        }
+        else {
+            alternateMobileNumberValue = alternateMobileNumber.getValue();
+        }
+
+        String mobileWalletProviderValue;
+        if (mobileWalletProvider.isEmpty()) {
+            mobileWalletProviderValue = "null";
+        }
+        else {
+            mobileWalletProviderValue = mobileWalletProvider.getValue();
+        }
+
+        String bankNameValue;
+        if (bankName.isEmpty()) {
+            bankNameValue = "null";
+        }
+        else {
+            bankNameValue = bankName.getValue();
+        }
+
+        String branchValue;
+        if (branch.isEmpty()) {
+            branchValue = "null";
+        }
+        else {
+            branchValue = branch.getValue();
+        }
+
+        String accountNumberValue;
+        if (accountNumber.isEmpty()) {
             accountNumberValue = "null";
         }
         else {
@@ -1529,7 +1758,8 @@ public class AgentForm extends VerticalLayout {
 
         ));
 
-        updateAgent.setEnabled(true);
+
+        updateAddAgent.setEnabled(true);
 
         if (response.equalsIgnoreCase(AGENT_ALREADY_EXIST)) {
             Notification notification = new Notification(AGENT_ALREADY_EXIST);
@@ -1598,14 +1828,26 @@ public class AgentForm extends VerticalLayout {
         }
     }
 
-    public static class DeleteEvent extends AddAgentFormEvent {
-        DeleteEvent(AgentForm source, AgentsModel agentsModel) {
-            super(source, agentsModel);
+    public static class AgentTerminatedEvent extends AddAgentFormEvent {
+        AgentTerminatedEvent(AgentForm source) {
+            super(source, null);
         }
     }
 
     public static class CloseEvent extends AddAgentFormEvent {
         CloseEvent(AgentForm source) {
+            super(source, null);
+        }
+    }
+
+    public static class CloseAttendanceFormEvent extends AddAgentFormEvent {
+        CloseAttendanceFormEvent(AgentForm source) {
+            super(source, null);
+        }
+    }
+
+    public static class AgentAddedEvent extends AddAgentFormEvent {
+        AgentAddedEvent(AgentForm source) {
             super(source, null);
         }
     }
