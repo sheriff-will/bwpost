@@ -123,7 +123,7 @@ public class AppBar extends FlexBoxLayout {
 	private void initAvatar() {
 		avatar = new Image();
 		avatar.setClassName(CLASS_NAME + "__avatar");
-		avatar.setSrc("images/logos/13.png");
+		avatar.setSrc("images/shutdown.png");
 		avatar.setAlt("User menu");
 
 		ContextMenu contextMenu = new ContextMenu(avatar);

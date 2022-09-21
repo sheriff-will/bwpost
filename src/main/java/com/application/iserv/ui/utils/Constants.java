@@ -48,9 +48,12 @@ public class Constants {
     public static final String SEARCH_AGENT_HINT = "Search agent...";
     public static final String ACTIVE = "Active";
     public static final String TERMINATED = "Terminated";
+    public static final String EXPIRED = "Expired";
     public static final String STATUS = "Status";
+    public static final String CONTRACT_STATUS = "Contract Status";
     public static final String AGENT_POSITION = "agent_position";
     public static final String SIMPLE_DATE_FORMAT = "dd MMMM yyyy";
+    public static final String SIMPLE_MONTH_DATE_FORMAT = "MMMM yyyy";
     public static final String DATE_FORMAT = "dd-MM-yyyy";
     public static final String DATE = "Date";
     public static final String DATE_OF_BIRTH = "Date Of Birth";
@@ -58,6 +61,7 @@ public class Constants {
     public static final String AGENT = "agent";
     public static final String POSITION = "position";
     public static final String RELATIONSHIP = "Relationship";
+    public static final String CONTRACT_DURATION = "Contract Duration";
     public static final String PAYMENT_METHOD = "Payment Method";
     public static final String POSITION_UPPER_CASE = "Position";
     public static final String ATTENDANCE_LOWER_CASE = "attendance";
@@ -92,7 +96,7 @@ public class Constants {
     public static final String YES = "Yes";
     public static final String NO = "No";
     public static final String APPROVED = "Approved";
-    public static final String DENIED = "Denied";
+    public static final String DECLINED = "Declined";
     public static final String PENDING = "Pending";
     public static final String ON_HOLD = "On hold";
     public static final String REASON = "Reason";
@@ -244,10 +248,10 @@ public class Constants {
 
     public static List<String> getStatuses() {
         return List.of(
-                APPROVE,
-                DENY,
+                APPROVED,
+                DECLINED,
                 HOLD,
-                PEND
+                PENDING
         );
     }
 

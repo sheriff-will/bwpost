@@ -10,8 +10,8 @@ import com.application.iserv.tests.components.navigation.drawer.NaviItem;
 import com.application.iserv.tests.components.navigation.drawer.NaviMenu;
 import com.application.iserv.tests.util.css.Overflow;
 import com.application.iserv.tests.views.Statistics;
-import com.application.iserv.tests.views.personnel.Managers;
 import com.application.iserv.ui.agents.views.AgentsView;
+import com.application.iserv.ui.parameters.views.ParametersView;
 import com.application.iserv.ui.payments.views.AuthorizeView;
 import com.application.iserv.ui.payments.views.HistoryView;
 import com.application.iserv.ui.payments.views.ReconcileView;
@@ -122,14 +122,14 @@ public class MainLayout extends FlexBoxLayout
 	 */
 	private void initNaviItems() {
 		NaviMenu menu = naviDrawer.getMenu();
-		menu.addNaviItem(VaadinIcon.USER_CHECK, "Agents", AgentsView.class);
+		menu.addNaviItem(VaadinIcon.USERS, "Agents", AgentsView.class);
 
 		NaviItem payments = menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", null);
 		menu.addNaviItem(payments, "Authorize", AuthorizeView.class);
 		menu.addNaviItem(payments, "Reconcile", ReconcileView.class);
 		menu.addNaviItem(payments, "History", HistoryView.class);
 
-		menu.addNaviItem(VaadinIcon.TOOLBOX, "Parameters", Managers.class);
+		menu.addNaviItem(VaadinIcon.TOOLBOX, "Parameters", ParametersView.class);
 		menu.addNaviItem(VaadinIcon.CHART_3D, "Reports", Statistics.class);
 
 		payments.setSubItemsVisible(false);
@@ -298,11 +298,11 @@ public class MainLayout extends FlexBoxLayout
 				appBar.showRightTab("History");
 				getAppBar().showTabs(true);
 			}
-
-			// TODO This are temporary!!!
 			else if (title.contains("Parameters")) {
 				getAppBar().showTabs(false);
 			}
+
+			// TODO These are temporary
 			else if (title.contains("Reports")) {
 				getAppBar().showTabs(false);
 			}

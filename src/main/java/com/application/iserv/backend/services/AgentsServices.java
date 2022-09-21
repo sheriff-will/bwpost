@@ -44,7 +44,7 @@ public class AgentsServices {
                     Integer.parseInt(getDateOfBirth[2])
             );
 
-            String placementDate_str = row[15].toString();
+            String placementDate_str = row[14].toString();
             String[] getPlacementDate = placementDate_str.split("-");
 
             LocalDate placementDate = LocalDate.of(
@@ -53,7 +53,7 @@ public class AgentsServices {
                     Integer.parseInt(getPlacementDate[2])
             );
 
-            String completionDate_str = row[16].toString();
+            String completionDate_str = row[15].toString();
             String[] getCompletionDate = completionDate_str.split("-");
 
             LocalDate completionDate = LocalDate.of(
@@ -64,7 +64,7 @@ public class AgentsServices {
 
             AgentsModel agentsModel = new AgentsModel(
                     Long.parseLong(row[0].toString()),
-                    LocalDateTime.parse(row[21].toString()),
+                    LocalDateTime.parse(row[20].toString()),
                     dateOfBirth,
                     placementDate,
                     completionDate,
@@ -80,14 +80,14 @@ public class AgentsServices {
                     row[11].toString(),
                     row[12].toString(),
                     row[13].toString(),
-                    row[14].toString(),
+                    row[24].toString(),
+                    row[16].toString(),
                     row[17].toString(),
                     row[18].toString(),
                     row[19].toString(),
-                    row[20].toString(),
-                    row[22].toString(),
-                    row[23].toString(),
-                    row[24].toString(),
+                    row[25].toString(),
+                    row[26].toString(),
+                    row[27].toString(),
                     row[1].toString()+" "+row[2].toString(),
                     PRESENT
             );
@@ -164,7 +164,7 @@ public class AgentsServices {
                     Integer.parseInt(getDateOfBirth[2])
             );
 
-            String placementDate_str = row[15].toString();
+            String placementDate_str = row[14].toString();
             String[] getPlacementDate = placementDate_str.split("-");
 
             LocalDate placementDate = LocalDate.of(
@@ -173,7 +173,7 @@ public class AgentsServices {
                     Integer.parseInt(getPlacementDate[2])
             );
 
-            String completionDate_str = row[16].toString();
+            String completionDate_str = row[15].toString();
             String[] getCompletionDate = completionDate_str.split("-");
 
             LocalDate completionDate = LocalDate.of(
@@ -184,7 +184,7 @@ public class AgentsServices {
 
             AgentsModel agentsModel = new AgentsModel(
                     Long.parseLong(row[0].toString()),
-                    LocalDateTime.parse(row[21].toString()),
+                    LocalDateTime.parse(row[20].toString()),
                     dateOfBirth,
                     placementDate,
                     completionDate,
@@ -200,14 +200,14 @@ public class AgentsServices {
                     row[11].toString(),
                     row[12].toString(),
                     row[13].toString(),
-                    row[14].toString(),
+                    row[24].toString(),
+                    row[16].toString(),
                     row[17].toString(),
                     row[18].toString(),
                     row[19].toString(),
-                    row[20].toString(),
-                    row[22].toString(),
-                    row[23].toString(),
-                    row[24].toString(),
+                    row[25].toString(),
+                    row[26].toString(),
+                    row[27].toString(),
                     row[1].toString()+" "+row[2].toString(),
                     PRESENT
             );
@@ -235,7 +235,7 @@ public class AgentsServices {
                     Integer.parseInt(getDateOfBirth[2])
             );
 
-            String placementDate_str = row[15].toString();
+            String placementDate_str = row[14].toString();
             String[] getPlacementDate = placementDate_str.split("-");
 
             LocalDate placementDate = LocalDate.of(
@@ -244,7 +244,7 @@ public class AgentsServices {
                     Integer.parseInt(getPlacementDate[2])
             );
 
-            String completionDate_str = row[16].toString();
+            String completionDate_str = row[15].toString();
             String[] getCompletionDate = completionDate_str.split("-");
 
             LocalDate completionDate = LocalDate.of(
@@ -255,7 +255,7 @@ public class AgentsServices {
 
             AgentsModel agentsModel = new AgentsModel(
                     Long.parseLong(row[0].toString()),
-                    LocalDateTime.parse(row[21].toString()),
+                    LocalDateTime.parse(row[20].toString()),
                     dateOfBirth,
                     placementDate,
                     completionDate,
@@ -271,14 +271,14 @@ public class AgentsServices {
                     row[11].toString(),
                     row[12].toString(),
                     row[13].toString(),
-                    row[14].toString(),
+                    row[24].toString(),
+                    row[16].toString(),
                     row[17].toString(),
                     row[18].toString(),
                     row[19].toString(),
-                    row[20].toString(),
-                    row[22].toString(),
-                    row[23].toString(),
-                    row[24].toString(),
+                    row[25].toString(),
+                    row[26].toString(),
+                    row[27].toString(),
                     row[1].toString()+" "+row[2].toString(),
                     PRESENT
             );
@@ -477,6 +477,12 @@ public class AgentsServices {
         }
 
         return attendance;
+
+    }
+
+    // Contract Duration
+    public List<String> getContractDuration(String district) {
+        return agentsRepository.retrieveDuration(district);
 
     }
 

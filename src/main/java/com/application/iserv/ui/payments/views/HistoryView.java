@@ -1,9 +1,10 @@
 package com.application.iserv.ui.payments.views;
 
 
+import com.application.iserv.backend.services.HistoryService;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.payments.forms.HistoryForm;
-import com.application.iserv.ui.payments.models.AgentPaymentsModel;
+import com.application.iserv.ui.payments.models.HistoryModel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
 
@@ -24,7 +26,6 @@ import static com.application.iserv.ui.utils.Constants.*;
 @Route(value = HISTORY_LOWER_CASE, layout = MainLayout.class)
 @PermitAll
 public class HistoryView extends VerticalLayout {
-
 
     // TextFields
     TextField searchAgent = new TextField();
@@ -40,9 +41,13 @@ public class HistoryView extends VerticalLayout {
     boolean isDateSelected = false;
 
     // Grid
-    Grid<AgentPaymentsModel> paymentsGrid = new Grid<>(AgentPaymentsModel.class);
+    Grid<HistoryModel> historyGrid = new Grid<>(HistoryModel.class);
 
-    public HistoryView() {
+    private final HistoryService historyService;
+
+    @Autowired
+    public HistoryView(HistoryService historyService) {
+        this.historyService = historyService;
 
         addClassName(HISTORY_PAYMENTS_VIEW);
         setSizeFull();
@@ -76,7 +81,7 @@ public class HistoryView extends VerticalLayout {
         searchAgent.addClassName("history-search-agent");
 
         DatePicker.DatePickerI18n dateFormat = new DatePicker.DatePickerI18n();
-        dateFormat.setDateFormat("dd-MM-yyyy");
+        dateFormat.setDateFormat(SIMPLE_MONTH_DATE_FORMAT);
 
         datePicker.setI18n(dateFormat);
         datePicker.setPlaceholder("Date");
@@ -142,31 +147,31 @@ public class HistoryView extends VerticalLayout {
 
     private void configureHistoryGrid() {
 
-        paymentsGrid.addClassName(PAYMENTS_HISTORY_GRID);
-        paymentsGrid.setSizeFull();
+        historyGrid.addClassName(PAYMENTS_HISTORY_GRID);
+        historyGrid.setSizeFull();
 
         if (isDateSelected) {
-            paymentsGrid.setColumns(AGENT, AMOUNT);
+            historyGrid.setColumns(AGENT, AMOUNT);
 
-            paymentsGrid.addComponentColumn(
+            historyGrid.addComponentColumn(
                     claimed -> createBadge(claimed.getClaimed())).setHeader(CLAIMED);
 
-            paymentsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
+            historyGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
         } else {
-            paymentsGrid.setColumns(AGENT);
+            historyGrid.setColumns(AGENT);
 
-            paymentsGrid.addComponentColumn(
-                    claimed -> createBadge(claimed.getAmount())).setHeader(AMOUNT);
+            historyGrid.addComponentColumn(
+                    claimed -> createBadge("-")).setHeader(AMOUNT);
 
-            paymentsGrid.addComponentColumn(
-                    claimed -> createBadge(claimed.getClaimed())).setHeader(CLAIMED);
+            historyGrid.addComponentColumn(
+                    claimed -> createBadge("-")).setHeader(CLAIMED);
 
-            paymentsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
+            historyGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
         }
 
-        paymentsGrid.asSingleSelect().addValueChangeListener(e -> {
+        historyGrid.asSingleSelect().addValueChangeListener(e -> {
             if (isDateSelected) {
                 addClassName(VIEWING_HISTORY);
                 viewHistory(e.getValue());
@@ -197,39 +202,41 @@ public class HistoryView extends VerticalLayout {
 
     private void updateAgentsPaymentsList() {
 
-        paymentsGrid.asSingleSelect().clear();
+        historyGrid.asSingleSelect().clear();
 
         if (isDateSelected) {
-            paymentsGrid.setItems(getTestPaymentAgents());
+            historyGrid.setItems(historyService.getAllHistory());
         }
         else {
-            paymentsGrid.setItems(getEmptyTestPaymentAgents());
+            historyGrid.setItems(historyService.getAllHistory());
         }
     }
 
     private void configureHistoryForm() {
         historyForm = new HistoryForm();
-        historyForm.setWidth(EM_30);
+        historyForm.setWidth("70%");
+
+        historyForm.addListener(HistoryForm.CloseHistoryFormEvent.class, e -> closeComponents());
     }
 
     private Component getContent() {
 
-        HorizontalLayout historyHorizontalLayout = new HorizontalLayout(paymentsGrid, historyForm);
-        historyHorizontalLayout.setFlexGrow(2, paymentsGrid);
+        HorizontalLayout historyHorizontalLayout = new HorizontalLayout(historyGrid, historyForm);
+        historyHorizontalLayout.setFlexGrow(2, historyGrid);
         historyHorizontalLayout.setFlexGrow(1, historyForm);
         historyHorizontalLayout.setSizeFull();
 
         return historyHorizontalLayout;
     }
 
-    private void viewHistory(AgentPaymentsModel agentPaymentsModel) {
+    private void viewHistory(HistoryModel historyModel) {
 
-        if (agentPaymentsModel == null) {
+        if (historyModel == null) {
             closeComponents();
         }
         else {
             addClassName(VIEWING_HISTORY);
-            historyForm.setHistory(agentPaymentsModel);
+            historyForm.setHistory(historyModel);
             historyForm.setVisible(true);
         }
 

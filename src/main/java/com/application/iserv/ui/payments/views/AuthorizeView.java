@@ -1,11 +1,11 @@
 package com.application.iserv.ui.payments.views;
 
 
+import com.application.iserv.backend.services.AuthorizeService;
 import com.application.iserv.security.services.SecurityService;
 import com.application.iserv.tests.MainLayout;
-import com.application.iserv.tests.components.navigation.bar.AppBar;
 import com.application.iserv.ui.payments.forms.AuthorizeForm;
-import com.application.iserv.ui.payments.models.AgentPaymentsModel;
+import com.application.iserv.ui.payments.models.AuthorizeModel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -16,6 +16,8 @@ import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -24,8 +26,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.*;
 
@@ -54,19 +59,23 @@ public class AuthorizeView extends VerticalLayout {
     boolean isDateSelected = false;
 
     // Grids
-    Grid<AgentPaymentsModel> paymentsGrid = new Grid<>(AgentPaymentsModel.class);
+    Grid<AuthorizeModel> authorizeGrid = new Grid<>(AuthorizeModel.class);
+
+    // Arrays
+    List<AuthorizeModel> authorizeModelList = new ArrayList<>();
 
     private final SecurityService securityService;
+    private final AuthorizeService authorizeService;
 
-    public AuthorizeView(SecurityService securityService) {
+    @Autowired
+    public AuthorizeView(SecurityService securityService, AuthorizeService authorizeService) {
         this.securityService = securityService;
+        this.authorizeService = authorizeService;
 
         addClassName(AUTHORIZE_PAYMENTS_VIEW);
         setSizeFull();
 
         tabs = new Tabs(authorize, reconcile, history);
-
-        AppBar appBar = new AppBar("", this.securityService);
 
         configureAuthorizeForm();
         configureAuthorizeGrid();
@@ -99,13 +108,17 @@ public class AuthorizeView extends VerticalLayout {
         subMenu.addItem("Approve All");
         menuBar.setEnabled(false);
 
-        searchAgent.setClearButtonVisible(true);
         searchAgent.setPlaceholder(SEARCH_AGENT_HINT);
+        searchAgent.setClearButtonVisible(true);
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
         searchAgent.addClassName(SEARCH_AGENT);
+        searchAgent.addValueChangeListener(searchAgentValueChanged -> authorizeGrid.setItems(
+                authorizeService.searchRemunerationAgents(searchAgent.getValue(), 0L)
+        ));
+
 
         DatePicker.DatePickerI18n dateFormat = new DatePicker.DatePickerI18n();
-        dateFormat.setDateFormat(DATE_FORMAT);
+        dateFormat.setDateFormat(SIMPLE_MONTH_DATE_FORMAT);
 
         datePicker.setI18n(dateFormat);
         datePicker.setPlaceholder(DATE);
@@ -176,34 +189,34 @@ public class AuthorizeView extends VerticalLayout {
     private void configureAuthorizeGrid() {
 
         if (isDateSelected) {
-            paymentsGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
-            paymentsGrid.setSizeFull();
+            authorizeGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
+            authorizeGrid.setSizeFull();
 
-            paymentsGrid.setColumns(AGENT, AMOUNT);
+            authorizeGrid.setColumns(AGENT, AMOUNT);
 
-            paymentsGrid.addComponentColumn(
-                    approval -> createBadge(approval.getApproval())).setHeader(STATUS);
+            authorizeGrid.addComponentColumn(
+                    status -> createBadge(status.getStatus())).setHeader(STATUS);
 
-            paymentsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
+            authorizeGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
         }
         else {
-            paymentsGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
-            paymentsGrid.setSizeFull();
+            authorizeGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
+            authorizeGrid.setSizeFull();
 
-            paymentsGrid.setColumns(AGENT);
+            authorizeGrid.setColumns(AGENT);
 
-            paymentsGrid.addComponentColumn(
-                    amount -> createBadge(amount.getAmount())).setHeader(AMOUNT);
+            authorizeGrid.addComponentColumn(
+                    status -> createBadge("-")).setHeader(AMOUNT);
 
-            paymentsGrid.addComponentColumn(
-                    status -> createBadge(status.getApproval())).setHeader(STATUS);
+            authorizeGrid.addComponentColumn(
+                    status -> createBadge("-")).setHeader(STATUS);
 
-            paymentsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
+            authorizeGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
         }
 
-        paymentsGrid.asSingleSelect().addValueChangeListener(e -> {
+        authorizeGrid.asSingleSelect().addValueChangeListener(e -> {
             if (isDateSelected) {
                 addClassName(VIEWING_AUTHORIZE);
                 showAuthorizeForm(e.getValue());
@@ -220,8 +233,8 @@ public class AuthorizeView extends VerticalLayout {
             label = new Span(APPROVED);
             label.getElement().getThemeList().add(BADGE_SUCCESSFUL);
         }
-        else if (approval.equalsIgnoreCase(DENIED)) {
-            label = new Span(DENIED);
+        else if (approval.equalsIgnoreCase(DECLINED)) {
+            label = new Span(DECLINED);
             label.getElement().getThemeList().add(BADGE_ERROR);
         }
         else if (approval.equalsIgnoreCase(PENDING)) {
@@ -238,40 +251,67 @@ public class AuthorizeView extends VerticalLayout {
 
     private void updateAgentsPaymentsList() {
 
-        paymentsGrid.asSingleSelect().clear();
+        authorizeGrid.asSingleSelect().clear();
+
+        authorizeModelList = authorizeService.getAllRemunerationHistory();
 
         if (isDateSelected) {
-            paymentsGrid.setItems(getTestPaymentAgents());
+            authorizeGrid.setItems(authorizeModelList);
         }
         else {
-            paymentsGrid.setItems(getEmptyTestPaymentAgents());
+            authorizeGrid.setItems(authorizeModelList);
         }
 
     }
 
     private void configureAuthorizeForm() {
-        authorizeForm = new AuthorizeForm();
+        authorizeForm = new AuthorizeForm(authorizeService);
         authorizeForm.setWidth(EM_30);
+
+        authorizeForm.addListener(AuthorizeForm.CloseAuthorizeFormEvent.class, e -> {
+            closeComponents();
+            authorizeGrid.asSingleSelect().clear();
+        });
+
+        authorizeForm.addListener(AuthorizeForm.RemunerationUpdatedEvent.class, e -> {
+            Notification notification = new Notification("Updated");
+            notification.setPosition(Notification.Position.BOTTOM_CENTER);
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            notification.setDuration(5000);
+            notification.open();
+
+            authorizeGrid.setItems(authorizeService.getAllRemunerationHistory());
+
+        });
+
     }
 
     private Component getContent() {
 
-        HorizontalLayout historyHorizontalLayout = new HorizontalLayout(paymentsGrid, authorizeForm);
-        historyHorizontalLayout.setFlexGrow(2, paymentsGrid);
+        HorizontalLayout historyHorizontalLayout = new HorizontalLayout(authorizeGrid, authorizeForm);
+        historyHorizontalLayout.setFlexGrow(2, authorizeGrid);
         historyHorizontalLayout.setFlexGrow(1, authorizeForm);
         historyHorizontalLayout.setSizeFull();
 
         return historyHorizontalLayout;
     }
 
-    private void showAuthorizeForm(AgentPaymentsModel agentPaymentsModel) {
+    private void showAuthorizeForm(AuthorizeModel authorizeModel) {
 
-        if (agentPaymentsModel == null) {
+        if (authorizeModel == null) {
             closeComponents();
         }
         else {
             addClassName(VIEWING_AUTHORIZE);
-            authorizeForm.setAuthorize(agentPaymentsModel);
+
+            if (authorizeModel.getStatus().equalsIgnoreCase(DECLINED)) {
+                authorizeForm.hideStatusReason(true);
+            }
+            else {
+                authorizeForm.hideStatusReason(false);
+            }
+
+            authorizeForm.setAuthorize(authorizeModel);
             authorizeForm.setVisible(true);
         }
 

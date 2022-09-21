@@ -56,6 +56,7 @@ public class AgentForm extends VerticalLayout {
     ComboBox<String> position = new ComboBox<>(POSITION_UPPER_CASE);
     ComboBox<String> relationship = new ComboBox<>(RELATIONSHIP);
     ComboBox<String> paymentMethod = new ComboBox<>(PAYMENT_METHOD);
+    ComboBox<String> duration = new ComboBox<>(CONTRACT_DURATION);
 
 
     // TextFields
@@ -191,6 +192,7 @@ public class AgentForm extends VerticalLayout {
                 placementOfficer,
                 placementPlace,
                 position,
+                duration,
                 placementDate,
                 completionDate,
                 paymentMethod,
@@ -206,7 +208,6 @@ public class AgentForm extends VerticalLayout {
         );
 
         formLayout.setColspan(education, 2);
-        formLayout.setColspan(position, 2);
         formLayout.setColspan(paymentMethod, 2);
         formLayout.setColspan(mobileWalletProvider, 2);
         formLayout.setColspan(bankName, 2);
@@ -264,36 +265,39 @@ public class AgentForm extends VerticalLayout {
 
             String payment = paymentMethodValueChangeEvent.getValue();
 
-            if (payment.equalsIgnoreCase(CASH)) {
-                mobileWalletProvider.setVisible(false);
-                bankName.setVisible(false);
-                branch.setVisible(false);
-                accountNumber.setVisible(false);
+            if (payment != null) {
+                if (payment.equalsIgnoreCase(CASH)) {
+                    mobileWalletProvider.setVisible(false);
+                    bankName.setVisible(false);
+                    branch.setVisible(false);
+                    accountNumber.setVisible(false);
 
-                bankName.clear();
-                branch.clear();
-                accountNumber.clear();
-                mobileWalletProvider.clear();
-            }
-            else if (payment.equalsIgnoreCase(MOBILE_WALLET)) {
-                mobileWalletProvider.setVisible(true);
+                    bankName.clear();
+                    branch.clear();
+                    accountNumber.clear();
+                    mobileWalletProvider.clear();
+                }
+                else if (payment.equalsIgnoreCase(MOBILE_WALLET)) {
+                    mobileWalletProvider.setVisible(true);
 
-                bankName.setVisible(false);
-                branch.setVisible(false);
-                accountNumber.setVisible(false);
+                    bankName.setVisible(false);
+                    branch.setVisible(false);
+                    accountNumber.setVisible(false);
 
-                bankName.clear();
-                branch.clear();
-                accountNumber.clear();
-            }
-            else if (payment.equalsIgnoreCase(BANK_EFT)) {
-                mobileWalletProvider.setVisible(false);
+                    bankName.clear();
+                    branch.clear();
+                    accountNumber.clear();
+                }
+                else if (payment.equalsIgnoreCase(BANK_EFT)) {
+                    mobileWalletProvider.setVisible(false);
 
-                bankName.setVisible(true);
-                branch.setVisible(true);
-                accountNumber.setVisible(true);
+                    bankName.setVisible(true);
+                    branch.setVisible(true);
+                    accountNumber.setVisible(true);
 
-                mobileWalletProvider.clear();
+                    mobileWalletProvider.clear();
+                }
+
             }
 
         });
@@ -310,6 +314,51 @@ public class AgentForm extends VerticalLayout {
             isUpdateReference = true;
             saveReference.setText(UPDATE);
             setReferences(e.getValue());
+        });
+
+        placementDate.addValueChangeListener(placementDateValueChange -> {
+            if (placementDate.getValue() != null
+                    && !placementDate.isEmpty() && duration.getValue() != null) {
+
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+                String placementDate_str = placementDate.getValue().format(dateTimeFormatter);
+                String[] getPlacementDate = placementDate_str.split("-");
+
+                LocalDate placementDateLocalDate = LocalDate.of(
+                        Integer.parseInt(getPlacementDate[2]),
+                        Integer.parseInt(getPlacementDate[1]),
+                        Integer.parseInt(getPlacementDate[0])
+                );
+
+                String[] strings = duration.getValue().split(" ");
+                long duration_lng = Long.parseLong(strings[0]);
+
+                completionDate.setValue(placementDateLocalDate.plusMonths(duration_lng));
+
+            }
+        });
+
+        duration.addValueChangeListener(durationValueChange -> {
+            if (placementDate.getValue() != null
+                    && !placementDate.isEmpty() && duration.getValue() != null) {
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+                String placementDate_str = placementDate.getValue().format(dateTimeFormatter);
+                String[] getPlacementDate = placementDate_str.split("-");
+
+                LocalDate placementDateLocalDate = LocalDate.of(
+                        Integer.parseInt(getPlacementDate[2]),
+                        Integer.parseInt(getPlacementDate[1]),
+                        Integer.parseInt(getPlacementDate[0])
+                );
+
+                String[] strings = duration.getValue().split(" ");
+                long duration_lng = Long.parseLong(strings[0]);
+
+                completionDate.setValue(placementDateLocalDate.plusMonths(duration_lng));
+
+            }
         });
 
     }
@@ -364,6 +413,8 @@ public class AgentForm extends VerticalLayout {
         bankName.setVisible(false);
         branch.setVisible(false);
         accountNumber.setVisible(false);
+
+        completionDate.setEnabled(false);
     }
 
     private void updateGridInfo() {
@@ -611,6 +662,11 @@ public class AgentForm extends VerticalLayout {
     }
 
     private void configureLists() {
+
+        // TODO Configure duration and remove static value "Kgatleng"
+        // Contract duration
+        duration.setItems(agentsServices.getContractDuration("Kgatleng"));
+        duration.setItemLabelGenerator(String::toString);
 
         // Marital statuses
         maritalStatus.setItems(getMaritalStatuses());
@@ -962,6 +1018,7 @@ public class AgentForm extends VerticalLayout {
             placementOfficer.setVisible(false);
             placementPlace.setVisible(false);
             position.setVisible(false);
+            duration.setVisible(false);
             placementDate.setVisible(false);
             completionDate.setVisible(false);
 
@@ -996,6 +1053,7 @@ public class AgentForm extends VerticalLayout {
             placementOfficer.setVisible(false);
             placementPlace.setVisible(false);
             position.setVisible(false);
+            duration.setVisible(false);
             placementDate.setVisible(false);
             completionDate.setVisible(false);
 
@@ -1016,6 +1074,7 @@ public class AgentForm extends VerticalLayout {
             placementOfficer.setVisible(true);
             placementPlace.setVisible(true);
             position.setVisible(true);
+            duration.setVisible(true);
             placementDate.setVisible(true);
             completionDate.setVisible(true);
 
@@ -1067,6 +1126,7 @@ public class AgentForm extends VerticalLayout {
             placementOfficer.setVisible(false);
             placementPlace.setVisible(false);
             position.setVisible(false);
+            duration.setVisible(false);
             placementDate.setVisible(false);
             completionDate.setVisible(false);
 
@@ -1074,8 +1134,8 @@ public class AgentForm extends VerticalLayout {
 
             addButtonGridReferenceLayout.setVisible(false);
 
-            if (!paymentMethod.getValue().isEmpty()
-                    && paymentMethod != null) {
+            if (paymentMethod.getValue() != null
+                    && !paymentMethod.getValue().isEmpty() && paymentMethod != null) {
                 String payment = paymentMethod.getValue();
 
                 if (payment.equalsIgnoreCase(CASH)) {
@@ -1123,6 +1183,7 @@ public class AgentForm extends VerticalLayout {
             placementOfficer.setVisible(false);
             placementPlace.setVisible(false);
             position.setVisible(false);
+            duration.setVisible(false);
             placementDate.setVisible(false);
             completionDate.setVisible(false);
 
@@ -1157,6 +1218,7 @@ public class AgentForm extends VerticalLayout {
             placementOfficer.setVisible(false);
             placementPlace.setVisible(false);
             position.setVisible(false);
+            duration.setVisible(false);
             placementDate.setVisible(false);
             completionDate.setVisible(false);
 

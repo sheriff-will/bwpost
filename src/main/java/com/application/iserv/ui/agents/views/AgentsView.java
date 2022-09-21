@@ -194,10 +194,11 @@ public class AgentsView extends VerticalLayout {
             }
         });
 
-        status.setLabel(STATUS);
-        status.setItems(ACTIVE, TERMINATED);
+        status.setLabel(CONTRACT_STATUS);
+        status.setItems(ACTIVE, EXPIRED, TERMINATED);
         status.setValue(ACTIVE);
         status.addComponents(ACTIVE, new Hr());
+        status.addComponents(EXPIRED, new Hr());
 
         status.addValueChangeListener(statusValueChangeEvent -> {
             if (statusValueChangeEvent.getValue().equalsIgnoreCase(ACTIVE)) {

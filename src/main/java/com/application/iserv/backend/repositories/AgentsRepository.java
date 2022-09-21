@@ -21,7 +21,19 @@ public class AgentsRepository {
 
     // Agent
     public List<Object[]> retrieveAllAgents() {
-        String sql = "SELECT * FROM participants WHERE is_terminated = '0'";
+        String sql = "SELECT participants.participant_id, participants.firstname, " +
+                "participants.lastname, participants.identity_number, participants.date_of_birth, " +
+                "participants.gender, participants.marital_status, participants.mobile_number," +
+                " participants.alternate_mobile_number, participants.postal_address, " +
+                "participants.residential_address, participants.education, participants.placement_officer," +
+                " participants.placement_place, participants.placement_date, participants.completion_date, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, participants.timestamp, participants.is_terminated, " +
+                "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
+                "parameters.village, parameters.service " +
+                "FROM participants, parameters" +
+                " WHERE participants.parameter_id = parameters.parameter_id " +
+                "AND participants.is_terminated = '0'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -74,7 +86,6 @@ public class AgentsRepository {
                     " education = '" + agentsModel.getEducation() + "'," +
                     " placement_officer = '" + agentsModel.getPlacementOfficer() + "'," +
                     " placement_place = '" + agentsModel.getPlacementPlace() + "'," +
-                    " position = '" + agentsModel.getPosition() + "'," +
                     " placement_date = '" + agentsModel.getPlacementDate() + "'," +
                     " completion_date = '" + agentsModel.getCompletionDate() + "'," +
                     " mobile_wallet_provider = '" + agentsModel.getMobileWalletProvider() + "'," +
@@ -82,9 +93,6 @@ public class AgentsRepository {
                     " branch = '" + agentsModel.getBranch() + "'," +
                     " account_number = '" + agentsModel.getAccountNumber() + "'," +
                     " timestamp = '" + agentsModel.getTimestamp() + "'," +
-                    " district = '" + agentsModel.getDistrict() + "'," +
-                    " village = '" + agentsModel.getVillage() + "'," +
-                    " service = '" + agentsModel.getService() + "'," +
                     " is_terminated = '0'" +
                     " WHERE participant_id = '" + agentsModel.getParticipantId() + "'";
 
@@ -134,23 +142,24 @@ public class AgentsRepository {
     public void addNewAgent(AgentsModel agentsModel) {
         try {
 
+            // TODO Replace hardcoded parameterId
+
             String insertAgentSQL = "INSERT INTO participants (firstname, lastname, identity_number, " +
                     "date_of_birth, gender, marital_status, mobile_number, alternate_mobile_number," +
                     "postal_address, residential_address, education, placement_officer, placement_place, " +
-                    "position, placement_date, completion_date, mobile_wallet_provider, bank_name, branch, " +
-                    "account_number, timestamp, district, village, service, is_terminated) VALUES(" +
+                    "placement_date, completion_date, mobile_wallet_provider, bank_name, branch, " +
+                    "account_number, timestamp, is_terminated, parameter_id) VALUES(" +
                     "'" + agentsModel.getFirstname() + "','" + agentsModel.getLastname() + "'," +
                     "'" + agentsModel.getIdentityNumber() + "','" + agentsModel.getDateOfBirth() + "'," +
                     "'" + agentsModel.getGender() + "','" + agentsModel.getMaritalStatus() + "'," +
                     "'" + agentsModel.getMobileNumber() + "','" + agentsModel.getAlternateMobileNumber() + "'," +
                     "'" + agentsModel.getPostalAddress() + "','" + agentsModel.getResidentialAddress() + "'," +
                     "'" + agentsModel.getEducation() + "','" + agentsModel.getPlacementOfficer() + "'," +
-                    "'" + agentsModel.getPlacementPlace() + "','" + agentsModel.getPosition() + "'," +
+                    "'" + agentsModel.getPlacementPlace() + "'," +
                     "'" + agentsModel.getPlacementDate() + "','" + agentsModel.getCompletionDate() + "'," +
                     "'" + agentsModel.getMobileWalletProvider() + "','" + agentsModel.getBankName() + "'," +
                     "'" + agentsModel.getBranch() + "','" + agentsModel.getAccountNumber() + "'," +
-                    "'" + agentsModel.getTimestamp() + "','" + agentsModel.getDistrict() + "'," +
-                    "'" + agentsModel.getVillage() + "','" + agentsModel.getService() + "','0')";
+                    "'" + agentsModel.getTimestamp() + "','0', '1')";
 
             Query insertAgentQuery = entityManager.createNativeQuery(insertAgentSQL);
             insertAgentQuery.executeUpdate();
@@ -162,7 +171,20 @@ public class AgentsRepository {
     }
 
     public List<Object[]> retrieveAllTerminatedAgents() {
-        String sql = "SELECT * FROM participants WHERE is_terminated = '1'";
+
+        String sql = "SELECT participants.participant_id, participants.firstname, " +
+                "participants.lastname, participants.identity_number, participants.date_of_birth, " +
+                "participants.gender, participants.marital_status, participants.mobile_number," +
+                " participants.alternate_mobile_number, participants.postal_address, " +
+                "participants.residential_address, participants.education, participants.placement_officer," +
+                " participants.placement_place, participants.placement_date, participants.completion_date, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, participants.timestamp, participants.is_terminated, " +
+                "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
+                "parameters.village, parameters.service " +
+                "FROM participants, parameters" +
+                " WHERE participants.parameter_id = parameters.parameter_id " +
+                "AND participants.is_terminated = '1'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -174,10 +196,19 @@ public class AgentsRepository {
     }
 
     public List<Object[]> searchForAgents(String agentNames, Long statusValue) {
-        System.err.println(statusValue);
-        String sql = "SELECT * FROM participants WHERE (participants.firstname " +
-                "LIKE '%"+agentNames+"%' OR participants.lastname " +
-                "LIKE '%"+agentNames+"%') AND participants.is_terminated = '"+statusValue+"'";
+        String sql = "SELECT participants.participant_id, participants.firstname, " +
+                "participants.lastname, participants.identity_number, participants.date_of_birth, " +
+                "participants.gender, participants.marital_status, participants.mobile_number," +
+                " participants.alternate_mobile_number, participants.postal_address, " +
+                "participants.residential_address, participants.education, participants.placement_officer," +
+                " participants.placement_place, participants.placement_date, participants.completion_date, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, participants.timestamp, participants.is_terminated, " +
+                "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
+                "parameters.village, parameters.service " +
+                "FROM participants, parameters" +
+                " WHERE participants.parameter_id = parameters.parameter_id " +
+                "AND (participants.firstname LIKE '%"+agentNames+"%' OR participants.lastname LIKE '%"+agentNames+"%') AND participants.is_terminated = '"+statusValue+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -195,7 +226,7 @@ public class AgentsRepository {
         try {
 
             String insertNomineeSQL = "INSERT INTO nominees (firstname, lastname, identity_number, " +
-                    "relationship, mobile_number, postal_address, participant_id, removed) VALUES(" +
+                    "relationship, primary_number, postal_address, participant_id, removed) VALUES(" +
                     "'" + nomineesModel.getFirstname() + "','" + nomineesModel.getLastname() + "'," +
                     "'" + nomineesModel.getIdentityNumber() + "','" + nomineesModel.getRelationship() + "'," +
                     "'" + nomineesModel.getPrimaryMobile() + "','" + nomineesModel.getPostalAddress() + "'," +
@@ -236,7 +267,7 @@ public class AgentsRepository {
                     " lastname = '" + nomineesModel.getLastname() + "'," +
                     " identity_number = '" + nomineesModel.getIdentityNumber() + "'," +
                     " relationship = '" + nomineesModel.getRelationship() + "'," +
-                    " mobile_number = '" + nomineesModel.getPrimaryMobile() + "'," +
+                    " primary_number = '" + nomineesModel.getPrimaryMobile() + "'," +
                     " postal_address = '" + nomineesModel.getPostalAddress() + "'," +
                     " participant_id = '" + nomineesModel.getParticipantId() + "'," +
                     " removed = '0'" +
@@ -275,7 +306,7 @@ public class AgentsRepository {
         try {
 
             String insertReferenceSQL = "INSERT INTO reference (firstname, lastname, identity_number, " +
-                    "mobile_number, postal_address, participant_id, removed) VALUES(" +
+                    "primary_number, postal_address, participant_id, removed) VALUES(" +
                     "'" + referenceModel.getFirstname() + "'," +
                     "'" + referenceModel.getLastname() + "'," +
                     "'" + referenceModel.getIdentityNumber() + "'," +
@@ -318,7 +349,7 @@ public class AgentsRepository {
                     "firstname = '" + referenceModel.getFirstname() + "'," +
                     " lastname = '" + referenceModel.getLastname() + "'," +
                     " identity_number = '" + referenceModel.getIdentityNumber() + "'," +
-                    " mobile_number = '" + referenceModel.getPrimaryMobile() + "'," +
+                    " primary_number = '" + referenceModel.getPrimaryMobile() + "'," +
                     " postal_address = '" + referenceModel.getPostalAddress() + "'," +
                     " participant_id = '" + referenceModel.getParticipantId() + "'," +
                     " removed = '0'" +
@@ -350,7 +381,6 @@ public class AgentsRepository {
 
     }
 
-
     // Attendance
     public List<Object[]> retrieveAllAttendance(Long statusValue) {
         String sql = "SELECT attendance_history.attendance_history_id, attendance_history.date, " +
@@ -361,6 +391,23 @@ public class AgentsRepository {
         try {
             Query query = entityManager.createNativeQuery(sql);
             return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    // Contract Duration
+    public List<String> retrieveDuration(String district) {
+
+        // TODO Remove hardcoded district 'Kgatleng'
+        String sql = "SELECT contract_duration.duration " +
+                "FROM contract_duration " +
+                "WHERE contract_duration.district = '"+district+"'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<String>) query.getResultList();
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
