@@ -15,27 +15,25 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +44,9 @@ public class AgentForm extends VerticalLayout {
     // Grids
     Grid<NomineesModel> nomineesGrid = new Grid<>(NomineesModel.class);
     Grid<ReferenceModel> referenceGrid = new Grid<>(ReferenceModel.class);
+
+    // IntegerField
+    IntegerField daysWorked = new IntegerField();
 
 
     // ComboBox
@@ -100,17 +101,17 @@ public class AgentForm extends VerticalLayout {
 
     // Attendance
     //ArrayList
-    Select<String> attendance = new Select<>();
     List<NomineesModel> allNomineesList = new ArrayList<>();
     List<NomineesModel> agentNomineesList = new ArrayList<>();
     List<ReferenceModel> allReferencesList = new ArrayList<>();
     List<ReferenceModel> agentReferencesList = new ArrayList<>();
+    List<String> contractDates = new ArrayList<>();
 
     // Buttons
     Button updateAddAgent = new Button();
     Button backButton = new Button(BACK);
     Button terminateButton = new Button(TERMINATE);
-    Button saveButton = new Button(SAVE);
+    Button updateButton = new Button(UPDATE);
     Button attendanceBackButton = new Button(BACK);
     Button addNomineeButton = new Button(ADD);
     Button addReferenceButton = new Button(ADD);
@@ -119,9 +120,6 @@ public class AgentForm extends VerticalLayout {
     Button saveReference = new Button();
     Button removeReference = new Button(REMOVE);
 
-    // TimePicker
-    TimePicker startTimePicker = new TimePicker(START_TIME);
-    TimePicker endTimePicker = new TimePicker(END_TIME);
 
     // Binder
     Binder<AgentsModel> agentsModelBinder = new Binder<>(AgentsModel.class);
@@ -164,7 +162,6 @@ public class AgentForm extends VerticalLayout {
         configureLists();
         checkScreenSize();
         configureBinder();
-        configureStatus();
         configureButtons();
         configureDialogs();
         configureGrids();
@@ -173,10 +170,14 @@ public class AgentForm extends VerticalLayout {
         configureHorizontalLayouts();
         addClassName(AGENTS_FORM);
 
+        daysWorked.setLabel("Working Days");
+        daysWorked.setHasControls(true);
+        daysWorked.setMin(0);
+        daysWorked.setMax(20);
+        daysWorked.setVisible(false);
+
         FormLayout formLayout = new FormLayout(
-                attendance,
-                startTimePicker,
-                endTimePicker,
+                daysWorked,
                 buttonsLayout,
                 firstname,
                 lastname,
@@ -213,9 +214,7 @@ public class AgentForm extends VerticalLayout {
         formLayout.setColspan(bankName, 2);
         formLayout.setColspan(branch, 2);
         formLayout.setColspan(accountNumber, 2);
-        formLayout.setColspan(attendance, 2);
-        formLayout.setColspan(startTimePicker, 2);
-        formLayout.setColspan(endTimePicker, 2);
+        formLayout.setColspan(daysWorked, 2);
 
         VerticalLayout buttonsVerticalLayout = new VerticalLayout(addAgentButtonsLayout);
         buttonsVerticalLayout.setPadding(false);
@@ -243,24 +242,6 @@ public class AgentForm extends VerticalLayout {
         showTab(tabs.getSelectedTab().getLabel());
 
         // Attendance
-        startTimePicker.setStep(Duration.ofMinutes(30));
-
-        endTimePicker.setStep(Duration.ofMinutes(30));
-
-        attendance.addValueChangeListener(attendanceValueChangeEvent -> {
-            if (attendanceValueChangeEvent.getValue() != null) {
-                if (attendanceValueChangeEvent.getValue().equalsIgnoreCase(HALF_DAY)
-                        && attendance.isVisible()) {
-                    startTimePicker.setVisible(true);
-                    endTimePicker.setVisible(true);
-                }
-                else {
-                    startTimePicker.setVisible(false);
-                    endTimePicker.setVisible(false);
-                }
-            }
-        });
-
         paymentMethod.addValueChangeListener(paymentMethodValueChangeEvent -> {
 
             String payment = paymentMethodValueChangeEvent.getValue();
@@ -334,6 +315,16 @@ public class AgentForm extends VerticalLayout {
                 String[] strings = duration.getValue().split(" ");
                 long duration_lng = Long.parseLong(strings[0]);
 
+                String duration_str = String.valueOf(duration_lng);
+                int duration_int = Integer.parseInt(duration_str);
+
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+                contractDates = new ArrayList<>();
+                for (int i = 1; i < duration_int + 1; i++) {
+                    contractDates.add(placementDateLocalDate.plusMonths(i).format(dateFormatter));
+                }
+
                 completionDate.setValue(placementDateLocalDate.plusMonths(duration_lng));
 
             }
@@ -356,9 +347,33 @@ public class AgentForm extends VerticalLayout {
                 String[] strings = duration.getValue().split(" ");
                 long duration_lng = Long.parseLong(strings[0]);
 
+                String duration_str = String.valueOf(duration_lng);
+                int duration_int = Integer.parseInt(duration_str);
+
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+                contractDates = new ArrayList<>();
+                for (int i = 1; i < duration_int + 1; i++) {
+                    contractDates.add(placementDateLocalDate.plusMonths(i).format(dateFormatter));
+                }
+
                 completionDate.setValue(placementDateLocalDate.plusMonths(duration_lng));
 
             }
+        });
+
+        daysWorked.addValueChangeListener(workingDaysValueChange -> {
+            if (daysWorked.getValue() != null && !daysWorked.isEmpty()) {
+                int workingDaysValue = daysWorked.getValue();
+
+                if (workingDaysValue > 20) {
+                    daysWorked.setErrorMessage("There are only 20 working days a month");
+                }
+                else {
+                    daysWorked.setErrorMessage("Enter valid working days");
+                }
+            }
+
         });
 
     }
@@ -403,9 +418,6 @@ public class AgentForm extends VerticalLayout {
     }
 
     private void hideComponents() {
-        attendance.setVisible(false);
-        startTimePicker.setVisible(false);
-        endTimePicker.setVisible(false);
         buttonsLayout.setVisible(false);
 
         paymentMethod.setVisible(false);
@@ -414,7 +426,8 @@ public class AgentForm extends VerticalLayout {
         branch.setVisible(false);
         accountNumber.setVisible(false);
 
-        completionDate.setEnabled(false);
+        completionDate.setReadOnly(true);
+
     }
 
     private void updateGridInfo() {
@@ -636,14 +649,6 @@ public class AgentForm extends VerticalLayout {
 
     }
 
-    private void configureStatus() {
-        attendance.setLabel(STATUS);
-        attendance.setItems(PRESENT, ABSENT, HALF_DAY);
-        attendance.setPlaceholder(SELECT_STATUS);
-        attendance.addComponents(PRESENT, new Hr());
-        attendance.addComponents(ABSENT, new Hr());
-    }
-
     private void configureBinder() {
 
         // Agents
@@ -701,6 +706,16 @@ public class AgentForm extends VerticalLayout {
     public void setAgent(AgentsModel agentsModel) {
         this.agentsModel = agentsModel;
         agentsModelBinder.readBean(agentsModel);
+
+        if (agentsModel.getPlacementDate() != null && agentsModel.getCompletionDate() != null) {
+            long monthsDifference = ChronoUnit.MONTHS.between(
+                    agentsModel.getPlacementDate(), agentsModel.getCompletionDate());
+
+            duration.setValue(monthsDifference+" Months");
+        }
+        else {
+            duration.clear();
+        }
 
         configureNullValues(agentsModel);
 
@@ -771,6 +786,7 @@ public class AgentForm extends VerticalLayout {
             placementOfficer.setVisible(false);
             placementPlace.setVisible(false);
             position.setVisible(false);
+            duration.setVisible(false);
             placementDate.setVisible(false);
             completionDate.setVisible(false);
 
@@ -1287,7 +1303,7 @@ public class AgentForm extends VerticalLayout {
 
         });
 
-        saveButton.addThemeVariants(
+        updateButton.addThemeVariants(
                 ButtonVariant.LUMO_PRIMARY
         );
 
@@ -1322,7 +1338,7 @@ public class AgentForm extends VerticalLayout {
             fireEvent(new AgentTerminatedEvent(this));
         });
 
-        buttonsLayout = new HorizontalLayout(saveButton, attendanceBackButton);
+        buttonsLayout = new HorizontalLayout(updateButton, attendanceBackButton);
         addAgentButtonsLayout = new HorizontalLayout(updateAddAgent, backButton, terminateButton);
         addAgentButtonsLayout.getStyle()
                 .set("margin-bottom", "var(--lumo-space-xl");
@@ -1698,7 +1714,9 @@ public class AgentForm extends VerticalLayout {
                 "Oodi",
                 IPELEGENG
 
-        ));
+        ),
+                contractDates
+        );
 
 
         updateAddAgent.setEnabled(true);
@@ -1839,7 +1857,7 @@ public class AgentForm extends VerticalLayout {
     public void changeLayout(boolean isAttendanceShowing) {
 
         if (isAttendanceShowing) {
-            attendance.setVisible(true);
+            daysWorked.setVisible(true);
             buttonsLayout.setVisible(true);
 
             tabs.setVisible(false);
@@ -1853,7 +1871,7 @@ public class AgentForm extends VerticalLayout {
             addAgentButtonsLayout.setVisible(false);
         }
         else {
-            attendance.setVisible(false);
+            daysWorked.setVisible(false);
             buttonsLayout.setVisible(false);
 
             tabs.setVisible(true);
@@ -1866,6 +1884,10 @@ public class AgentForm extends VerticalLayout {
             mobileNumber.setVisible(true);
             addAgentButtonsLayout.setVisible(true);
         }
+    }
+
+    public void resetTabs() {
+        tabs.setSelectedTab(identification);
     }
 
     // Events

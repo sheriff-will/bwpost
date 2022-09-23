@@ -5,13 +5,14 @@ import java.time.LocalDateTime;
 
 public class AgentsModel {
 
+    Integer daysWorked;
     Long participantId;
     LocalDateTime timestamp;
     LocalDate dateOfBirth, placementDate, completionDate;
     String firstname, lastname, identityNumber, gender, maritalStatus, mobileNumber,
             alternateMobileNumber, postalAddress, residentialAddress, education, placementOfficer,
             placementPlace, position, mobileWalletProvider, bankName,
-            branch, accountNumber, district, village, service, agent, attendance;
+            branch, accountNumber, district, village, service, agent;
 
     public AgentsModel() {
 
@@ -57,7 +58,7 @@ public class AgentsModel {
                        String alternateMobileNumber, String postalAddress, String residentialAddress,
                        String education, String placementOfficer, String placementPlace, String position,
                        String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                       String district, String village, String service, String agent, String attendance) {
+                       String district, String village, String service, String agent) {
         this.participantId = participantId;
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
@@ -84,7 +85,51 @@ public class AgentsModel {
         this.village = village;
         this.service = service;
         this.agent = agent;
-        this.attendance = attendance;
+    }
+
+    public AgentsModel(Integer daysWorked, Long participantId, LocalDateTime timestamp,
+                       LocalDate dateOfBirth, LocalDate placementDate, LocalDate completionDate,
+                       String firstname, String lastname, String identityNumber, String gender,
+                       String maritalStatus, String mobileNumber, String alternateMobileNumber,
+                       String postalAddress, String residentialAddress, String education,
+                       String placementOfficer, String placementPlace, String position,
+                       String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                       String district, String village, String service, String agent) {
+        this.daysWorked = daysWorked;
+        this.participantId = participantId;
+        this.timestamp = timestamp;
+        this.dateOfBirth = dateOfBirth;
+        this.placementDate = placementDate;
+        this.completionDate = completionDate;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.identityNumber = identityNumber;
+        this.gender = gender;
+        this.maritalStatus = maritalStatus;
+        this.mobileNumber = mobileNumber;
+        this.alternateMobileNumber = alternateMobileNumber;
+        this.postalAddress = postalAddress;
+        this.residentialAddress = residentialAddress;
+        this.education = education;
+        this.placementOfficer = placementOfficer;
+        this.placementPlace = placementPlace;
+        this.position = position;
+        this.mobileWalletProvider = mobileWalletProvider;
+        this.bankName = bankName;
+        this.branch = branch;
+        this.accountNumber = accountNumber;
+        this.district = district;
+        this.village = village;
+        this.service = service;
+        this.agent = agent;
+    }
+
+    public Integer getDaysWorked() {
+        return daysWorked;
+    }
+
+    public void setDaysWorked(Integer daysWorked) {
+        this.daysWorked = daysWorked;
     }
 
     public Long getParticipantId() {
@@ -295,18 +340,11 @@ public class AgentsModel {
         this.agent = agent;
     }
 
-    public String getAttendance() {
-        return attendance;
-    }
-
-    public void setAttendance(String attendance) {
-        this.attendance = attendance;
-    }
-
     @Override
     public String toString() {
         return "AgentsModel{" +
-                "participantId=" + participantId +
+                "daysWorked=" + daysWorked +
+                ", participantId=" + participantId +
                 ", timestamp=" + timestamp +
                 ", dateOfBirth=" + dateOfBirth +
                 ", placementDate=" + placementDate +
@@ -332,7 +370,6 @@ public class AgentsModel {
                 ", village='" + village + '\'' +
                 ", service='" + service + '\'' +
                 ", agent='" + agent + '\'' +
-                ", attendance='" + attendance + '\'' +
                 '}';
     }
 

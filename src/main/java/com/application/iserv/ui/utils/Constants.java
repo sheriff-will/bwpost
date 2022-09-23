@@ -55,6 +55,7 @@ public class Constants {
     public static final String SIMPLE_DATE_FORMAT = "dd MMMM yyyy";
     public static final String SIMPLE_MONTH_DATE_FORMAT = "MMMM yyyy";
     public static final String DATE_FORMAT = "dd-MM-yyyy";
+    public static final String MONTH_DATE_FORMAT = "yyyy-MM";
     public static final String DATE = "Date";
     public static final String DATE_OF_BIRTH = "Date Of Birth";
     public static final String AGENT_ATTENDANCE = "agent_attendance";
@@ -73,6 +74,7 @@ public class Constants {
     public static final String ABSENT = "Absent";
     public static final String EXPORT_STATEMENTS = "Export Statements";
     public static final String RATE = "Rate/day";
+    public static final String DAYS_WORKED_CAMEL_CASE= "daysWorked";
     public static final String DAYS_WORKED = "Days Worked";
     public static final String BASE_SALARY = "Base Salary";
     public static final String BONUS = "Bonus";

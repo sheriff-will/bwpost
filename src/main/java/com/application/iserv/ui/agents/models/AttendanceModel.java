@@ -1,46 +1,25 @@
 package com.application.iserv.ui.agents.models;
 
-import java.time.LocalDate;
-
 public class AttendanceModel {
 
-    String status;
-    LocalDate date;
-    Long attendanceId, participantId;
+    int daysWorked;
+    Long participantId;
 
     public AttendanceModel() {
 
     }
 
-    public AttendanceModel(String status, LocalDate date, Long attendanceId, Long participantId) {
-        this.status = status;
-        this.date = date;
-        this.attendanceId = attendanceId;
+    public AttendanceModel(int daysWorked, Long participantId) {
+        this.daysWorked = daysWorked;
         this.participantId = participantId;
     }
 
-    public String getStatus() {
-        return status;
+    public int getDaysWorked() {
+        return daysWorked;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public Long getAttendanceId() {
-        return attendanceId;
-    }
-
-    public void setAttendanceId(Long attendanceId) {
-        this.attendanceId = attendanceId;
+    public void setDaysWorked(int daysWorked) {
+        this.daysWorked = daysWorked;
     }
 
     public Long getParticipantId() {
@@ -54,9 +33,7 @@ public class AttendanceModel {
     @Override
     public String toString() {
         return "AttendanceModel{" +
-                "status='" + status + '\'' +
-                ", date=" + date +
-                ", attendanceId=" + attendanceId +
+                "daysWorked=" + daysWorked +
                 ", participantId=" + participantId +
                 '}';
     }

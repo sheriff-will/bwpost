@@ -139,11 +139,12 @@ public class AgentsRepository {
     }
 
     @Modifying
-    public void addNewAgent(AgentsModel agentsModel) {
+    public void addNewAgent(AgentsModel agentsModel, List<String> contractDates) {
         try {
 
             // TODO Replace hardcoded parameterId
 
+            // Insert to participants
             String insertAgentSQL = "INSERT INTO participants (firstname, lastname, identity_number, " +
                     "date_of_birth, gender, marital_status, mobile_number, alternate_mobile_number," +
                     "postal_address, residential_address, education, placement_officer, placement_place, " +
@@ -163,6 +164,25 @@ public class AgentsRepository {
 
             Query insertAgentQuery = entityManager.createNativeQuery(insertAgentSQL);
             insertAgentQuery.executeUpdate();
+
+            // Select participantId
+            String sql = "SELECT participants.participant_id " +
+                    "FROM participants " +
+                    "WHERE participants.identity_number = '"+agentsModel.getIdentityNumber()+"'";
+
+            Query query = entityManager.createNativeQuery(sql);
+
+            // Insert to attendance_history
+            for (int i = 0; i < contractDates.size(); i++) {
+                String date = contractDates.get(i);
+                String insertAttendanceSQL = "INSERT INTO attendance_history " +
+                        "(date, days_worked, participant_id) VALUES(" +
+                        "'" + date + "','20', '" + query.getResultList().get(0)+"')";
+
+                Query insertAttendanceQuery = entityManager.createNativeQuery(insertAttendanceSQL);
+                insertAttendanceQuery.executeUpdate();
+
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -213,6 +233,22 @@ public class AgentsRepository {
         try {
             Query query = entityManager.createNativeQuery(sql);
             return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<String> retrieveDuration(String district) {
+
+        // TODO Remove hardcoded district 'Kgatleng'
+        String sql = "SELECT contract_duration.duration " +
+                "FROM contract_duration " +
+                "WHERE contract_duration.district = '"+district+"'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<String>) query.getResultList();
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -381,12 +417,24 @@ public class AgentsRepository {
 
     }
 
+
     // Attendance
-    public List<Object[]> retrieveAllAttendance(Long statusValue) {
-        String sql = "SELECT attendance_history.attendance_history_id, attendance_history.date, " +
-                "attendance_history.status, attendance_history.participant_id FROM attendance_history," +
-                " participants WHERE attendance_history.participant_id = participants.participant_id " +
-                "AND participants.is_terminated = '"+statusValue+"'";
+    public List<Object[]> retrieveAttendance(String date) {
+        String sql = "SELECT participants.participant_id, participants.firstname, " +
+                "participants.lastname, participants.identity_number, participants.date_of_birth, " +
+                "participants.gender, participants.marital_status, participants.mobile_number," +
+                " participants.alternate_mobile_number, participants.postal_address, " +
+                "participants.residential_address, participants.education, participants.placement_officer," +
+                " participants.placement_place, participants.placement_date, participants.completion_date, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, participants.timestamp, participants.is_terminated, " +
+                "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
+                "parameters.village, parameters.service, attendance_history.days_worked " +
+                "FROM participants, parameters, attendance_history" +
+                " WHERE participants.parameter_id = parameters.parameter_id " +
+                "AND participants.is_terminated = '0'" +
+                "AND participants.participant_id = attendance_history.participant_id " +
+                "AND attendance_history.date = '"+date+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -397,17 +445,29 @@ public class AgentsRepository {
         }
     }
 
-    // Contract Duration
-    public List<String> retrieveDuration(String district) {
-
-        // TODO Remove hardcoded district 'Kgatleng'
-        String sql = "SELECT contract_duration.duration " +
-                "FROM contract_duration " +
-                "WHERE contract_duration.district = '"+district+"'";
+    public List<Object[]> searchAttendance(String date, String agentNames, Long statusValue) {
+        String sql = "SELECT participants.participant_id, participants.firstname, " +
+                "participants.lastname, participants.identity_number, participants.date_of_birth, " +
+                "participants.gender, participants.marital_status, participants.mobile_number," +
+                " participants.alternate_mobile_number, participants.postal_address, " +
+                "participants.residential_address, participants.education, participants.placement_officer," +
+                " participants.placement_place, participants.placement_date, participants.completion_date, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, participants.timestamp, participants.is_terminated, " +
+                "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
+                "parameters.village, parameters.service, attendance_history.days_worked " +
+                "FROM participants, parameters, attendance_history" +
+                " WHERE participants.parameter_id = parameters.parameter_id " +
+                "AND participants.is_terminated = '0'" +
+                "AND participants.participant_id = attendance_history.participant_id " +
+                "AND attendance_history.date = '"+date+"' " +
+                "AND (participants.firstname LIKE '%"+agentNames+"%'" +
+                " OR participants.lastname LIKE '%"+agentNames+"%') " +
+                "AND participants.is_terminated = '"+statusValue+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
-            return (List<String>) query.getResultList();
+            return (List<Object[]>) query.getResultList();
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

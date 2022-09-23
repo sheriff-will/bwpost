@@ -5,7 +5,6 @@ import com.application.iserv.backend.services.AgentsServices;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.agents.forms.AgentForm;
 import com.application.iserv.ui.agents.models.AgentsModel;
-import com.application.iserv.ui.agents.models.AttendanceModel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -25,6 +24,7 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,8 +182,23 @@ public class AgentsView extends VerticalLayout {
                 if (status.getValue().equalsIgnoreCase(ACTIVE)) {
                     statusValue = 0L;
                     agentsModelList = new ArrayList<>();
-                    agentsModelList = agentsServices.searchAgents(searchAgent.getValue(), statusValue);
+
+                    if (isAttendanceOpen && datePicker.getValue() != null) {
+                        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+                        agentsModelList = agentsServices.searchAttendance(
+                                datePicker.getValue().format(dateTimeFormatter),
+                                searchAgent.getValue(),
+                                statusValue
+                        );
+
+                    }
+                    else {
+                        agentsModelList = agentsServices.searchAgents(searchAgent.getValue(), statusValue);
+                    }
+
                     agentsGrid.setItems(agentsModelList);
+
                 }
                 else if (status.getValue().equalsIgnoreCase(TERMINATED)) {
                     statusValue = 1L;
@@ -316,17 +331,16 @@ public class AgentsView extends VerticalLayout {
     }
 
     private void addAttendanceToAgents() {
-        List<AttendanceModel> attendanceModelList = agentsServices.getAttendance(statusValue);
 
-        for (int i = 0; i < attendanceModelList.size(); i++) {
-            String attendance = attendanceModelList.get(i).getStatus();
-            Long participantId = attendanceModelList.get(i).getParticipantId();
+        if (datePicker.getValue() != null) {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
 
-            for (int j = 0; j < agentsModelList.size(); j++) {
-                if (participantId == agentsModelList.get(j).getParticipantId()) {
-                    agentsModelList.get(j).setAttendance(attendance);
-                }
-            }
+            agentsGrid.setItems(
+                    agentsServices.getAttendance(
+                            datePicker.getValue().format(dateTimeFormatter)
+                    ));
+
+            agentsGrid.asSingleSelect().clear();
 
         }
 
@@ -353,6 +367,10 @@ public class AgentsView extends VerticalLayout {
 
         agentsGrid.asSingleSelect().clear();
 
+        agentForm.resetTabs();
+
+        updateAgents();
+
     }
 
     private void configureAgentsGrid(String columns) {
@@ -363,7 +381,7 @@ public class AgentsView extends VerticalLayout {
             agentsGrid.setColumns(AGENT, POSITION);
         }
         else if (columns.equalsIgnoreCase(AGENT_ATTENDANCE)) {
-            agentsGrid.setColumns(AGENT, ATTENDANCE_LOWER_CASE);
+            agentsGrid.setColumns(AGENT, DAYS_WORKED_CAMEL_CASE);
         }
 
         agentsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
