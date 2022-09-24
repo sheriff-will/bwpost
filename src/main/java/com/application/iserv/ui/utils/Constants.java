@@ -29,6 +29,7 @@ public class Constants {
     public static final String SAVE = "Save";
     public static final String BACK = "Back";
     public static final String UPDATE = "Update";
+    public static final String UPDATED = "Updated";
     public static final String ADD = "Add";
     public static final String REMOVE = "Remove";
 

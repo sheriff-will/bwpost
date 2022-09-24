@@ -366,11 +366,16 @@ public class AgentForm extends VerticalLayout {
             if (daysWorked.getValue() != null && !daysWorked.isEmpty()) {
                 int workingDaysValue = daysWorked.getValue();
 
+                // TODO Add regex as if statement
                 if (workingDaysValue > 20) {
+                    daysWorked.setInvalid(true);
                     daysWorked.setErrorMessage("There are only 20 working days a month");
                 }
-                else {
+                else if (workingDaysValue < 0) {
+                    daysWorked.setInvalid(true);
                     daysWorked.setErrorMessage("Enter valid working days");
+                } else {
+                    daysWorked.setInvalid(false);
                 }
             }
 
@@ -1307,6 +1312,17 @@ public class AgentForm extends VerticalLayout {
                 ButtonVariant.LUMO_PRIMARY
         );
 
+        updateButton.addClickListener(click -> {
+            if (daysWorked.getValue() != null && !daysWorked.isInvalid()) {
+                agentsServices.updateAttendance(
+                        daysWorked.getValue(), agentsModel.getParticipantId()
+                );
+
+                fireEvent(new AgentDaysWorkedUpdatedEvent(this));
+
+            }
+        });
+
         attendanceBackButton.addThemeVariants(
                 ButtonVariant.LUMO_CONTRAST
         );
@@ -1908,6 +1924,12 @@ public class AgentForm extends VerticalLayout {
 
     public static class AgentUpdatedEvent extends AddAgentFormEvent {
         AgentUpdatedEvent(AgentForm source) {
+            super(source, null);
+        }
+    }
+
+    public static class AgentDaysWorkedUpdatedEvent extends AddAgentFormEvent {
+        AgentDaysWorkedUpdatedEvent(AgentForm source) {
             super(source, null);
         }
     }

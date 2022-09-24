@@ -169,6 +169,17 @@ public class AgentsView extends VerticalLayout {
 
         });
 
+        agentForm.addListener(AgentForm.AgentDaysWorkedUpdatedEvent.class, e -> {
+            Notification notification = new Notification(UPDATED);
+            notification.setPosition(Notification.Position.BOTTOM_CENTER);
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            notification.setDuration(5000);
+            notification.open();
+
+            updateAttendance();
+
+        });
+
     }
 
     private Component getToolbar() {
@@ -177,7 +188,6 @@ public class AgentsView extends VerticalLayout {
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
         searchAgent.addClassName(SEARCH_AGENT);
         searchAgent.addValueChangeListener(searchAgentValueChanged -> {
-
             if (status.getValue() != null) {
                 if (status.getValue().equalsIgnoreCase(ACTIVE)) {
                     statusValue = 0L;
@@ -216,13 +226,15 @@ public class AgentsView extends VerticalLayout {
         status.addComponents(EXPIRED, new Hr());
 
         status.addValueChangeListener(statusValueChangeEvent -> {
-            if (statusValueChangeEvent.getValue().equalsIgnoreCase(ACTIVE)) {
-                agentsGrid.setItems(agentsServices.getAllAgents());
-                agentForm.disableButtons(true);
-            }
-            else if (statusValueChangeEvent.getValue().equalsIgnoreCase(TERMINATED)) {
-                agentsGrid.setItems(agentsServices.getAllTerminatedAgents());
-                agentForm.disableButtons(false);
+            if (!isAttendanceOpen) {
+                if (statusValueChangeEvent.getValue().equalsIgnoreCase(ACTIVE)) {
+                    agentsGrid.setItems(agentsServices.getAllAgents());
+                    agentForm.disableButtons(true);
+                }
+                else if (statusValueChangeEvent.getValue().equalsIgnoreCase(TERMINATED)) {
+                    agentsGrid.setItems(agentsServices.getAllTerminatedAgents());
+                    agentForm.disableButtons(false);
+                }
             }
         });
 
@@ -282,6 +294,9 @@ public class AgentsView extends VerticalLayout {
             isAttendanceOpen = true;
 
             addAgentButton.setEnabled(false);
+
+            status.setValue(ACTIVE);
+            status.setReadOnly(true);
 
             if (agentForm.isVisible()) {
                 agentForm.setVisible(false);
@@ -355,6 +370,9 @@ public class AgentsView extends VerticalLayout {
         addAgentButton.setEnabled(true);
         attendanceButton.setEnabled(true);
 
+        status.setValue(ACTIVE);
+        status.setReadOnly(false);
+
         dateBackHorizontalLayout.setVisible(false);
 
         isAttendanceOpen = false;
@@ -391,6 +409,15 @@ public class AgentsView extends VerticalLayout {
     private void updateAgents() {
         agentsModelList = agentsServices.getAllAgents();
         agentsGrid.setItems(agentsModelList);
+    }
+
+    private void updateAttendance() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+        agentsGrid.setItems(agentsServices.getAttendance(
+                datePicker.getValue().format(dateTimeFormatter))
+        );
+
     }
 
     private void editAgent(AgentsModel agentsModel) {

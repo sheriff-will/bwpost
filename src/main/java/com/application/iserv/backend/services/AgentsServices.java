@@ -590,4 +590,8 @@ public class AgentsServices {
         return agents;
     }
 
+    public void updateAttendance(Integer daysWorked, Long participantId) {
+        agentsRepository.updateAttendance(daysWorked, participantId);
+    }
+
 }

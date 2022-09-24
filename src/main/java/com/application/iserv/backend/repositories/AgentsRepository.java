@@ -474,4 +474,21 @@ public class AgentsRepository {
         }
     }
 
+    @Modifying
+    public void updateAttendance(Integer daysWorked, Long participantId) {
+        try {
+
+            String updateParticipantSQL = "UPDATE attendance_history SET " +
+                    "attendance_history.days_worked = '" + daysWorked + "'" +
+                    " WHERE attendance_history.participant_id = '" + participantId + "'";
+
+            Query updateParticipantQuery = entityManager.createNativeQuery(updateParticipantSQL);
+            updateParticipantQuery.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
+
 }
