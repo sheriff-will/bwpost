@@ -41,6 +41,8 @@ import static com.application.iserv.ui.utils.Constants.*;
 
 public class AgentForm extends VerticalLayout {
 
+    // TODO Make duration always positive for expired agents
+
     // Grids
     Grid<NomineesModel> nomineesGrid = new Grid<>(NomineesModel.class);
     Grid<ReferenceModel> referenceGrid = new Grid<>(ReferenceModel.class);
@@ -1629,6 +1631,7 @@ public class AgentForm extends VerticalLayout {
 
     private void addAgent() {
 
+        paymentMethod.setInvalid(false);
         updateAddAgent.setDisableOnClick(true);
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);

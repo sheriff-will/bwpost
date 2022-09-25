@@ -27,6 +27,34 @@ public class TestSomeStuff {
         // Get dates difference durations in months
         System.err.println(ChronoUnit.MONTHS.between(LocalDate.now(), localDate.plusMonths(a)));
 
+        LocalDate completionLocalDate2 = LocalDate.of(2022, 10, 26);
+
+        String[] completionLocalDate2_str = completionLocalDate2.toString().split("-");
+        String year = completionLocalDate2_str[0];
+        String month = completionLocalDate2_str[1];
+
+        String completionDate_str = year+month;
+
+        System.err.println("date: "+completionDate_str);
+
+        LocalDate todayLocalDate = LocalDate.now();
+        String[] todayLocalDate2_str = todayLocalDate.toString().split("-");
+        String year1 = todayLocalDate2_str[0];
+        String month1 = todayLocalDate2_str[1];
+
+        String todayDate2_str = year1+month1;
+        System.err.println("today date: "+todayDate2_str);
+
+        int diff = Integer.parseInt(todayDate2_str) - Integer.parseInt(completionDate_str);
+
+        if (diff < 0) {
+            System.err.println("Date valid");
+        }
+        else {
+            System.err.println("Date invalid");
+        }
+
+
     }
 
 }

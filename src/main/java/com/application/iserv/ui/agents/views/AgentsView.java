@@ -235,6 +235,10 @@ public class AgentsView extends VerticalLayout {
                     agentsGrid.setItems(agentsServices.getAllTerminatedAgents());
                     agentForm.disableButtons(false);
                 }
+                else if (statusValueChangeEvent.getValue().equalsIgnoreCase(EXPIRED)) {
+                    agentsGrid.setItems(agentsServices.getAllExpiredAgents());
+                    agentForm.disableButtons(false);
+                }
             }
         });
 
