@@ -1,6 +1,7 @@
 package com.application.iserv.ui.utils;
 
 import com.application.iserv.ui.agents.models.TestAgentsModel;
+import com.application.iserv.ui.parameters.models.ParametersModel;
 import com.application.iserv.ui.payments.models.AgentPaymentsModel;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class Constants {
     public static final String UPDATE = "Update";
     public static final String UPDATED = "Updated";
     public static final String ADD = "Add";
+    public static final String ADD_PARAMETER = "Add Parameter";
     public static final String REMOVE = "Remove";
 
     public static final String TERMINATE = "Terminate";
@@ -66,6 +68,7 @@ public class Constants {
     public static final String CONTRACT_DURATION = "Contract Duration";
     public static final String PAYMENT_METHOD = "Payment Method";
     public static final String POSITION_UPPER_CASE = "Position";
+    public static final String RATE_PER_DAY_CAMEL_CASE = "ratePerDay";
     public static final String ATTENDANCE_LOWER_CASE = "attendance";
     public static final String ATTENDANCE = "Attendance";
     public static final String START_TIME = "Start Time";
@@ -75,6 +78,7 @@ public class Constants {
     public static final String ABSENT = "Absent";
     public static final String EXPORT_STATEMENTS = "Export Statements";
     public static final String RATE = "Rate/day";
+    public static final String RATE_PER_DAY = "Rate Per Day";
     public static final String DAYS_WORKED_CAMEL_CASE= "daysWorked";
     public static final String DAYS_WORKED = "Days Worked";
     public static final String BASE_SALARY = "Base Salary";
@@ -133,6 +137,9 @@ public class Constants {
     public static final String BANK_EFT = "Bank / EFT";
     public static final String SUCCESSFUL = "Successful";
     public static final String NOMINEE_ALREADY_EXIST = "Nominee already exist";
+    public static final String PARAMETER_ALREADY_EXIST = "Parameter already exist";
+    public static final String PARAMETER_SUCCESSFULLY_ADDED = "Parameter successfully added";
+    public static final String PARAMETER_SUCCESSFULLY_UPDATED = "Parameter successfully updated";
     public static final String AGENT_ALREADY_EXIST = "Agent already exist";
     public static final String AGENT_SUCCESSFULLY_UPDATED = "Agent successfully updated";
     public static final String AGENT_SUCCESSFULLY_TERMINATED = "Agent successfully terminated";
@@ -143,6 +150,7 @@ public class Constants {
     public static final String NOMINEE_SUCCESSFULLY_ADDED = "Nominee Successfully Added";
     public static final String REFERENCE_SUCCESSFULLY_ADDED = "Reference Successfully Added";
     public static final String NOMINEE_SUCCESSFULLY_REMOVED = "Nominee Successfully Removed";
+    public static final String PARAMETER_SUCCESSFULLY_REMOVED = "Parameter Successfully Removed";
     public static final String REFERENCE_SUCCESSFULLY_REMOVED = "Reference Successfully Removed";
 
 
@@ -551,6 +559,25 @@ public class Constants {
                 user2,
                 user3,
                 user4
+        );
+
+    }
+
+    public static List<ParametersModel> getTestParameters() {
+
+        ParametersModel parameters1 = new ParametersModel(
+                "Supervisor",
+                39.98
+        );
+
+        ParametersModel parameters2 = new ParametersModel(
+                "Field Agent",
+                28.00
+        );
+
+        return List.of(
+                parameters1,
+                parameters2
         );
 
     }
