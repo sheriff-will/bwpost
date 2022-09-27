@@ -18,10 +18,27 @@ public class ParametersRepository {
     EntityManager entityManager;
 
     public List<Object[]> checkForParameter(ParametersModel parametersModel) {
-        String sql = "SELECT parameters.position, parameters.rate_per_day " +
+        String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
                 "FROM parameters" +
                 " WHERE parameters.position = '"+parametersModel.getPosition()+"' " +
                 "AND parameters.village = 'Oodi' AND parameters.service = 'Ipelegeng'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<Object[]> checkUpdateParameter(ParametersModel parametersModel) {
+
+        // TODO Remove hardcoded village and service
+        String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
+                "FROM parameters" +
+                " WHERE parameters.village = 'Oodi'" +
+                " AND parameters.service = 'Ipelegeng'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -55,7 +72,7 @@ public class ParametersRepository {
     public List<Object[]> getParameters() {
 
         // TODO Remove hardcoded village, service
-        String sql = "SELECT parameters.position, parameters.rate_per_day " +
+        String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
                 "FROM parameters " +
                 "WHERE parameters.village = 'Oodi' AND parameters.service = 'Ipelegeng'";
 
@@ -72,18 +89,33 @@ public class ParametersRepository {
     public void updateParameter(ParametersModel parametersModel) {
         try {
 
-            String updateAgentSQL = "UPDATE parameters SET " +
+            String updateParameterSQL = "UPDATE parameters SET " +
                     "rate_per_day = '" + parametersModel.getRatePerDay() + "'," +
                     " position = '" + parametersModel.getPosition() + "'" +
-                    " WHERE village = 'Oodi' AND service = 'Ipelegeng'";
+                    " WHERE parameter_id = '"+parametersModel.getParameterId()+"' " +
+                    "AND village = 'Oodi' AND service = 'Ipelegeng'";
 
-            Query updateAgentQuery = entityManager.createNativeQuery(updateAgentSQL);
-            updateAgentQuery.executeUpdate();
+            Query updateParameterQuery = entityManager.createNativeQuery(updateParameterSQL);
+            updateParameterQuery.executeUpdate();
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
 
+    }
+
+    @Modifying
+    public void deleteParameter(Long parameterId) {
+        try {
+
+            String deleteParameterSQL = "DELETE FROM parameters WHERE parameters.parameter_id = '"+parameterId+"'";
+
+            Query deleteParameterQuery = entityManager.createNativeQuery(deleteParameterSQL);
+            deleteParameterQuery.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 }

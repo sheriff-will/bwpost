@@ -48,6 +48,9 @@ public class ParametersView extends VerticalLayout {
     // Service
     private final ParametersService parametersService;
 
+    // Longs
+    Long parameterId;
+
     @Autowired
     public ParametersView(ParametersService parametersService) {
         this.parametersService = parametersService;
@@ -75,6 +78,8 @@ public class ParametersView extends VerticalLayout {
         if (parametersModel != null) {
             position.setValue(parametersModel.getPosition());
             ratePerDay.setValue(parametersModel.getRatePerDay());
+
+            parameterId = parametersModel.getParameterId();
 
             saveParameter.setText(UPDATE);
             removeParameter.setVisible(true);
@@ -127,7 +132,7 @@ public class ParametersView extends VerticalLayout {
 
         removeParameter.addClickListener(click -> {
             removeParameter.setDisableOnClick(true);
-            // agentsServices.removeParameter(nomineeId);
+            parametersService.deleteParameter(parameterId);
 
             updateParameters();
 
@@ -196,10 +201,24 @@ public class ParametersView extends VerticalLayout {
 
         }
         else {
-            String response = parametersService.addParameter(new ParametersModel(
-                    position.getValue(),
-                    ratePerDay.getValue()
-            ));
+
+            String response;
+
+            if (saveParameter.getText().equalsIgnoreCase(UPDATE)) {
+                response = parametersService.updateParameter(new ParametersModel(
+                        position.getValue(),
+                        parameterId,
+                        ratePerDay.getValue()
+                ));
+
+            }
+            else {
+                response = parametersService.addParameter(new ParametersModel(
+                        position.getValue(),
+                        ratePerDay.getValue()
+                ));
+
+            }
 
             if (response.equalsIgnoreCase(PARAMETER_ALREADY_EXIST)) {
                 Notification notification = new Notification(PARAMETER_ALREADY_EXIST);

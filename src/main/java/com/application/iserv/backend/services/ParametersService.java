@@ -44,8 +44,9 @@ public class ParametersService {
         for(Object[] row : allParameters) {
 
             ParametersModel parametersModel = new ParametersModel(
-                    row[0].toString(),
-                    Double.parseDouble(row[1].toString())
+                    row[1].toString(),
+                    Long.parseLong(row[0].toString()),
+                    Double.parseDouble(row[2].toString())
             );
 
             parameters.add(parametersModel);
@@ -57,27 +58,48 @@ public class ParametersService {
     }
 
     public String updateParameter(ParametersModel parametersModel) {
-        String response = SUCCESSFUL;
-        List<Object[]> checkParameter = parametersRepository.checkForParameter(parametersModel);
+        String response = "";
+        List<Object[]> checkParameter = parametersRepository.checkUpdateParameter(parametersModel);
 
-        if (checkParameter.isEmpty()) {
-            parametersRepository.updateParameter(parametersModel);
-            response = SUCCESSFUL;
-        } else {
+        if (!checkParameter.isEmpty()) {
 
-            List<String> parameters = new ArrayList<>();
+            List<String> positions = new ArrayList<>();
+            List<Long> parameterIds = new ArrayList<>();
 
             for (Object[] row : checkParameter) {
-
-                parameters.add(row[0].toString());
-                
+                positions.add(row[1].toString());
+                parameterIds.add(Long.parseLong(row[0].toString()));
             }
 
-            if (!parameters.contains(parametersModel.getPosition())) {
-                response = PARAMETER_ALREADY_EXIST;
+            int positionIdIndex = -1;
+            int parameterIdIndex = -1;
+
+            for (int i = 0; i < parameterIds.size(); i++) {
+                if (parameterIds.get(i).equals(parametersModel.getParameterId())) {
+                    parameterIdIndex = i;
+                }
+            }
+
+            for (int i = 0; i < positions.size(); i++) {
+                if (positions.get(i).equalsIgnoreCase(parametersModel.getPosition())) {
+                    positionIdIndex = i;
+                }
+            }
+
+            boolean isSuccessful = false;
+            if (positionIdIndex == parameterIdIndex) {
+                isSuccessful = true;
+            }
+            else if (positionIdIndex == -1) {
+                isSuccessful = true;
+            }
+
+            if (isSuccessful) {
+                response = SUCCESSFUL;
+                parametersRepository.updateParameter(parametersModel);
             }
             else {
-                response = SUCCESSFUL;
+                response = PARAMETER_ALREADY_EXIST;
             }
 
         }
@@ -86,5 +108,8 @@ public class ParametersService {
 
     }
 
+    public void deleteParameter(Long parameterId) {
+        parametersRepository.deleteParameter(parameterId);
+    }
 }
 
