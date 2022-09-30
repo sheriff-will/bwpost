@@ -1,8 +1,6 @@
 package com.application.iserv.ui.payments.views;
 
-
 import com.application.iserv.backend.services.AuthorizeService;
-import com.application.iserv.security.services.SecurityService;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.payments.forms.AuthorizeForm;
 import com.application.iserv.ui.payments.models.AuthorizeModel;
@@ -29,6 +27,8 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,12 +64,13 @@ public class AuthorizeView extends VerticalLayout {
     // Arrays
     List<AuthorizeModel> authorizeModelList = new ArrayList<>();
 
-    private final SecurityService securityService;
     private final AuthorizeService authorizeService;
 
+    // Strings
+    String date;
+
     @Autowired
-    public AuthorizeView(SecurityService securityService, AuthorizeService authorizeService) {
-        this.securityService = securityService;
+    public AuthorizeView(AuthorizeService authorizeService) {
         this.authorizeService = authorizeService;
 
         addClassName(AUTHORIZE_PAYMENTS_VIEW);
@@ -84,6 +85,10 @@ public class AuthorizeView extends VerticalLayout {
                 getToolbar(),
                 getContent()
         );
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+        date = LocalDate.now().format(dateFormatter);
 
         updateAgentsPaymentsList();
         closeComponents();
@@ -105,7 +110,21 @@ public class AuthorizeView extends VerticalLayout {
         SubMenu subMenu = options.getSubMenu();
         subMenu.addItem("Download");
         subMenu.add(new Hr());
-        subMenu.addItem("Approve All");
+        subMenu.addItem("Approve All").addClickListener(click -> {
+            if (!authorizeModelList.isEmpty()) {
+                authorizeService.approveAllRemuneration(authorizeModelList);
+
+                updateAgentsPaymentsList();
+
+                Notification notification = new Notification(SUCCESSFULLY_APPROVED_ALL);
+                notification.setPosition(Notification.Position.BOTTOM_CENTER);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                notification.setDuration(5000);
+                notification.open();
+
+            }
+        });
+
         menuBar.setEnabled(false);
 
         searchAgent.setPlaceholder(SEARCH_AGENT_HINT);
@@ -113,7 +132,7 @@ public class AuthorizeView extends VerticalLayout {
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
         searchAgent.addClassName(SEARCH_AGENT);
         searchAgent.addValueChangeListener(searchAgentValueChanged -> authorizeGrid.setItems(
-                authorizeService.searchRemunerationAgents(searchAgent.getValue(), 0L)
+                authorizeService.searchRemunerationAgents(searchAgent.getValue(), date)
         ));
 
 
@@ -127,7 +146,23 @@ public class AuthorizeView extends VerticalLayout {
 
             menuBar.setEnabled(true);
             configureAuthorizeGrid();
+
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+            String placementDate_str = datePicker.getValue().format(dateTimeFormatter);
+            String[] getDatePickerDate = placementDate_str.split("-");
+
+            LocalDate datePickerLocalDate = LocalDate.of(
+                    Integer.parseInt(getDatePickerDate[2]),
+                    Integer.parseInt(getDatePickerDate[1]),
+                    Integer.parseInt(getDatePickerDate[0])
+            );
+
+            date = datePickerLocalDate.format(dateFormatter);
+
             updateAgentsPaymentsList();
+
         });
 
         datePicker1.setI18n(dateFormat);
@@ -137,7 +172,23 @@ public class AuthorizeView extends VerticalLayout {
 
             menuBar.setEnabled(true);
             configureAuthorizeGrid();
+
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+            String placementDate_str = datePicker1.getValue().format(dateTimeFormatter);
+            String[] getDatePickerDate = placementDate_str.split("-");
+
+            LocalDate datePickerLocalDate = LocalDate.of(
+                    Integer.parseInt(getDatePickerDate[2]),
+                    Integer.parseInt(getDatePickerDate[1]),
+                    Integer.parseInt(getDatePickerDate[0])
+            );
+
+            date = datePickerLocalDate.format(dateFormatter);
+
             updateAgentsPaymentsList();
+
         });
 
         datePicker1.setVisible(false);
@@ -207,7 +258,7 @@ public class AuthorizeView extends VerticalLayout {
             authorizeGrid.setColumns(AGENT);
 
             authorizeGrid.addComponentColumn(
-                    status -> createBadge("-")).setHeader(AMOUNT);
+                    status -> createBadge("-")).setHeader(CAPS_AMOUNT);
 
             authorizeGrid.addComponentColumn(
                     status -> createBadge("-")).setHeader(STATUS);
@@ -229,17 +280,23 @@ public class AuthorizeView extends VerticalLayout {
 
         Span label;
 
-        if (approval.equalsIgnoreCase(APPROVED)) {
-            label = new Span(APPROVED);
-            label.getElement().getThemeList().add(BADGE_SUCCESSFUL);
-        }
-        else if (approval.equalsIgnoreCase(DECLINED)) {
-            label = new Span(DECLINED);
-            label.getElement().getThemeList().add(BADGE_ERROR);
-        }
-        else if (approval.equalsIgnoreCase(PENDING)) {
-            label = new Span(PENDING);
-            label.getElement().getThemeList().add(BADGE);
+        if (approval != null) {
+            if (approval.equalsIgnoreCase(APPROVED)) {
+                label = new Span(APPROVED);
+                label.getElement().getThemeList().add(BADGE_SUCCESSFUL);
+            }
+            else if (approval.equalsIgnoreCase(DECLINED)) {
+                label = new Span(DECLINED);
+                label.getElement().getThemeList().add(BADGE_ERROR);
+            }
+            else if (approval.equalsIgnoreCase(PENDING)) {
+                label = new Span(PENDING);
+                label.getElement().getThemeList().add(BADGE);
+            }
+            else {
+                label = new Span("-");
+                label.getElement().getThemeList().add(BADGE_CONTRAST);
+            }
         }
         else {
             label = new Span("-");
@@ -253,7 +310,7 @@ public class AuthorizeView extends VerticalLayout {
 
         authorizeGrid.asSingleSelect().clear();
 
-        authorizeModelList = authorizeService.getAllRemunerationHistory();
+        authorizeModelList = authorizeService.getAllRemunerationHistory(date);
 
         if (isDateSelected) {
             authorizeGrid.setItems(authorizeModelList);
@@ -280,7 +337,7 @@ public class AuthorizeView extends VerticalLayout {
             notification.setDuration(5000);
             notification.open();
 
-            authorizeGrid.setItems(authorizeService.getAllRemunerationHistory());
+            updateAgentsPaymentsList();
 
         });
 
@@ -302,17 +359,25 @@ public class AuthorizeView extends VerticalLayout {
             closeComponents();
         }
         else {
-            addClassName(VIEWING_AUTHORIZE);
 
-            if (authorizeModel.getStatus().equalsIgnoreCase(DECLINED)) {
-                authorizeForm.hideStatusReason(true);
+            if (authorizeModel.getStatus() != null) {
+
+                addClassName(VIEWING_AUTHORIZE);
+
+                if (authorizeModel.getStatus().equalsIgnoreCase(DECLINED)) {
+                    authorizeForm.hideStatusReason(true);
+                }
+                else {
+                    authorizeForm.hideStatusReason(false);
+                }
+
+                authorizeForm.setAuthorize(authorizeModel);
+                authorizeForm.setVisible(true);
             }
             else {
-                authorizeForm.hideStatusReason(false);
+                authorizeForm.setVisible(false);
             }
 
-            authorizeForm.setAuthorize(authorizeModel);
-            authorizeForm.setVisible(true);
         }
 
     }

@@ -184,6 +184,20 @@ public class AgentsRepository {
 
             }
 
+            // Insert to remuneration_history
+            for (int i = 0; i < contractDates.size(); i++) {
+                String month = contractDates.get(i);
+
+                String insertRemunerationSQL = "INSERT INTO remuneration_history (month, status, status_reason, " +
+                        "claimed, bonus_amount, bonus_reason, deduction_amount, deduction_reason, participant_id) " +
+                        "VALUES('"+month+"', 'Hold', 'null', 'null', '0', 'null', '0', 'null', " +
+                        "'"+query.getResultList().get(0)+"')";
+
+                Query insertRemunerationQuery = entityManager.createNativeQuery(insertRemunerationSQL);
+                insertRemunerationQuery.executeUpdate();
+
+            }
+
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -228,7 +242,8 @@ public class AgentsRepository {
                 "parameters.village, parameters.service " +
                 "FROM participants, parameters" +
                 " WHERE participants.parameter_id = parameters.parameter_id " +
-                "AND (participants.firstname LIKE '%"+agentNames+"%' OR participants.lastname LIKE '%"+agentNames+"%') AND participants.is_terminated = '"+statusValue+"'";
+                "AND (participants.firstname LIKE '%"+agentNames+"%' OR participants.lastname LIKE '%"+agentNames+"%')" +
+                " AND participants.is_terminated = '"+statusValue+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);

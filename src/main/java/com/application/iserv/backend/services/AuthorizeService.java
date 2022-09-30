@@ -5,7 +5,6 @@ import com.application.iserv.ui.payments.models.AuthorizeModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,38 +18,43 @@ public class AuthorizeService {
         this.authorizeRepository = authorizeRepository;
     }
 
-    public List<AuthorizeModel> getAllRemunerationHistory() {
-        List<Object[]> allRemunerationHistory = authorizeRepository.retrieveAllRemunerationHistory();
+    public List<AuthorizeModel> getAllRemunerationHistory(String date) {
+        List<Object[]> allRemunerationHistory = authorizeRepository.retrieveAllRemunerationHistory(date);
 
         List<AuthorizeModel> remunerationHistory = new ArrayList<>();
 
         for(Object[] row : allRemunerationHistory) {
 
-            String month_str = row[1].toString();
-            String[] getMonth = month_str.split("-");
+            if (!row[1].toString().equalsIgnoreCase("null")) {
 
-            LocalDate month = LocalDate.of(
-                    Integer.parseInt(getMonth[0]),
-                    Integer.parseInt(getMonth[1]),
-                    Integer.parseInt(getMonth[2])
-            );
+                double amount = Double.parseDouble(
+                        row[11].toString()) * Double.parseDouble(row[12].toString());
 
-            AuthorizeModel authorizeModel = new AuthorizeModel(
-                    month,
-                    Long.parseLong(row[0].toString()),
-                    Long.parseLong(row[9].toString()),
-                    row[2].toString(),
-                    row[3].toString(),
-                    row[4].toString(),
-                    row[5].toString(),
-                    row[6].toString(),
-                    row[7].toString(),
-                    row[8].toString(),
-                    row[10].toString()+" "+row[11].toString(),
-                    "auto - generated"
-            );
+                AuthorizeModel authorizeModel = new AuthorizeModel(
+                        amount,
+                        Integer.parseInt(row[4].toString()),
+                        Integer.parseInt(row[6].toString()),
+                        Long.parseLong(row[0].toString()),
+                        Long.parseLong(row[8].toString()),
+                        row[1].toString(),
+                        row[2].toString(),
+                        row[3].toString(),
+                        row[5].toString(),
+                        row[7].toString(),
+                        row[9].toString()+" "+row[10].toString()
+                );
 
-            remunerationHistory.add(authorizeModel);
+                remunerationHistory.add(authorizeModel);
+
+            }
+            else {
+                AuthorizeModel authorizeModel = new AuthorizeModel(
+                        row[9].toString()+" "+row[10].toString()
+                );
+
+                remunerationHistory.add(authorizeModel);
+
+            }
 
         }
 
@@ -61,36 +65,29 @@ public class AuthorizeService {
         authorizeRepository.updateRemunerationDetails(authorizeModel);
     }
 
-    public List<AuthorizeModel> searchRemunerationAgents(String agentNames, Long statusValue) {
+    public List<AuthorizeModel> searchRemunerationAgents(String agentNames, String date) {
         List<Object[]> allRemunerationHistory = authorizeRepository
-                .searchForRemunerationAgents(agentNames, statusValue);
+                .searchForRemunerationAgents(agentNames, date);
 
         List<AuthorizeModel> remunerationHistory = new ArrayList<>();
 
         for(Object[] row : allRemunerationHistory) {
 
-            String month_str = row[1].toString();
-            String[] getMonth = month_str.split("-");
-
-            LocalDate month = LocalDate.of(
-                    Integer.parseInt(getMonth[0]),
-                    Integer.parseInt(getMonth[1]),
-                    Integer.parseInt(getMonth[2])
-            );
+            double amount = Double.parseDouble(
+                    row[11].toString()) * Double.parseDouble(row[12].toString());
 
             AuthorizeModel authorizeModel = new AuthorizeModel(
-                    month,
+                    amount,
+                    Integer.parseInt(row[4].toString()),
+                    Integer.parseInt(row[6].toString()),
                     Long.parseLong(row[0].toString()),
-                    Long.parseLong(row[9].toString()),
+                    Long.parseLong(row[8].toString()),
+                    row[1].toString(),
                     row[2].toString(),
                     row[3].toString(),
-                    row[4].toString(),
                     row[5].toString(),
-                    row[6].toString(),
                     row[7].toString(),
-                    row[8].toString(),
-                    row[10].toString()+" "+row[11].toString(),
-                    "auto - generated"
+                    row[9].toString()+" "+row[10].toString()
             );
 
             remunerationHistory.add(authorizeModel);
@@ -98,6 +95,10 @@ public class AuthorizeService {
         }
 
         return remunerationHistory;
+    }
+
+    public void approveAllRemuneration(List<AuthorizeModel> authorizeModelList) {
+        authorizeRepository.approveAllRemunerationDetails(authorizeModelList);
     }
 
 }

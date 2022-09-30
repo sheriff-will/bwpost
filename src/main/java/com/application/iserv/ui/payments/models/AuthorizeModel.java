@@ -1,57 +1,72 @@
 package com.application.iserv.ui.payments.models;
 
-import java.time.LocalDate;
-
 public class AuthorizeModel {
 
-    LocalDate month;
+    double amount;
+    int bonusAmount, deductionAmount;
     Long remunerationHistoryId, participantId;
-    String status, statusReason, claimed, bonusAmount,
-            bonusReason, deductionAmount, deductionReason, agent, amount;
+    String status, statusReason, claimed, bonusReason, deductionReason, agent;
 
     public AuthorizeModel() {
 
     }
 
-    public AuthorizeModel(LocalDate month, Long remunerationHistoryId, Long participantId,
-                          String status, String statusReason, String claimed, String bonusAmount,
-                          String bonusReason, String deductionAmount, String deductionReason) {
-        this.month = month;
+    public AuthorizeModel(String agent) {
+        this.agent = agent;
+    }
+
+    public AuthorizeModel(int bonusAmount, int deductionAmount, Long remunerationHistoryId,
+                          Long participantId, String status, String statusReason, String claimed,
+                          String bonusReason, String deductionReason) {
+        this.bonusAmount = bonusAmount;
+        this.deductionAmount = deductionAmount;
         this.remunerationHistoryId = remunerationHistoryId;
         this.participantId = participantId;
         this.status = status;
         this.statusReason = statusReason;
         this.claimed = claimed;
-        this.bonusAmount = bonusAmount;
         this.bonusReason = bonusReason;
-        this.deductionAmount = deductionAmount;
         this.deductionReason = deductionReason;
     }
 
-    public AuthorizeModel(LocalDate month, Long remunerationHistoryId, Long participantId,
-                          String status, String statusReason, String claimed, String bonusAmount,
-                          String bonusReason, String deductionAmount, String deductionReason,
-                          String agent, String amount) {
-        this.month = month;
+    public AuthorizeModel(double amount, int bonusAmount, int deductionAmount, Long remunerationHistoryId,
+                          Long participantId, String status, String statusReason, String claimed,
+                          String bonusReason, String deductionReason, String agent) {
+        this.amount = amount;
+        this.bonusAmount = bonusAmount;
+        this.deductionAmount = deductionAmount;
         this.remunerationHistoryId = remunerationHistoryId;
         this.participantId = participantId;
         this.status = status;
         this.statusReason = statusReason;
         this.claimed = claimed;
-        this.bonusAmount = bonusAmount;
         this.bonusReason = bonusReason;
-        this.deductionAmount = deductionAmount;
         this.deductionReason = deductionReason;
         this.agent = agent;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 
-    public LocalDate getMonth() {
-        return month;
+    public int getBonusAmount() {
+        return bonusAmount;
     }
 
-    public void setMonth(LocalDate month) {
-        this.month = month;
+    public void setBonusAmount(int bonusAmount) {
+        this.bonusAmount = bonusAmount;
+    }
+
+    public int getDeductionAmount() {
+        return deductionAmount;
+    }
+
+    public void setDeductionAmount(int deductionAmount) {
+        this.deductionAmount = deductionAmount;
     }
 
     public Long getRemunerationHistoryId() {
@@ -94,28 +109,12 @@ public class AuthorizeModel {
         this.claimed = claimed;
     }
 
-    public String getBonusAmount() {
-        return bonusAmount;
-    }
-
-    public void setBonusAmount(String bonusAmount) {
-        this.bonusAmount = bonusAmount;
-    }
-
     public String getBonusReason() {
         return bonusReason;
     }
 
     public void setBonusReason(String bonusReason) {
         this.bonusReason = bonusReason;
-    }
-
-    public String getDeductionAmount() {
-        return deductionAmount;
-    }
-
-    public void setDeductionAmount(String deductionAmount) {
-        this.deductionAmount = deductionAmount;
     }
 
     public String getDeductionReason() {
@@ -134,29 +133,20 @@ public class AuthorizeModel {
         this.agent = agent;
     }
 
-    public String getAmount() {
-        return amount;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-
     @Override
     public String toString() {
-        return "RemunerationHistoryModel{" +
-                "month=" + month +
+        return "AuthorizeModel{" +
+                "amount=" + amount +
+                ", bonusAmount=" + bonusAmount +
+                ", deductionAmount=" + deductionAmount +
                 ", remunerationHistoryId=" + remunerationHistoryId +
                 ", participantId=" + participantId +
                 ", status='" + status + '\'' +
                 ", statusReason='" + statusReason + '\'' +
                 ", claimed='" + claimed + '\'' +
-                ", bonusAmount='" + bonusAmount + '\'' +
                 ", bonusReason='" + bonusReason + '\'' +
-                ", deductionAmount='" + deductionAmount + '\'' +
                 ", deductionReason='" + deductionReason + '\'' +
                 ", agent='" + agent + '\'' +
-                ", amount='" + amount + '\'' +
                 '}';
     }
 

@@ -12,6 +12,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
@@ -22,9 +23,9 @@ import static com.application.iserv.ui.utils.Constants.*;
 public class AuthorizeForm extends FormLayout {
 
     // TextFields
-    TextField bonusAmount = new TextField();
+    IntegerField bonusAmount = new IntegerField();
     TextField bonusReason = new TextField();
-    TextField deductionAmount = new TextField();
+    IntegerField deductionAmount = new IntegerField();
     TextField deductionReason = new TextField();
     TextField statusReason = new TextField(REASON);
 
@@ -93,12 +94,12 @@ public class AuthorizeForm extends FormLayout {
         this.authorizeModel = authorizeModel;
         binder.readBean(authorizeModel);
 
-        if (bonusAmount.getValue().equalsIgnoreCase("null")) {
+        if (bonusAmount.getValue().equals(0)) {
             bonusAmount.clear();
             bonusReason.clear();
         }
 
-        if (deductionAmount.getValue().equalsIgnoreCase("null")) {
+        if (deductionAmount.getValue().equals(0)) {
             deductionAmount.clear();
             deductionReason.clear();
         }
@@ -119,6 +120,15 @@ public class AuthorizeForm extends FormLayout {
             deductionAmount.setEnabled(true);
             deductionReason.setEnabled(true);
         }
+
+        if (bonusAmount.getValue() != null) {
+            deductionAmount.setEnabled(false);
+            deductionReason.setEnabled(false);
+        }
+        else if (deductionAmount.getValue() != null) {
+            bonusAmount.setEnabled(false);
+            bonusReason.setEnabled(false);
+        }
     }
 
     private void configureLayouts() {
@@ -133,7 +143,7 @@ public class AuthorizeForm extends FormLayout {
         bonusReason.setLabel(REASON);
         bonusReason.setPlaceholder(REASON_FOR_BONUS);
         bonusAmount.addValueChangeListener(bonusValueChangeEvent -> {
-            if (bonusAmount.getValue().isEmpty()) {
+            if (bonusAmount.getValue() == null) {
                 deductionAmount.setEnabled(true);
                 deductionReason.setEnabled(true);
             }
@@ -159,7 +169,7 @@ public class AuthorizeForm extends FormLayout {
         deductionReason.setPlaceholder(REASON_FOR_DEDUCTION);
         deductionAmount.addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
 
-            if (deductionAmount.getValue().isEmpty()) {
+            if (deductionAmount.getValue() == null) {
                 bonusAmount.setEnabled(true);
                 bonusReason.setEnabled(true);
             }
@@ -213,6 +223,7 @@ public class AuthorizeForm extends FormLayout {
                     notification.open();
 
                     statusReason.setInvalid(true);
+                    save.setEnabled(true);
                 }
                 else {
                     updateRemuneration();
@@ -236,12 +247,12 @@ public class AuthorizeForm extends FormLayout {
             statusReason_str = statusReason.getValue();
         }
 
-        String bonusAmount_str;
+        int bonusAmount_int;
         if (bonusAmount.isEmpty()) {
-            bonusAmount_str = "null";
+            bonusAmount_int = 0;
         }
         else {
-            bonusAmount_str = bonusAmount.getValue();
+            bonusAmount_int = bonusAmount.getValue();
         }
 
         String bonusAmountReason_str;
@@ -252,12 +263,12 @@ public class AuthorizeForm extends FormLayout {
             bonusAmountReason_str = bonusReason.getValue();
         }
 
-        String deductionAmount_str;
+        int deductionAmount_int;
         if (deductionAmount.isEmpty()) {
-            deductionAmount_str = "null";
+            deductionAmount_int = 0;
         }
         else {
-            deductionAmount_str = deductionAmount.getValue();
+            deductionAmount_int = deductionAmount.getValue();
         }
 
         String deductionAmountReason_str;
@@ -269,15 +280,14 @@ public class AuthorizeForm extends FormLayout {
         }
 
         authorizeService.updateRemuneration(new AuthorizeModel(
-                authorizeModel.getMonth(),
+                bonusAmount_int,
+                deductionAmount_int,
                 authorizeModel.getRemunerationHistoryId(),
                 authorizeModel.getParticipantId(),
                 status.getValue(),
                 statusReason_str,
                 authorizeModel.getClaimed(),
-                bonusAmount_str,
                 bonusAmountReason_str,
-                deductionAmount_str,
                 deductionAmountReason_str
         ));
 

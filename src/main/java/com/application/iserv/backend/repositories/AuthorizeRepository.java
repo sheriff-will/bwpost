@@ -17,14 +17,21 @@ public class AuthorizeRepository {
     @PersistenceContext
     EntityManager entityManager;
 
-    public List<Object[]> retrieveAllRemunerationHistory() {
-        String sql = "SELECT remuneration_history.remuneration_history_id, remuneration_history.month, " +
-                "remuneration_history.status, remuneration_history.status_reason, remuneration_history.claimed," +
-                " remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
-                "remuneration_history.deduction_amount, remuneration_history.deduction_reason, " +
-                "remuneration_history.participant_id, participants.firstname, participants.lastname " +
-                "FROM remuneration_history, participants WHERE " +
-                "remuneration_history.participant_id = participants.participant_id";
+    public List<Object[]> retrieveAllRemunerationHistory(String date) {
+
+        String sql = "SELECT remuneration_history.remuneration_history_id, remuneration_history.status, " +
+                "remuneration_history.status_reason, remuneration_history.claimed, " +
+                "remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
+                "remuneration_history.deduction_amount, remuneration_history.deduction_reason," +
+                " remuneration_history.participant_id, participants.firstname, participants.lastname, " +
+                "parameters.rate_per_day, attendance_history.days_worked " +
+                "FROM remuneration_history, participants, parameters, attendance_history " +
+                "WHERE remuneration_history.participant_id = participants.participant_id A" +
+                "ND participants.participant_id = attendance_history.participant_id " +
+                "AND participants.parameter_id = parameters.parameter_id " +
+                "AND remuneration_history.month = '"+date+"' " +
+                "AND attendance_history.date = '"+date+"' " +
+                "AND participants.is_terminated = '0'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -35,15 +42,23 @@ public class AuthorizeRepository {
         }
     }
 
-    public List<Object[]> searchForRemunerationAgents(String agentNames, Long statusValue) {
-        String sql = "SELECT remuneration_history.remuneration_history_id, remuneration_history.month, " +
-                "remuneration_history.status, remuneration_history.status_reason, remuneration_history.claimed," +
-                " remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
-                "remuneration_history.deduction_amount, remuneration_history.deduction_reason, " +
-                "remuneration_history.participant_id, participants.firstname, participants.lastname " +
-                "FROM remuneration_history, participants WHERE " +
-                "(participants.firstname LIKE '%"+agentNames+"%' OR participants.lastname LIKE '%"+agentNames+"%') " +
-                "AND remuneration_history.participant_id = participants.participant_id";
+    public List<Object[]> searchForRemunerationAgents(String agentNames, String date) {
+
+        String sql = "SELECT remuneration_history.remuneration_history_id, remuneration_history.status, " +
+                "remuneration_history.status_reason, remuneration_history.claimed, " +
+                "remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
+                "remuneration_history.deduction_amount, remuneration_history.deduction_reason," +
+                " remuneration_history.participant_id, participants.firstname, participants.lastname, " +
+                "parameters.rate_per_day, attendance_history.days_worked " +
+                "FROM remuneration_history, participants, parameters, attendance_history " +
+                "WHERE (participants.firstname LIKE '%"+agentNames+"%' " +
+                "OR participants.lastname LIKE '%"+agentNames+"%') " +
+                "AND remuneration_history.participant_id = participants.participant_id " +
+                "AND participants.participant_id = attendance_history.participant_id " +
+                "AND participants.parameter_id = parameters.parameter_id " +
+                "AND remuneration_history.month = '"+date+"' " +
+                "AND attendance_history.date = '"+date+"' " +
+                "AND participants.is_terminated = '0'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -58,8 +73,7 @@ public class AuthorizeRepository {
     public void updateRemunerationDetails(AuthorizeModel authorizeModel) {
         try {
 
-            String updateAgentSQL = "UPDATE remuneration_history SET " +
-                    "month = '" + authorizeModel.getMonth() + "'," +
+            String updateAgentSQL = "UPDATE remuneration_history SET" +
                     " status = '" + authorizeModel.getStatus() + "'," +
                     " status_reason = '" + authorizeModel.getStatusReason() + "'," +
                     " claimed = '" + authorizeModel.getClaimed() + "'," +
@@ -72,6 +86,27 @@ public class AuthorizeRepository {
 
             Query updateAgentQuery = entityManager.createNativeQuery(updateAgentSQL);
             updateAgentQuery.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
+
+    @Modifying
+    public void approveAllRemunerationDetails(List<AuthorizeModel> authorizeModelList) {
+        try {
+
+            for (int i = 0; i < authorizeModelList.size(); i++) {
+
+                String approveAllRemunerationSQL = "UPDATE remuneration_history SET" +
+                        " status = 'Approved'" +
+                        " WHERE remuneration_history_id = '" + authorizeModelList.get(i).getRemunerationHistoryId() + "'";
+
+                Query approveAllRemunerationQuery = entityManager.createNativeQuery(approveAllRemunerationSQL);
+                approveAllRemunerationQuery.executeUpdate();
+
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

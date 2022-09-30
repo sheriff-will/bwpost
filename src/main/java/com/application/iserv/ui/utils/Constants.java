@@ -100,6 +100,7 @@ public class Constants {
     public static final String CSV_FORMAT = ".csv";
     public static final String DATE_TO_RECONCILE = "Select date to reconcile";
     public static final String AMOUNT = "amount";
+    public static final String CAPS_AMOUNT = "Amount";
     public static final String YES = "Yes";
     public static final String NO = "No";
     public static final String APPROVED = "Approved";
@@ -142,6 +143,7 @@ public class Constants {
     public static final String PARAMETER_SUCCESSFULLY_UPDATED = "Parameter successfully updated";
     public static final String AGENT_ALREADY_EXIST = "Agent already exist";
     public static final String AGENT_SUCCESSFULLY_UPDATED = "Agent successfully updated";
+    public static final String SUCCESSFULLY_APPROVED_ALL = "Successfully approved all";
     public static final String AGENT_SUCCESSFULLY_TERMINATED = "Agent successfully terminated";
     public static final String AGENT_SUCCESSFULLY_ADDED = "Agent successfully added";
     public static final String REFERENCE_ALREADY_EXIST = "Reference already exist";
