@@ -150,8 +150,8 @@ public class AuthorizeView extends VerticalLayout {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
 
-            String placementDate_str = datePicker.getValue().format(dateTimeFormatter);
-            String[] getDatePickerDate = placementDate_str.split("-");
+            String date_str = datePicker.getValue().format(dateTimeFormatter);
+            String[] getDatePickerDate = date_str.split("-");
 
             LocalDate datePickerLocalDate = LocalDate.of(
                     Integer.parseInt(getDatePickerDate[2]),
@@ -176,8 +176,8 @@ public class AuthorizeView extends VerticalLayout {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
 
-            String placementDate_str = datePicker1.getValue().format(dateTimeFormatter);
-            String[] getDatePickerDate = placementDate_str.split("-");
+            String date_str = datePicker1.getValue().format(dateTimeFormatter);
+            String[] getDatePickerDate = date_str.split("-");
 
             LocalDate datePickerLocalDate = LocalDate.of(
                     Integer.parseInt(getDatePickerDate[2]),

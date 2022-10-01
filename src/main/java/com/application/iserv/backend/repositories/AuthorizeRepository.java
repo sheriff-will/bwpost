@@ -26,8 +26,8 @@ public class AuthorizeRepository {
                 " remuneration_history.participant_id, participants.firstname, participants.lastname, " +
                 "parameters.rate_per_day, attendance_history.days_worked " +
                 "FROM remuneration_history, participants, parameters, attendance_history " +
-                "WHERE remuneration_history.participant_id = participants.participant_id A" +
-                "ND participants.participant_id = attendance_history.participant_id " +
+                "WHERE remuneration_history.participant_id = participants.participant_id " +
+                "AND participants.participant_id = attendance_history.participant_id " +
                 "AND participants.parameter_id = parameters.parameter_id " +
                 "AND remuneration_history.month = '"+date+"' " +
                 "AND attendance_history.date = '"+date+"' " +

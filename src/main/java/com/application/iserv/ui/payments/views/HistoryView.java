@@ -20,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import static com.application.iserv.ui.utils.Constants.*;
 
 @PageTitle("iServ | Payments")
@@ -43,7 +46,11 @@ public class HistoryView extends VerticalLayout {
     // Grid
     Grid<HistoryModel> historyGrid = new Grid<>(HistoryModel.class);
 
+    // Services
     private final HistoryService historyService;
+
+    // Strings
+    String date;
 
     @Autowired
     public HistoryView(HistoryService historyService) {
@@ -61,6 +68,10 @@ public class HistoryView extends VerticalLayout {
                 getContent()
         );
 
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+        date = LocalDate.now().format(dateFormatter);
+
         updateAgentsPaymentsList();
         closeComponents();
 
@@ -69,6 +80,8 @@ public class HistoryView extends VerticalLayout {
     private void closeComponents() {
 
         historyForm.setVisible(false);
+
+        historyGrid.asSingleSelect().clear();
 
         removeClassName(VIEWING_HISTORY);
     }
@@ -89,7 +102,23 @@ public class HistoryView extends VerticalLayout {
             isDateSelected = true;
 
             configureHistoryGrid();
+
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+            String date_str = datePicker.getValue().format(dateTimeFormatter);
+            String[] getDatePickerDate = date_str.split("-");
+
+            LocalDate datePickerLocalDate = LocalDate.of(
+                    Integer.parseInt(getDatePickerDate[2]),
+                    Integer.parseInt(getDatePickerDate[1]),
+                    Integer.parseInt(getDatePickerDate[0])
+            );
+
+            date = datePickerLocalDate.format(dateFormatter);
+
             updateAgentsPaymentsList();
+
         });
 
         datePicker1.setI18n(dateFormat);
@@ -98,7 +127,23 @@ public class HistoryView extends VerticalLayout {
             isDateSelected = true;
 
             configureHistoryGrid();
+
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+            String date_str = datePicker1.getValue().format(dateTimeFormatter);
+            String[] getDatePickerDate = date_str.split("-");
+
+            LocalDate datePickerLocalDate = LocalDate.of(
+                    Integer.parseInt(getDatePickerDate[2]),
+                    Integer.parseInt(getDatePickerDate[1]),
+                    Integer.parseInt(getDatePickerDate[0])
+            );
+
+            date = datePickerLocalDate.format(dateFormatter);
+
             updateAgentsPaymentsList();
+
         });
 
         datePicker1.setVisible(false);
@@ -162,7 +207,7 @@ public class HistoryView extends VerticalLayout {
             historyGrid.setColumns(AGENT);
 
             historyGrid.addComponentColumn(
-                    claimed -> createBadge("-")).setHeader(AMOUNT);
+                    claimed -> createBadge("-")).setHeader(CAPS_AMOUNT);
 
             historyGrid.addComponentColumn(
                     claimed -> createBadge("-")).setHeader(CLAIMED);
@@ -205,10 +250,10 @@ public class HistoryView extends VerticalLayout {
         historyGrid.asSingleSelect().clear();
 
         if (isDateSelected) {
-            historyGrid.setItems(historyService.getAllHistory());
+            historyGrid.setItems(historyService.getAllHistory(date));
         }
         else {
-            historyGrid.setItems(historyService.getAllHistory());
+            historyGrid.setItems(historyService.getAllHistory(date));
         }
     }
 

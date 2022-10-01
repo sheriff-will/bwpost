@@ -1,23 +1,22 @@
 package com.application.iserv.ui.payments.models;
 
-import java.time.LocalDate;
-
 public class HistoryModel {
 
-    LocalDate month;
     Long remunerationHistoryId, participantId;
     String status, statusReason, claimed, bonusAmount, bonusReason, deductionAmount,
-            deductionReason, agent, amount, mobileWalletProvider, bankName, branch, accountNumber;
+            deductionReason, agent, amount, mobileWalletProvider, bankName, branch,
+            accountNumber, ratePerDay, daysWorked, baseSalary, totalSalary, paymentMode, provider;
 
     public HistoryModel() {
 
     }
 
-    public HistoryModel(LocalDate month, Long remunerationHistoryId, Long participantId, String status,
-                        String statusReason, String claimed, String bonusAmount, String bonusReason,
-                        String deductionAmount, String deductionReason, String agent, String amount,
-                        String mobileWalletProvider, String bankName, String branch, String accountNumber) {
-        this.month = month;
+    public HistoryModel(Long remunerationHistoryId, Long participantId, String status, String statusReason,
+                        String claimed, String bonusAmount, String bonusReason, String deductionAmount,
+                        String deductionReason, String agent, String amount, String mobileWalletProvider,
+                        String bankName, String branch, String accountNumber, String ratePerDay,
+                        String daysWorked, String baseSalary, String totalSalary, String paymentMode,
+                        String provider) {
         this.remunerationHistoryId = remunerationHistoryId;
         this.participantId = participantId;
         this.status = status;
@@ -33,14 +32,12 @@ public class HistoryModel {
         this.bankName = bankName;
         this.branch = branch;
         this.accountNumber = accountNumber;
-    }
-
-    public LocalDate getMonth() {
-        return month;
-    }
-
-    public void setMonth(LocalDate month) {
-        this.month = month;
+        this.ratePerDay = ratePerDay;
+        this.daysWorked = daysWorked;
+        this.baseSalary = baseSalary;
+        this.totalSalary = totalSalary;
+        this.paymentMode = paymentMode;
+        this.provider = provider;
     }
 
     public Long getRemunerationHistoryId() {
@@ -163,11 +160,58 @@ public class HistoryModel {
         this.accountNumber = accountNumber;
     }
 
+    public String getRatePerDay() {
+        return ratePerDay;
+    }
+
+    public void setRatePerDay(String ratePerDay) {
+        this.ratePerDay = ratePerDay;
+    }
+
+    public String getDaysWorked() {
+        return daysWorked;
+    }
+
+    public void setDaysWorked(String daysWorked) {
+        this.daysWorked = daysWorked;
+    }
+
+    public String getBaseSalary() {
+        return baseSalary;
+    }
+
+    public void setBaseSalary(String baseSalary) {
+        this.baseSalary = baseSalary;
+    }
+
+    public String getTotalSalary() {
+        return totalSalary;
+    }
+
+    public void setTotalSalary(String totalSalary) {
+        this.totalSalary = totalSalary;
+    }
+
+    public String getPaymentMode() {
+        return paymentMode;
+    }
+
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
     @Override
     public String toString() {
         return "HistoryModel{" +
-                "month=" + month +
-                ", remunerationHistoryId=" + remunerationHistoryId +
+                "remunerationHistoryId=" + remunerationHistoryId +
                 ", participantId=" + participantId +
                 ", status='" + status + '\'' +
                 ", statusReason='" + statusReason + '\'' +
@@ -182,6 +226,12 @@ public class HistoryModel {
                 ", bankName='" + bankName + '\'' +
                 ", branch='" + branch + '\'' +
                 ", accountNumber='" + accountNumber + '\'' +
+                ", ratePerDay='" + ratePerDay + '\'' +
+                ", daysWorked='" + daysWorked + '\'' +
+                ", baseSalary='" + baseSalary + '\'' +
+                ", totalSalary='" + totalSalary + '\'' +
+                ", paymentMode='" + paymentMode + '\'' +
+                ", provider='" + provider + '\'' +
                 '}';
     }
 

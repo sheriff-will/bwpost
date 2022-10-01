@@ -190,7 +190,7 @@ public class AgentsRepository {
 
                 String insertRemunerationSQL = "INSERT INTO remuneration_history (month, status, status_reason, " +
                         "claimed, bonus_amount, bonus_reason, deduction_amount, deduction_reason, participant_id) " +
-                        "VALUES('"+month+"', 'Hold', 'null', 'null', '0', 'null', '0', 'null', " +
+                        "VALUES('"+month+"', 'Hold', 'null', 'No', '0', 'null', '0', 'null', " +
                         "'"+query.getResultList().get(0)+"')";
 
                 Query insertRemunerationQuery = entityManager.createNativeQuery(insertRemunerationSQL);

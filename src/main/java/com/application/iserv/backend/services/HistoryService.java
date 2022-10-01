@@ -5,7 +5,6 @@ import com.application.iserv.ui.payments.models.HistoryModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,40 +18,69 @@ public class HistoryService {
         this.historyRepository = historyRepository;
     }
 
-    public List<HistoryModel> getAllHistory() {
-        List<Object[]> allHistory = historyRepository.retrieveAllHistory();
+    public List<HistoryModel> getAllHistory(String date) {
+        List<Object[]> allHistory = historyRepository.retrieveAllHistory(date);
 
         List<HistoryModel> historyModelList = new ArrayList<>();
 
         for(Object[] row : allHistory) {
 
-            String month_str = row[1].toString();
-            String[] getMonth = month_str.split("-");
+            double amount = Double.parseDouble(
+                    row[15].toString()) * Double.parseDouble(row[16].toString());
 
-            LocalDate month = LocalDate.of(
-                    Integer.parseInt(getMonth[0]),
-                    Integer.parseInt(getMonth[1]),
-                    Integer.parseInt(getMonth[2])
-            );
+            double baseSalary = Double.parseDouble(row[15].toString()) * 20;
+
+            double totalSalary;
+
+            if (!row[4].toString().equalsIgnoreCase("0")) {
+                totalSalary = amount + Double.parseDouble(row[4].toString());
+            }
+            else if (!row[6].toString().equalsIgnoreCase("0")) {
+                totalSalary = amount - Double.parseDouble(row[6].toString());
+            }
+            else {
+                totalSalary = amount;
+            }
+
+            String provider = "";
+            String paymentMode = "";
+
+            if (!row[11].toString().equalsIgnoreCase("null")) {
+                provider = "Orange Money"; // TODO Remove hardcode Orange money
+                paymentMode = "Mobile Wallet";
+            }
+            else if (!row[12].toString().equalsIgnoreCase("null")) {
+                provider = row[12].toString();
+                paymentMode = "Bank";
+            }
+            else if (row[11].toString().equalsIgnoreCase("null")
+                    && row[12].toString().equalsIgnoreCase("null")) {
+                provider = "Botswana Post Office"; // TODO Remove hardcoded Botswana Post Office
+                paymentMode = "Cash";
+            }
 
             HistoryModel historyModel = new HistoryModel(
-                    month,
                     Long.parseLong(row[0].toString()),
-                    Long.parseLong(row[9].toString()),
+                    Long.parseLong(row[8].toString()),
+                    row[1].toString(),
                     row[2].toString(),
                     row[3].toString(),
                     row[4].toString(),
                     row[5].toString(),
                     row[6].toString(),
                     row[7].toString(),
-                    row[8].toString(),
-                    row[10].toString()+" "+row[11].toString(),
-                    "auto - generated",
+                    row[9].toString()+" "+row[10].toString(),
+                    String.valueOf(amount),
+                    row[11].toString(),
                     row[12].toString(),
                     row[13].toString(),
                     row[14].toString(),
-                    row[15].toString()
-
+                    row[15].toString(),
+                    row[16].toString(),
+                    String.valueOf(baseSalary),
+                    String.valueOf(totalSalary),
+                    paymentMode,
+                    provider
             );
 
             historyModelList.add(historyModel);

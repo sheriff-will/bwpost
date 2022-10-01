@@ -21,8 +21,10 @@ public class HistoryForm extends VerticalLayout {
     TextField ratePerDay = new TextField();
     TextField daysWorked = new TextField();
     TextField baseSalary = new TextField();
-    TextField bonus = new TextField();
-    TextField deduction = new TextField();
+    TextField bonusAmount = new TextField();
+    TextField bonusReason = new TextField();
+    TextField deductionAmount = new TextField();
+    TextField deductionReason = new TextField();
     TextField totalSalary = new TextField();
     TextField status = new TextField();
     TextField claimed = new TextField();
@@ -36,6 +38,9 @@ public class HistoryForm extends VerticalLayout {
     // Binder
     Binder<HistoryModel> binder = new Binder<>(HistoryModel.class);
 
+    // Forms
+    FormLayout formLayout;
+
     private HistoryModel historyModel;
 
     public HistoryForm() {
@@ -47,44 +52,40 @@ public class HistoryForm extends VerticalLayout {
         binder.bindInstanceFields(this);
 
         ratePerDay.setReadOnly(true);
-        ratePerDay.setLabel(RATE);
-        ratePerDay.setValue("P15.00");
+        ratePerDay.setLabel(RATE_PER_DAY);
 
         daysWorked.setReadOnly(true);
         daysWorked.setLabel(DAYS_WORKED);
-        daysWorked.setValue("18");
 
         baseSalary.setReadOnly(true);
         baseSalary.setLabel(BASE_SALARY);
-        baseSalary.setValue("P270.00");
 
-        bonus.setReadOnly(true);
-        bonus.setLabel(BONUS);
-        bonus.setValue("P0.00");
+        bonusAmount.setReadOnly(true);
+        bonusAmount.setLabel(BONUS);
 
-        deduction.setReadOnly(true);
-        deduction.setLabel(DEDUCTION);
-        deduction.setValue("P0.00");
+        bonusReason.setReadOnly(true);
+        bonusReason.setLabel(REASON_FOR_BONUS);
+
+        deductionAmount.setReadOnly(true);
+        deductionAmount.setLabel(DEDUCTION);
+
+        deductionReason.setReadOnly(true);
+        deductionReason.setLabel(REASON_FOR_DEDUCTION);
 
         totalSalary.setReadOnly(true);
         totalSalary.setLabel(TOTAL_SALARY);
-        totalSalary.setValue("P270.00");
 
         status.setReadOnly(true);
         status.setLabel(APPROVAL);
-        status.setValue("Approved");
 
         claimed.setReadOnly(true);
         claimed.setLabel(CLAIMED);
-        claimed.setValue("Yes");
 
         paymentMode.setReadOnly(true);
         paymentMode.setLabel(PAYMENT_MODE);
-        paymentMode.setValue("Cash");
 
         provider.setReadOnly(true);
         provider.setLabel("Provider");
-        provider.setValue(PROVIDER);
 
         exportStatements.addThemeVariants(
                 ButtonVariant.LUMO_PRIMARY
@@ -96,15 +97,28 @@ public class HistoryForm extends VerticalLayout {
         exportBackLayout.getStyle()
                 .set("margin-bottom", "var(--lumo-space-xl");
 
-        FormLayout formLayout = new FormLayout(
-                ratePerDay, daysWorked, baseSalary, bonus, deduction,
-                totalSalary, status, claimed, paymentMode, provider
+        formLayout = new FormLayout(
+                ratePerDay,
+                daysWorked,
+                baseSalary,
+                bonusAmount,
+                bonusReason,
+                deductionAmount,
+                deductionReason,
+                totalSalary,
+                status,
+                claimed,
+                paymentMode,
+                provider
         );
 
         formLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("300px", 2)
         );
+
+        formLayout.setColspan(bonusReason, 2);
+        formLayout.setColspan(deductionReason, 2);
 
         VerticalLayout buttonsVerticalLayout = new VerticalLayout(exportBackLayout);
         buttonsVerticalLayout.setPadding(false);
@@ -120,6 +134,43 @@ public class HistoryForm extends VerticalLayout {
     public void setHistory(HistoryModel historyModel) {
         this.historyModel = historyModel;
         binder.readBean(historyModel);
+
+        if (historyModel.getBonusAmount().equalsIgnoreCase("0")) {
+            bonusAmount.setVisible(false);
+            bonusReason.setVisible(false);
+
+            formLayout.setColspan(provider, 1);
+
+        }
+        else {
+            bonusAmount.setVisible(true);
+            bonusReason.setVisible(true);
+
+            deductionAmount.setVisible(false);
+            deductionReason.setVisible(false);
+
+            formLayout.setColspan(provider, 2);
+
+        }
+
+        if (historyModel.getDeductionAmount().equalsIgnoreCase("0")) {
+            deductionAmount.setVisible(false);
+            deductionReason.setVisible(false);
+
+            formLayout.setColspan(provider, 1);
+
+        }
+        else {
+            deductionAmount.setVisible(true);
+            deductionReason.setVisible(true);
+
+            bonusAmount.setVisible(false);
+            bonusReason.setVisible(false);
+
+            formLayout.setColspan(provider, 2);
+
+        }
+
     }
 
     private void configureButtons() {
