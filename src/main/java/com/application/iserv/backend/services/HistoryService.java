@@ -2,11 +2,24 @@ package com.application.iserv.backend.services;
 
 import com.application.iserv.backend.repositories.HistoryRepository;
 import com.application.iserv.ui.payments.models.HistoryModel;
+import com.application.iserv.ui.payments.models.HistoryStatementModel;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.application.iserv.ui.utils.Constants.SIMPLE_MONTH_DATE_FORMAT;
 
 @Service
 public class HistoryService {
@@ -88,6 +101,75 @@ public class HistoryService {
         }
 
         return historyModelList;
+    }
+
+    public void exportReport(String names, Long participantId) throws FileNotFoundException, JRException {
+        List<Object[]> allHistory = historyRepository.exportStatements(participantId);
+
+        List<HistoryStatementModel> historyStatementModelList = new ArrayList<>();
+
+        for(Object[] row : allHistory) {
+
+            String month_str = row[0].toString();
+            String[] getMonth = month_str.split("-");
+
+            // TODO 1 in the magic number
+            LocalDate monthDate = LocalDate.of(
+                    Integer.parseInt(getMonth[0]),
+                    Integer.parseInt(getMonth[1]),
+                    1
+            );
+
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(SIMPLE_MONTH_DATE_FORMAT);
+
+            String date = monthDate.format(dateFormatter);
+
+            Double amount = Double.parseDouble(row[3].toString()) * Integer.parseInt(row[4].toString());
+
+            amount = amount + Integer.parseInt(row[1].toString());
+
+            amount = amount - Integer.parseInt(row[2].toString());
+
+            HistoryStatementModel historyStatementModel = new HistoryStatementModel(
+                    Double.parseDouble(row[3].toString()),
+                    date,
+                    String.valueOf(amount),
+                    Integer.parseInt(row[1].toString()),
+                    Integer.parseInt(row[2].toString()),
+                    Integer.parseInt(row[4].toString())
+            );
+
+            historyStatementModelList.add(historyStatementModel);
+
+        }
+
+        File file = ResourceUtils.getFile("classpath:participants_history.jrxml");
+
+        JasperReport jasperReport = JasperCompileManager
+                .compileReport(file.getAbsolutePath());
+
+        JRBeanCollectionDataSource jrBeanCollectionDataSource
+                = new JRBeanCollectionDataSource(historyStatementModelList);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("createdBy", "iServ");
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(
+                jasperReport,
+                parameters,
+                jrBeanCollectionDataSource
+        );
+
+        // TODO Make constant
+
+        String path = "/home/sheriff-will/Documents/iServ Reports/";
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm - dd MMMM yyyy");
+
+        String saveAs = path+names+" "+ LocalDateTime.now().format(dateFormatter)+".pdf";
+
+        JasperExportManager.exportReportToPdfFile(jasperPrint, saveAs);
+
     }
 
 }

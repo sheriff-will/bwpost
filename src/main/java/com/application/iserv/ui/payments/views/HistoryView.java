@@ -19,7 +19,6 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -258,10 +257,12 @@ public class HistoryView extends VerticalLayout {
     }
 
     private void configureHistoryForm() {
-        historyForm = new HistoryForm();
+        historyForm = new HistoryForm(historyService);
         historyForm.setWidth("70%");
 
         historyForm.addListener(HistoryForm.CloseHistoryFormEvent.class, e -> closeComponents());
+
+        historyForm.addListener(HistoryForm.ExportStatementsEvent.class, e -> closeComponents());
     }
 
     private Component getContent() {

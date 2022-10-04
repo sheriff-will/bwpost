@@ -147,7 +147,9 @@ public class AgentForm extends VerticalLayout {
     Long participantId;
 
     // Strings
+    String date;
     String selectedTabLabel = "";
+
     private NomineesModel nomineesModel;
     private ReferenceModel referenceModel;
 
@@ -710,7 +712,7 @@ public class AgentForm extends VerticalLayout {
 
     }
 
-    public void setAgent(AgentsModel agentsModel) {
+    public void setAgent(AgentsModel agentsModel, String monthDate) {
         this.agentsModel = agentsModel;
         agentsModelBinder.readBean(agentsModel);
 
@@ -731,6 +733,8 @@ public class AgentForm extends VerticalLayout {
         configureNominees();
         configureReferences();
         updateGridInfo();
+
+        date = monthDate;
 
     }
 
@@ -1317,7 +1321,9 @@ public class AgentForm extends VerticalLayout {
         updateButton.addClickListener(click -> {
             if (daysWorked.getValue() != null && !daysWorked.isInvalid()) {
                 agentsServices.updateAttendance(
-                        daysWorked.getValue(), agentsModel.getParticipantId()
+                        daysWorked.getValue(),
+                        agentsModel.getParticipantId(),
+                        date
                 );
 
                 fireEvent(new AgentDaysWorkedUpdatedEvent(this));

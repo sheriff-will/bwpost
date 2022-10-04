@@ -694,8 +694,8 @@ public class AgentsServices {
         return agents;
     }
 
-    public void updateAttendance(Integer daysWorked, Long participantId) {
-        agentsRepository.updateAttendance(daysWorked, participantId);
+    public void updateAttendance(Integer daysWorked, Long participantId, String date) {
+        agentsRepository.updateAttendance(daysWorked, participantId, date);
     }
 
 }

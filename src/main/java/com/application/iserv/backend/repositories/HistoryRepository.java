@@ -47,4 +47,25 @@ public class HistoryRepository {
         }
     }
 
+    public List<Object[]> exportStatements(Long participantId) {
+
+        String sql = "SELECT remuneration_history.month," +
+                " remuneration_history.bonus_amount, remuneration_history.deduction_amount," +
+                " parameters.rate_per_day, attendance_history.days_worked " +
+                "FROM remuneration_history, parameters, participants, attendance_history " +
+                "WHERE remuneration_history.participant_id = '"+participantId+"' " +
+                "AND participants.participant_id = remuneration_history.participant_id " +
+                "AND parameters.parameter_id = participants.parameter_id " +
+                "AND remuneration_history.participant_id = attendance_history.participant_id " +
+                "AND attendance_history.date = remuneration_history.month";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ package com.application.iserv.ui.utils;
 import com.application.iserv.ui.agents.models.TestAgentsModel;
 import com.application.iserv.ui.parameters.models.ParametersModel;
 import com.application.iserv.ui.payments.models.AgentPaymentsModel;
+import com.application.iserv.ui.payments.models.HistoryStatementModel;
 
 import java.util.List;
 
@@ -581,6 +582,127 @@ public class Constants {
                 parameters1,
                 parameters2
         );
+
+    }
+
+    public static List<HistoryStatementModel> getStatementData() {
+
+        HistoryStatementModel h1 = new HistoryStatementModel(
+               29.95,
+                "August 2022",
+                "300",
+                8,
+                9
+                ,9
+        );
+
+        HistoryStatementModel h2 = new HistoryStatementModel(
+                39.95,
+                "September 2022",
+                "560",
+                8,
+                9
+                ,9
+        );
+
+        return List.of(
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2,
+                h1,
+                h2
+                );
 
     }
 

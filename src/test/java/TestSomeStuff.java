@@ -1,4 +1,8 @@
+import org.junit.Test;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 public class TestSomeStuff {
@@ -55,6 +59,14 @@ public class TestSomeStuff {
         }
 
 
+    }
+
+    @Test
+    public void testTimeFormats() {
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm - dd MMMM yyyy");
+
+        System.err.println(LocalDateTime.now().format(dateFormatter));
     }
 
 }

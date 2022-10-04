@@ -70,6 +70,9 @@ public class AgentsView extends VerticalLayout {
     // ArrayList
     List<AgentsModel> agentsModelList = new ArrayList<>();
 
+    // Strings
+    String date = "";
+
     @Autowired
     public AgentsView(AgentsServices agentsServices) {
         this.agentsServices = agentsServices;
@@ -285,7 +288,7 @@ public class AgentsView extends VerticalLayout {
         statusAttendanceLayout.addClassName(STATUS_ATTENDANCE_LAYOUT);
 
         DatePicker.DatePickerI18n dateFormat = new DatePicker.DatePickerI18n();
-        dateFormat.setDateFormat(SIMPLE_DATE_FORMAT);
+        dateFormat.setDateFormat(SIMPLE_MONTH_DATE_FORMAT);
 
         datePicker.setI18n(dateFormat);
         datePicker.setPlaceholder(DATE);
@@ -306,6 +309,10 @@ public class AgentsView extends VerticalLayout {
             }
 
             agentForm.hideAllComponents(true);
+
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+            date = datePicker.getValue().format(dateFormatter);
 
         });
 
@@ -431,13 +438,13 @@ public class AgentsView extends VerticalLayout {
         }
         else {
             if (isAttendanceOpen) {
-                agentForm.setAgent(agentsModel);
+                agentForm.setAgent(agentsModel, date);
                 agentForm.changeLayout(true);
                 agentForm.setVisible(true);
             }
             else {
                 agentForm.setButtonText(false);
-                agentForm.setAgent(agentsModel);
+                agentForm.setAgent(agentsModel, date);
                 agentForm.setVisible(true);
             }
         }

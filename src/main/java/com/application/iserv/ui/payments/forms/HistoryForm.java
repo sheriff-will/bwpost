@@ -1,17 +1,25 @@
 package com.application.iserv.ui.payments.forms;
 
 
+import com.application.iserv.backend.services.HistoryService;
 import com.application.iserv.ui.payments.models.HistoryModel;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
+import net.sf.jasperreports.engine.JRException;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.FileNotFoundException;
 
 import static com.application.iserv.ui.utils.Constants.*;
 
@@ -32,6 +40,7 @@ public class HistoryForm extends VerticalLayout {
     TextField provider = new TextField();
 
     // Buttons
+    Button OK = new Button("OK");
     Button back = new Button(BACK);
     Button exportStatements = new Button(EXPORT_STATEMENTS);
 
@@ -41,9 +50,24 @@ public class HistoryForm extends VerticalLayout {
     // Forms
     FormLayout formLayout;
 
+    // Dialogs
+    Dialog statementDialog = new Dialog();
+
     private HistoryModel historyModel;
 
-    public HistoryForm() {
+    // Services
+    private final HistoryService historyService;
+
+    // Longs
+    Long participantId;
+
+    // Strings
+    String names;
+    String firstname;
+
+    @Autowired
+    public HistoryForm(HistoryService historyService) {
+        this.historyService = historyService;
 
         configureButtons();
 
@@ -87,9 +111,6 @@ public class HistoryForm extends VerticalLayout {
         provider.setReadOnly(true);
         provider.setLabel("Provider");
 
-        exportStatements.addThemeVariants(
-                ButtonVariant.LUMO_PRIMARY
-        );
 
         HorizontalLayout exportBackLayout = new HorizontalLayout(exportStatements, back);
         exportBackLayout.setFlexGrow(2, exportStatements);
@@ -135,6 +156,12 @@ public class HistoryForm extends VerticalLayout {
         this.historyModel = historyModel;
         binder.readBean(historyModel);
 
+        String[] getFirstname = historyModel.getAgent().split(" ");
+
+        firstname = getFirstname[0];
+        names = historyModel.getAgent();
+        participantId = historyModel.getParticipantId();
+
         if (historyModel.getBonusAmount().equalsIgnoreCase("0")) {
             bonusAmount.setVisible(false);
             bonusReason.setVisible(false);
@@ -179,12 +206,62 @@ public class HistoryForm extends VerticalLayout {
                 ButtonVariant.LUMO_PRIMARY
         );
 
+        exportStatements.addClickListener(click -> {
+
+            try {
+                historyService.exportReport(names, participantId);
+            } catch (FileNotFoundException | JRException e) {
+                throw new RuntimeException(e);
+            }
+
+            configureDialogs();
+
+            statementDialog.open();
+
+        });
+
         back.addThemeVariants(
                 ButtonVariant.LUMO_PRIMARY,
                 ButtonVariant.LUMO_CONTRAST
         );
 
         back.addClickListener(click -> fireEvent(new CloseHistoryFormEvent(this)));
+
+    }
+
+    private void configureDialogs() {
+
+        statementDialog = new Dialog();
+
+        H2 h2 = new H2(firstname+"'s statement has been successfully exported");
+
+        FormLayout formLayout1 = new FormLayout(
+                h2
+        );
+
+        formLayout1.setColspan(h2, 2);
+
+        statementDialog.getHeader().add(
+                new Button(new Icon("lumo", "cross"), (e) -> {
+                    statementDialog.close();
+                })
+        );
+
+        statementDialog.addDialogCloseActionListener(dialogCloseActionEvent -> {
+            statementDialog.close();
+            fireEvent(new ExportStatementsEvent(this));
+        });
+
+        OK.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        OK.addClickListener(click -> {
+            statementDialog.close();
+            fireEvent(new ExportStatementsEvent(this));
+        });
+
+        statementDialog.setHeaderTitle("Exported");
+        statementDialog.add(formLayout1);
+        statementDialog.getFooter().add(OK);
 
     }
 

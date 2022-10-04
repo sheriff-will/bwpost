@@ -490,12 +490,13 @@ public class AgentsRepository {
     }
 
     @Modifying
-    public void updateAttendance(Integer daysWorked, Long participantId) {
+    public void updateAttendance(Integer daysWorked, Long participantId, String date) {
         try {
 
             String updateParticipantSQL = "UPDATE attendance_history SET " +
                     "attendance_history.days_worked = '" + daysWorked + "'" +
-                    " WHERE attendance_history.participant_id = '" + participantId + "'";
+                    " WHERE attendance_history.participant_id = '" + participantId + "'" +
+                    " AND attendance_history.date = '"+date+"'";
 
             Query updateParticipantQuery = entityManager.createNativeQuery(updateParticipantSQL);
             updateParticipantQuery.executeUpdate();
