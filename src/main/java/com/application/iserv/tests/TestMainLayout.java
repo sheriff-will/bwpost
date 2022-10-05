@@ -3,7 +3,7 @@ package com.application.iserv.tests;
 import com.application.iserv.tests.components.navigation.drawer.BrandExpression;
 import com.application.iserv.tests.components.navigation.drawer.NaviMenu;
 import com.application.iserv.tests.util.UIUtils;
-import com.application.iserv.ui.agents.views.AgentsView;
+import com.application.iserv.ui.participants.views.ParticipantsView;
 import com.application.iserv.ui.payments.views.AuthorizeView;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
@@ -127,7 +127,7 @@ public class TestMainLayout extends AppLayout implements AfterNavigationObserver
 
     private Component[] createMenuItems() {
         return new Tab[] {
-                createTab("Agents", AgentsView.class),
+                createTab("Agents", ParticipantsView.class),
                 createTab("Payments", AuthorizeView.class)
         };
     }

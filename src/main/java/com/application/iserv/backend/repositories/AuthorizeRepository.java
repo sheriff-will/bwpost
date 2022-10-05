@@ -42,7 +42,7 @@ public class AuthorizeRepository {
         }
     }
 
-    public List<Object[]> searchForRemunerationAgents(String agentNames, String date) {
+    public List<Object[]> searchAuthorize(String agentNames, String date) {
 
         String sql = "SELECT remuneration_history.remuneration_history_id, remuneration_history.status, " +
                 "remuneration_history.status_reason, remuneration_history.claimed, " +

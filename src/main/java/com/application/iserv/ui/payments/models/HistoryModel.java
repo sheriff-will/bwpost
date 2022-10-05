@@ -4,7 +4,7 @@ public class HistoryModel {
 
     Long remunerationHistoryId, participantId;
     String status, statusReason, claimed, bonusAmount, bonusReason, deductionAmount,
-            deductionReason, agent, amount, mobileWalletProvider, bankName, branch,
+            deductionReason, participant, amount, mobileWalletProvider, bankName, branch,
             accountNumber, ratePerDay, daysWorked, baseSalary, totalSalary, paymentMode, provider;
 
     public HistoryModel() {
@@ -13,7 +13,7 @@ public class HistoryModel {
 
     public HistoryModel(Long remunerationHistoryId, Long participantId, String status, String statusReason,
                         String claimed, String bonusAmount, String bonusReason, String deductionAmount,
-                        String deductionReason, String agent, String amount, String mobileWalletProvider,
+                        String deductionReason, String participant, String amount, String mobileWalletProvider,
                         String bankName, String branch, String accountNumber, String ratePerDay,
                         String daysWorked, String baseSalary, String totalSalary, String paymentMode,
                         String provider) {
@@ -26,7 +26,7 @@ public class HistoryModel {
         this.bonusReason = bonusReason;
         this.deductionAmount = deductionAmount;
         this.deductionReason = deductionReason;
-        this.agent = agent;
+        this.participant = participant;
         this.amount = amount;
         this.mobileWalletProvider = mobileWalletProvider;
         this.bankName = bankName;
@@ -112,12 +112,12 @@ public class HistoryModel {
         this.deductionReason = deductionReason;
     }
 
-    public String getAgent() {
-        return agent;
+    public String getParticipant() {
+        return participant;
     }
 
-    public void setAgent(String agent) {
-        this.agent = agent;
+    public void setParticipant(String participant) {
+        this.participant = participant;
     }
 
     public String getAmount() {
@@ -220,7 +220,7 @@ public class HistoryModel {
                 ", bonusReason='" + bonusReason + '\'' +
                 ", deductionAmount='" + deductionAmount + '\'' +
                 ", deductionReason='" + deductionReason + '\'' +
-                ", agent='" + agent + '\'' +
+                ", agent='" + participant + '\'' +
                 ", amount='" + amount + '\'' +
                 ", mobileWalletProvider='" + mobileWalletProvider + '\'' +
                 ", bankName='" + bankName + '\'' +

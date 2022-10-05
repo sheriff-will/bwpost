@@ -87,10 +87,14 @@ public class HistoryView extends VerticalLayout {
 
     private Component getToolbar() {
 
+        searchAgent.setPlaceholder(SEARCH_AGENT_HINT);
         searchAgent.setClearButtonVisible(true);
-        searchAgent.setPlaceholder("Search agent...");
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
-        searchAgent.addClassName("history-search-agent");
+        searchAgent.addClassName(SEARCH_AGENT);
+        searchAgent.addValueChangeListener(searchAgentValueChanged -> historyGrid.setItems(
+                historyService.searchHistory(searchAgent.getValue(), date)
+        ));
+
 
         DatePicker.DatePickerI18n dateFormat = new DatePicker.DatePickerI18n();
         dateFormat.setDateFormat(SIMPLE_MONTH_DATE_FORMAT);
@@ -195,7 +199,7 @@ public class HistoryView extends VerticalLayout {
         historyGrid.setSizeFull();
 
         if (isDateSelected) {
-            historyGrid.setColumns(AGENT, AMOUNT);
+            historyGrid.setColumns(PARTICIPANT, AMOUNT);
 
             historyGrid.addComponentColumn(
                     claimed -> createBadge(claimed.getClaimed())).setHeader(CLAIMED);
@@ -203,7 +207,7 @@ public class HistoryView extends VerticalLayout {
             historyGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
         } else {
-            historyGrid.setColumns(AGENT);
+            historyGrid.setColumns(PARTICIPANT);
 
             historyGrid.addComponentColumn(
                     claimed -> createBadge("-")).setHeader(CAPS_AMOUNT);

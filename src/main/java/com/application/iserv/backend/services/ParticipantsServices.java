@@ -1,9 +1,9 @@
 package com.application.iserv.backend.services;
 
-import com.application.iserv.backend.repositories.AgentsRepository;
-import com.application.iserv.ui.agents.models.AgentsModel;
-import com.application.iserv.ui.agents.models.NomineesModel;
-import com.application.iserv.ui.agents.models.ReferenceModel;
+import com.application.iserv.backend.repositories.ParticipantsRepository;
+import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.participants.models.NomineesModel;
+import com.application.iserv.ui.participants.models.ReferenceModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,21 +16,21 @@ import java.util.List;
 import static com.application.iserv.ui.utils.Constants.*;
 
 @Service
-public class AgentsServices {
+public class ParticipantsServices {
 
-    private final AgentsRepository agentsRepository;
+    private final ParticipantsRepository participantsRepository;
 
     @Autowired
-    public AgentsServices(AgentsRepository agentsRepository) {
-        this.agentsRepository = agentsRepository;
+    public ParticipantsServices(ParticipantsRepository participantsRepository) {
+        this.participantsRepository = participantsRepository;
     }
 
     // Agents
-    public List<AgentsModel> getAllAgents() {
+    public List<ParticipantsModel> getAllAgents() {
 
-        List<Object[]> allAgents = agentsRepository.retrieveAllAgents();
+        List<Object[]> allAgents = participantsRepository.retrieveAllAgents();
 
-        List<AgentsModel> agents = new ArrayList<>();
+        List<ParticipantsModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -75,7 +75,7 @@ public class AgentsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference <= 0) {
-                AgentsModel agentsModel = new AgentsModel(
+                ParticipantsModel participantsModel = new ParticipantsModel(
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
                         dateOfBirth,
@@ -104,7 +104,7 @@ public class AgentsServices {
                         row[1].toString()+" "+row[2].toString()
                 );
 
-                agents.add(agentsModel);
+                agents.add(participantsModel);
 
             }
 
@@ -113,9 +113,9 @@ public class AgentsServices {
         return agents;
     }
 
-    public String updateAgent(AgentsModel agentsModel) {
+    public String updateAgent(ParticipantsModel participantsModel) {
         String response = SUCCESSFUL;
-        List<Object[]> checkAgentList = agentsRepository.checkForAgent(agentsModel);
+        List<Object[]> checkAgentList = participantsRepository.checkForAgent(participantsModel);
 
         List<String> recordAgent = new ArrayList<>();
 
@@ -126,46 +126,46 @@ public class AgentsServices {
                 String bigIntegerStr = bigInteger.toString();
                 Long participantId = Long.parseLong(bigIntegerStr);
 
-                if (agentsModel.getParticipantId() != participantId) {
-                    recordAgent.add(AGENT_ALREADY_EXIST);
+                if (participantsModel.getParticipantId() != participantId) {
+                    recordAgent.add(PARTICIPANT_ALREADY_EXIST);
                 }
 
             }
         }
 
         if (!recordAgent.isEmpty()) {
-            response = AGENT_ALREADY_EXIST;
+            response = PARTICIPANT_ALREADY_EXIST;
         }
         else {
-            agentsRepository.updateAgentDetails(agentsModel);
+            participantsRepository.updateAgentDetails(participantsModel);
         }
 
         return response;
     }
 
     public void terminateAgent(Long participantId) {
-        agentsRepository.terminateAgentDetails(participantId);
+        participantsRepository.terminateAgentDetails(participantId);
     }
 
-    public String addAgent(AgentsModel agentsModel, List<String> contractDates) {
+    public String addAgent(ParticipantsModel participantsModel, List<String> contractDates) {
         String response;
-        List<Object[]> checkAgent = agentsRepository.checkForAgent(agentsModel);
+        List<Object[]> checkAgent = participantsRepository.checkForAgent(participantsModel);
 
         if (checkAgent.isEmpty()) {
-            agentsRepository.addNewAgent(agentsModel, contractDates); // TODO Remove hardcoded date
+            participantsRepository.addNewAgent(participantsModel, contractDates); // TODO Remove hardcoded date
             response = SUCCESSFUL;
         }
         else {
-            response = AGENT_ALREADY_EXIST;
+            response = PARTICIPANT_ALREADY_EXIST;
         }
 
         return response;
     }
 
-    public List<AgentsModel> getAllTerminatedAgents() {
-        List<Object[]> allAgents = agentsRepository.retrieveAllTerminatedAgents();
+    public List<ParticipantsModel> getAllTerminatedAgents() {
+        List<Object[]> allAgents = participantsRepository.retrieveAllTerminatedAgents();
 
-        List<AgentsModel> agents = new ArrayList<>();
+        List<ParticipantsModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -196,7 +196,7 @@ public class AgentsServices {
                     Integer.parseInt(getCompletionDate[2])
             );
 
-            AgentsModel agentsModel = new AgentsModel(
+            ParticipantsModel participantsModel = new ParticipantsModel(
                     Long.parseLong(row[0].toString()),
                     LocalDateTime.parse(row[20].toString()),
                     dateOfBirth,
@@ -225,17 +225,17 @@ public class AgentsServices {
                     row[1].toString()+" "+row[2].toString()
             );
 
-            agents.add(agentsModel);
+            agents.add(participantsModel);
 
         }
 
         return agents;
     }
 
-    public List<AgentsModel> searchAgents(String agentNames, Long statusValue) {
-        List<Object[]> allAgents = agentsRepository.searchForAgents(agentNames, statusValue);
+    public List<ParticipantsModel> searchAgents(String agentNames, Long statusValue, boolean isExpired) {
+        List<Object[]> allAgents = participantsRepository.searchForAgents(agentNames, statusValue);
 
-        List<AgentsModel> agents = new ArrayList<>();
+        List<ParticipantsModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -259,6 +259,8 @@ public class AgentsServices {
 
             String completionDate_str = row[15].toString();
             String[] getCompletionDate = completionDate_str.split("-");
+            String completionYear = getCompletionDate[0];
+            String completionMonth = getCompletionDate[1];
 
             LocalDate completionDate = LocalDate.of(
                     Integer.parseInt(getCompletionDate[0]),
@@ -266,36 +268,87 @@ public class AgentsServices {
                     Integer.parseInt(getCompletionDate[2])
             );
 
-            AgentsModel agentsModel = new AgentsModel(
-                    Long.parseLong(row[0].toString()),
-                    LocalDateTime.parse(row[20].toString()),
-                    dateOfBirth,
-                    placementDate,
-                    completionDate,
-                    row[1].toString(),
-                    row[2].toString(),
-                    row[3].toString(),
-                    row[5].toString(),
-                    row[6].toString(),
-                    row[7].toString(),
-                    row[8].toString(),
-                    row[9].toString(),
-                    row[10].toString(),
-                    row[11].toString(),
-                    row[12].toString(),
-                    row[13].toString(),
-                    row[24].toString(),
-                    row[16].toString(),
-                    row[17].toString(),
-                    row[18].toString(),
-                    row[19].toString(),
-                    row[25].toString(),
-                    row[26].toString(),
-                    row[27].toString(),
-                    row[1].toString()+" "+row[2].toString()
-            );
+            LocalDate todayLocalDate = LocalDate.now();
+            String[] todayLocalDate_str = todayLocalDate.toString().split("-");
+            String todayYear = todayLocalDate_str[0];
+            String todayMonth = todayLocalDate_str[1];
 
-            agents.add(agentsModel);
+            String compareTodayDate_str = todayYear+todayMonth;
+            String compareCompletionDate_str = completionYear+completionMonth;
+
+            int dateDifference = Integer.parseInt(compareTodayDate_str)
+                    - Integer.parseInt(compareCompletionDate_str);
+
+            if (isExpired) {
+                if (dateDifference > 0) {
+                    ParticipantsModel participantsModel = new ParticipantsModel(
+                            Long.parseLong(row[0].toString()),
+                            LocalDateTime.parse(row[20].toString()),
+                            dateOfBirth,
+                            placementDate,
+                            completionDate,
+                            row[1].toString(),
+                            row[2].toString(),
+                            row[3].toString(),
+                            row[5].toString(),
+                            row[6].toString(),
+                            row[7].toString(),
+                            row[8].toString(),
+                            row[9].toString(),
+                            row[10].toString(),
+                            row[11].toString(),
+                            row[12].toString(),
+                            row[13].toString(),
+                            row[24].toString(),
+                            row[16].toString(),
+                            row[17].toString(),
+                            row[18].toString(),
+                            row[19].toString(),
+                            row[25].toString(),
+                            row[26].toString(),
+                            row[27].toString(),
+                            row[1].toString()+" "+row[2].toString()
+                    );
+
+                    agents.add(participantsModel);
+
+                }
+            }
+            else {
+                if (dateDifference <= 0) {
+                    ParticipantsModel participantsModel = new ParticipantsModel(
+                            Long.parseLong(row[0].toString()),
+                            LocalDateTime.parse(row[20].toString()),
+                            dateOfBirth,
+                            placementDate,
+                            completionDate,
+                            row[1].toString(),
+                            row[2].toString(),
+                            row[3].toString(),
+                            row[5].toString(),
+                            row[6].toString(),
+                            row[7].toString(),
+                            row[8].toString(),
+                            row[9].toString(),
+                            row[10].toString(),
+                            row[11].toString(),
+                            row[12].toString(),
+                            row[13].toString(),
+                            row[24].toString(),
+                            row[16].toString(),
+                            row[17].toString(),
+                            row[18].toString(),
+                            row[19].toString(),
+                            row[25].toString(),
+                            row[26].toString(),
+                            row[27].toString(),
+                            row[1].toString()+" "+row[2].toString()
+                    );
+
+                    agents.add(participantsModel);
+
+                }
+            }
 
         }
 
@@ -303,14 +356,14 @@ public class AgentsServices {
     }
 
     public List<String> getContractDuration(String district) {
-        return agentsRepository.retrieveDuration(district);
+        return participantsRepository.retrieveDuration(district);
     }
 
-    public List<AgentsModel> getAllExpiredAgents() {
+    public List<ParticipantsModel> getAllExpiredAgents() {
 
-        List<Object[]> allAgents = agentsRepository.retrieveAllAgents();
+        List<Object[]> allAgents = participantsRepository.retrieveAllAgents();
 
-        List<AgentsModel> agents = new ArrayList<>();
+        List<ParticipantsModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -355,7 +408,7 @@ public class AgentsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference > 0) {
-                AgentsModel agentsModel = new AgentsModel(
+                ParticipantsModel participantsModel = new ParticipantsModel(
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
                         dateOfBirth,
@@ -384,7 +437,7 @@ public class AgentsServices {
                         row[1].toString()+" "+row[2].toString()
                 );
 
-                agents.add(agentsModel);
+                agents.add(participantsModel);
 
             }
 
@@ -396,7 +449,7 @@ public class AgentsServices {
 
     // Nominees
     public List<NomineesModel> getAllNominees() {
-        List<Object[]> allNominees = agentsRepository.retrieveAllNominees();
+        List<Object[]> allNominees = participantsRepository.retrieveAllNominees();
 
         List<NomineesModel> nominees = new ArrayList<>();
 
@@ -424,10 +477,10 @@ public class AgentsServices {
 
     public String addNominee(NomineesModel nomineesModel) {
         String response;
-        List<Object[]> checkNominee = agentsRepository.checkForNominee(nomineesModel);
+        List<Object[]> checkNominee = participantsRepository.checkForNominee(nomineesModel);
 
         if (checkNominee.isEmpty()) {
-            agentsRepository.addNewNominee(nomineesModel);
+            participantsRepository.addNewNominee(nomineesModel);
             response = SUCCESSFUL;
         }
         else {
@@ -440,7 +493,7 @@ public class AgentsServices {
     public String updateNominee(NomineesModel nomineesModel) {
         String response = SUCCESSFUL;
 
-        List<Object[]> checkNomineeList = agentsRepository.checkForNominee(nomineesModel);
+        List<Object[]> checkNomineeList = participantsRepository.checkForNominee(nomineesModel);
 
         List<String> recordNominee = new ArrayList<>();
 
@@ -462,20 +515,20 @@ public class AgentsServices {
             response = NOMINEE_ALREADY_EXIST;
         }
         else {
-            agentsRepository.updateNomineeDetails(nomineesModel);
+            participantsRepository.updateNomineeDetails(nomineesModel);
         }
 
         return response;
     }
 
     public void removeNominee(Long nomineeId) {
-        agentsRepository.removeNomineeDetails(nomineeId);
+        participantsRepository.removeNomineeDetails(nomineeId);
     }
 
 
     // Reference
     public List<ReferenceModel> getAllReferences() {
-        List<Object[]> allReferences = agentsRepository.retrieveAllReferences();
+        List<Object[]> allReferences = participantsRepository.retrieveAllReferences();
 
         List<ReferenceModel> references = new ArrayList<>();
 
@@ -502,10 +555,10 @@ public class AgentsServices {
 
     public String addReference(ReferenceModel referenceModel) {
         String response;
-        List<Object[]> checkReference = agentsRepository.checkForReference(referenceModel);
+        List<Object[]> checkReference = participantsRepository.checkForReference(referenceModel);
 
         if (checkReference.isEmpty()) {
-            agentsRepository.addNewReference(referenceModel);
+            participantsRepository.addNewReference(referenceModel);
             response = SUCCESSFUL;
         }
         else {
@@ -518,7 +571,7 @@ public class AgentsServices {
     public String updateReference(ReferenceModel referenceModel) {
         String response = SUCCESSFUL;
 
-        List<Object[]> checkReferenceList = agentsRepository.checkForReference(referenceModel);
+        List<Object[]> checkReferenceList = participantsRepository.checkForReference(referenceModel);
 
         List<String> recordReference = new ArrayList<>();
 
@@ -540,22 +593,22 @@ public class AgentsServices {
             response = REFERENCE_ALREADY_EXIST;
         }
         else {
-            agentsRepository.updateReferenceDetails(referenceModel);
+            participantsRepository.updateReferenceDetails(referenceModel);
         }
 
         return response;
     }
 
     public void removeReference(Long referenceId) {
-        agentsRepository.removeReferenceDetails(referenceId);
+        participantsRepository.removeReferenceDetails(referenceId);
     }
 
 
     // Attendance
-    public List<AgentsModel> getAttendance(String date) {
-        List<Object[]> allAgents = agentsRepository.retrieveAttendance(date);
+    public List<ParticipantsModel> getAttendance(String date) {
+        List<Object[]> allAgents = participantsRepository.retrieveAttendance(date);
 
-        List<AgentsModel> agents = new ArrayList<>();
+        List<ParticipantsModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -586,7 +639,7 @@ public class AgentsServices {
                     Integer.parseInt(getCompletionDate[2])
             );
 
-            AgentsModel agentsModel = new AgentsModel(
+            ParticipantsModel participantsModel = new ParticipantsModel(
                     Integer.parseInt(row[28].toString()),
                     Long.parseLong(row[0].toString()),
                     LocalDateTime.parse(row[20].toString()),
@@ -616,17 +669,17 @@ public class AgentsServices {
                     row[1].toString()+" "+row[2].toString()
             );
 
-            agents.add(agentsModel);
+            agents.add(participantsModel);
 
         }
 
         return agents;
     }
 
-    public List<AgentsModel> searchAttendance(String date, String agentNames, Long statusValue) {
-        List<Object[]> allAgents = agentsRepository.searchAttendance(date, agentNames, statusValue);
+    public List<ParticipantsModel> searchAttendance(String date, String agentNames, Long statusValue) {
+        List<Object[]> allAgents = participantsRepository.searchAttendance(date, agentNames, statusValue);
 
-        List<AgentsModel> agents = new ArrayList<>();
+        List<ParticipantsModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -657,7 +710,7 @@ public class AgentsServices {
                     Integer.parseInt(getCompletionDate[2])
             );
 
-            AgentsModel agentsModel = new AgentsModel(
+            ParticipantsModel participantsModel = new ParticipantsModel(
                     Integer.parseInt(row[28].toString()),
                     Long.parseLong(row[0].toString()),
                     LocalDateTime.parse(row[20].toString()),
@@ -687,7 +740,7 @@ public class AgentsServices {
                     row[1].toString()+" "+row[2].toString()
             );
 
-            agents.add(agentsModel);
+            agents.add(participantsModel);
 
         }
 
@@ -695,7 +748,7 @@ public class AgentsServices {
     }
 
     public void updateAttendance(Integer daysWorked, Long participantId, String date) {
-        agentsRepository.updateAttendance(daysWorked, participantId, date);
+        participantsRepository.updateAttendance(daysWorked, participantId, date);
     }
 
 }

@@ -68,4 +68,35 @@ public class HistoryRepository {
         }
     }
 
+    public List<Object[]> searchHistory(String agentNames, String date) {
+
+        String sql = "SELECT remuneration_history.remuneration_history_id, remuneration_history.status, " +
+                "remuneration_history.status_reason, remuneration_history.claimed, " +
+                "remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
+                "remuneration_history.deduction_amount, remuneration_history.deduction_reason, " +
+                "remuneration_history.participant_id, participants.firstname, participants.lastname, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, " +
+                "parameters.rate_per_day, attendance_history.days_worked " +
+                "FROM remuneration_history, participants, parameters, attendance_history " +
+                "WHERE (participants.firstname LIKE '%"+agentNames+"%' " +
+                "OR participants.lastname LIKE '%"+agentNames+"%') " +
+                "AND remuneration_history.participant_id = participants.participant_id " +
+                "AND participants.participant_id = attendance_history.participant_id " +
+                "AND participants.parameter_id = parameters.parameter_id " +
+                "AND (remuneration_history.status = '"+APPROVED+"' " +
+                "OR remuneration_history.status = '"+DECLINED+"') " +
+                "AND remuneration_history.month = '"+date+"' " +
+                "AND attendance_history.date = '"+date+"' " +
+                "AND participants.is_terminated = '0'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
 }

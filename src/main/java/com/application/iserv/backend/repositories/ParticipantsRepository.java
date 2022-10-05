@@ -1,8 +1,8 @@
 package com.application.iserv.backend.repositories;
 
-import com.application.iserv.ui.agents.models.AgentsModel;
-import com.application.iserv.ui.agents.models.NomineesModel;
-import com.application.iserv.ui.agents.models.ReferenceModel;
+import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.participants.models.NomineesModel;
+import com.application.iserv.ui.participants.models.ReferenceModel;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 @Transactional
-public class AgentsRepository {
+public class ParticipantsRepository {
 
     @PersistenceContext
     EntityManager entityManager;
@@ -69,32 +69,32 @@ public class AgentsRepository {
     }
 
     @Modifying
-    public void updateAgentDetails(AgentsModel agentsModel) {
+    public void updateAgentDetails(ParticipantsModel participantsModel) {
         try {
 
             String updateAgentSQL = "UPDATE participants SET " +
-                    "firstname = '" + agentsModel.getFirstname() + "'," +
-                    " lastname = '" + agentsModel.getLastname() + "'," +
-                    " identity_number = '" + agentsModel.getIdentityNumber() + "'," +
-                    " date_of_birth = '" + agentsModel.getDateOfBirth() + "'," +
-                    " gender = '" + agentsModel.getGender() + "'," +
-                    " marital_status = '" + agentsModel.getMaritalStatus() + "'," +
-                    " mobile_number = '" + agentsModel.getMobileNumber() + "'," +
-                    " alternate_mobile_number = '" + agentsModel.getAlternateMobileNumber() + "'," +
-                    " postal_address = '" + agentsModel.getPostalAddress() + "'," +
-                    " residential_address = '" + agentsModel.getResidentialAddress() + "'," +
-                    " education = '" + agentsModel.getEducation() + "'," +
-                    " placement_officer = '" + agentsModel.getPlacementOfficer() + "'," +
-                    " placement_place = '" + agentsModel.getPlacementPlace() + "'," +
-                    " placement_date = '" + agentsModel.getPlacementDate() + "'," +
-                    " completion_date = '" + agentsModel.getCompletionDate() + "'," +
-                    " mobile_wallet_provider = '" + agentsModel.getMobileWalletProvider() + "'," +
-                    " bank_name = '" + agentsModel.getBankName() + "'," +
-                    " branch = '" + agentsModel.getBranch() + "'," +
-                    " account_number = '" + agentsModel.getAccountNumber() + "'," +
-                    " timestamp = '" + agentsModel.getTimestamp() + "'," +
+                    "firstname = '" + participantsModel.getFirstname() + "'," +
+                    " lastname = '" + participantsModel.getLastname() + "'," +
+                    " identity_number = '" + participantsModel.getIdentityNumber() + "'," +
+                    " date_of_birth = '" + participantsModel.getDateOfBirth() + "'," +
+                    " gender = '" + participantsModel.getGender() + "'," +
+                    " marital_status = '" + participantsModel.getMaritalStatus() + "'," +
+                    " mobile_number = '" + participantsModel.getMobileNumber() + "'," +
+                    " alternate_mobile_number = '" + participantsModel.getAlternateMobileNumber() + "'," +
+                    " postal_address = '" + participantsModel.getPostalAddress() + "'," +
+                    " residential_address = '" + participantsModel.getResidentialAddress() + "'," +
+                    " education = '" + participantsModel.getEducation() + "'," +
+                    " placement_officer = '" + participantsModel.getPlacementOfficer() + "'," +
+                    " placement_place = '" + participantsModel.getPlacementPlace() + "'," +
+                    " placement_date = '" + participantsModel.getPlacementDate() + "'," +
+                    " completion_date = '" + participantsModel.getCompletionDate() + "'," +
+                    " mobile_wallet_provider = '" + participantsModel.getMobileWalletProvider() + "'," +
+                    " bank_name = '" + participantsModel.getBankName() + "'," +
+                    " branch = '" + participantsModel.getBranch() + "'," +
+                    " account_number = '" + participantsModel.getAccountNumber() + "'," +
+                    " timestamp = '" + participantsModel.getTimestamp() + "'," +
                     " is_terminated = '0'" +
-                    " WHERE participant_id = '" + agentsModel.getParticipantId() + "'";
+                    " WHERE participant_id = '" + participantsModel.getParticipantId() + "'";
 
             Query updateAgentQuery = entityManager.createNativeQuery(updateAgentSQL);
             updateAgentQuery.executeUpdate();
@@ -105,11 +105,11 @@ public class AgentsRepository {
 
     }
 
-    public List<Object[]> checkForAgent(AgentsModel agentsModel) {
+    public List<Object[]> checkForAgent(ParticipantsModel participantsModel) {
 
         String sql = "SELECT participants.participant_id " +
                 "FROM participants " +
-                "WHERE participants.identity_number = '" + agentsModel.getIdentityNumber() + "' " +
+                "WHERE participants.identity_number = '" + participantsModel.getIdentityNumber() + "' " +
                 "AND participants.is_terminated = '0'";
 
         try {
@@ -139,7 +139,7 @@ public class AgentsRepository {
     }
 
     @Modifying
-    public void addNewAgent(AgentsModel agentsModel, List<String> contractDates) {
+    public void addNewAgent(ParticipantsModel participantsModel, List<String> contractDates) {
         try {
 
             // TODO Replace hardcoded parameterId
@@ -150,17 +150,17 @@ public class AgentsRepository {
                     "postal_address, residential_address, education, placement_officer, placement_place, " +
                     "placement_date, completion_date, mobile_wallet_provider, bank_name, branch, " +
                     "account_number, timestamp, is_terminated, parameter_id) VALUES(" +
-                    "'" + agentsModel.getFirstname() + "','" + agentsModel.getLastname() + "'," +
-                    "'" + agentsModel.getIdentityNumber() + "','" + agentsModel.getDateOfBirth() + "'," +
-                    "'" + agentsModel.getGender() + "','" + agentsModel.getMaritalStatus() + "'," +
-                    "'" + agentsModel.getMobileNumber() + "','" + agentsModel.getAlternateMobileNumber() + "'," +
-                    "'" + agentsModel.getPostalAddress() + "','" + agentsModel.getResidentialAddress() + "'," +
-                    "'" + agentsModel.getEducation() + "','" + agentsModel.getPlacementOfficer() + "'," +
-                    "'" + agentsModel.getPlacementPlace() + "'," +
-                    "'" + agentsModel.getPlacementDate() + "','" + agentsModel.getCompletionDate() + "'," +
-                    "'" + agentsModel.getMobileWalletProvider() + "','" + agentsModel.getBankName() + "'," +
-                    "'" + agentsModel.getBranch() + "','" + agentsModel.getAccountNumber() + "'," +
-                    "'" + agentsModel.getTimestamp() + "','0', '1')";
+                    "'" + participantsModel.getFirstname() + "','" + participantsModel.getLastname() + "'," +
+                    "'" + participantsModel.getIdentityNumber() + "','" + participantsModel.getDateOfBirth() + "'," +
+                    "'" + participantsModel.getGender() + "','" + participantsModel.getMaritalStatus() + "'," +
+                    "'" + participantsModel.getMobileNumber() + "','" + participantsModel.getAlternateMobileNumber() + "'," +
+                    "'" + participantsModel.getPostalAddress() + "','" + participantsModel.getResidentialAddress() + "'," +
+                    "'" + participantsModel.getEducation() + "','" + participantsModel.getPlacementOfficer() + "'," +
+                    "'" + participantsModel.getPlacementPlace() + "'," +
+                    "'" + participantsModel.getPlacementDate() + "','" + participantsModel.getCompletionDate() + "'," +
+                    "'" + participantsModel.getMobileWalletProvider() + "','" + participantsModel.getBankName() + "'," +
+                    "'" + participantsModel.getBranch() + "','" + participantsModel.getAccountNumber() + "'," +
+                    "'" + participantsModel.getTimestamp() + "','0', '1')";
 
             Query insertAgentQuery = entityManager.createNativeQuery(insertAgentSQL);
             insertAgentQuery.executeUpdate();
@@ -168,7 +168,7 @@ public class AgentsRepository {
             // Select participantId
             String sql = "SELECT participants.participant_id " +
                     "FROM participants " +
-                    "WHERE participants.identity_number = '"+agentsModel.getIdentityNumber()+"'";
+                    "WHERE participants.identity_number = '"+ participantsModel.getIdentityNumber()+"'";
 
             Query query = entityManager.createNativeQuery(sql);
 

@@ -5,14 +5,14 @@ public class AuthorizeModel {
     double amount;
     int bonusAmount, deductionAmount;
     Long remunerationHistoryId, participantId;
-    String status, statusReason, claimed, bonusReason, deductionReason, agent;
+    String status, statusReason, claimed, bonusReason, deductionReason, participant;
 
     public AuthorizeModel() {
 
     }
 
-    public AuthorizeModel(String agent) {
-        this.agent = agent;
+    public AuthorizeModel(String participant) {
+        this.participant = participant;
     }
 
     public AuthorizeModel(int bonusAmount, int deductionAmount, Long remunerationHistoryId,
@@ -31,7 +31,7 @@ public class AuthorizeModel {
 
     public AuthorizeModel(double amount, int bonusAmount, int deductionAmount, Long remunerationHistoryId,
                           Long participantId, String status, String statusReason, String claimed,
-                          String bonusReason, String deductionReason, String agent) {
+                          String bonusReason, String deductionReason, String participant) {
         this.amount = amount;
         this.bonusAmount = bonusAmount;
         this.deductionAmount = deductionAmount;
@@ -42,7 +42,7 @@ public class AuthorizeModel {
         this.claimed = claimed;
         this.bonusReason = bonusReason;
         this.deductionReason = deductionReason;
-        this.agent = agent;
+        this.participant = participant;
     }
 
     public double getAmount() {
@@ -125,12 +125,12 @@ public class AuthorizeModel {
         this.deductionReason = deductionReason;
     }
 
-    public String getAgent() {
-        return agent;
+    public String getParticipant() {
+        return participant;
     }
 
-    public void setAgent(String agent) {
-        this.agent = agent;
+    public void setParticipant(String participant) {
+        this.participant = participant;
     }
 
     @Override
@@ -146,7 +146,7 @@ public class AuthorizeModel {
                 ", claimed='" + claimed + '\'' +
                 ", bonusReason='" + bonusReason + '\'' +
                 ", deductionReason='" + deductionReason + '\'' +
-                ", agent='" + agent + '\'' +
+                ", agent='" + participant + '\'' +
                 '}';
     }
 

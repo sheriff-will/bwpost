@@ -3,14 +3,14 @@ package com.application.iserv.ui.payments.models;
 
 public class AgentPaymentsModel {
 
-    String agent, amount, claimed, ratePerDay, daysWorked,
+    String participant, amount, claimed, ratePerDay, daysWorked,
             baseSalary, bonus, deduction, approval, paymentMode,
             provider, totalSalary;
 
-    public AgentPaymentsModel(String agent, String amount, String claimed, String ratePerDay,
+    public AgentPaymentsModel(String participant, String amount, String claimed, String ratePerDay,
                               String daysWorked, String baseSalary, String bonus, String deduction,
                               String approval, String paymentMode, String provider, String totalSalary) {
-        this.agent = agent;
+        this.participant = participant;
         this.amount = amount;
         this.claimed = claimed;
         this.ratePerDay = ratePerDay;
@@ -24,12 +24,12 @@ public class AgentPaymentsModel {
         this.totalSalary = totalSalary;
     }
 
-    public String getAgent() {
-        return agent;
+    public String getParticipant() {
+        return participant;
     }
 
-    public void setAgent(String agent) {
-        this.agent = agent;
+    public void setParticipant(String participant) {
+        this.participant = participant;
     }
 
     public String getAmount() {

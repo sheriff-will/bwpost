@@ -1,6 +1,6 @@
 package com.application.iserv.ui.utils;
 
-import com.application.iserv.ui.agents.models.TestAgentsModel;
+import com.application.iserv.ui.participants.models.TestAgentsModel;
 import com.application.iserv.ui.parameters.models.ParametersModel;
 import com.application.iserv.ui.payments.models.AgentPaymentsModel;
 import com.application.iserv.ui.payments.models.HistoryStatementModel;
@@ -27,7 +27,11 @@ public class Constants {
     public static final String BANKING = "Banking";
     public static final String NOMINEES = "Nominees";
     public static final String REFERENCES = "References";
-    public static final String ADD_AGENT = "Add Agent";
+    public static final String PARTICIPANTS = "Participants";
+    public static final String PAYMENTS = "Payments";
+    public static final String PARAMETERS = "Parameters";
+    public static final String REPORTS = "Reports";
+    public static final String ADD_PARTICIPANT = "Add Participant";
     public static final String SAVE = "Save";
     public static final String BACK = "Back";
     public static final String UPDATE = "Update";
@@ -49,7 +53,7 @@ public class Constants {
     public static final String ACCOUNT_NUMBER = "Account Number";
 
     public static final String NON_BINARY = "Non - Binary";
-    public static final String SEARCH_AGENT_HINT = "Search agent...";
+    public static final String SEARCH_AGENT_HINT = "Search participant...";
     public static final String ACTIVE = "Active";
     public static final String TERMINATED = "Terminated";
     public static final String EXPIRED = "Expired";
@@ -63,7 +67,7 @@ public class Constants {
     public static final String DATE = "Date";
     public static final String DATE_OF_BIRTH = "Date Of Birth";
     public static final String AGENT_ATTENDANCE = "agent_attendance";
-    public static final String AGENT = "agent";
+    public static final String PARTICIPANT = "participant";
     public static final String POSITION = "position";
     public static final String RELATIONSHIP = "Relationship";
     public static final String CONTRACT_DURATION = "Contract Duration";
@@ -96,7 +100,7 @@ public class Constants {
     public static final String AUTHORIZE_LOWER_CASE = "authorize";
     public static final String RECONCILE_LOWER_CASE = "reconcile";
     public static final String HISTORY_LOWER_CASE = "history";
-    public static final String AGENTS_LOWER_CASE = "agents";
+    public static final String PARTICIPANTS_LOWER_CASE = "participants";
     public static final String CSV_ERROR_MESSAGE = "Upload a csv file.";
     public static final String CSV_FORMAT = ".csv";
     public static final String DATE_TO_RECONCILE = "Select date to reconcile";
@@ -142,11 +146,11 @@ public class Constants {
     public static final String PARAMETER_ALREADY_EXIST = "Parameter already exist";
     public static final String PARAMETER_SUCCESSFULLY_ADDED = "Parameter successfully added";
     public static final String PARAMETER_SUCCESSFULLY_UPDATED = "Parameter successfully updated";
-    public static final String AGENT_ALREADY_EXIST = "Agent already exist";
-    public static final String AGENT_SUCCESSFULLY_UPDATED = "Agent successfully updated";
+    public static final String PARTICIPANT_ALREADY_EXIST = "Participant already exist";
+    public static final String PARTICIPANT_SUCCESSFULLY_UPDATED = "Participant successfully updated";
     public static final String SUCCESSFULLY_APPROVED_ALL = "Successfully approved all";
-    public static final String AGENT_SUCCESSFULLY_TERMINATED = "Agent successfully terminated";
-    public static final String AGENT_SUCCESSFULLY_ADDED = "Agent successfully added";
+    public static final String PARTICIPANT_SUCCESSFULLY_TERMINATED = "Participant successfully terminated";
+    public static final String PARTICIPANT_SUCCESSFULLY_ADDED = "Participant successfully added";
     public static final String REFERENCE_ALREADY_EXIST = "Reference already exist";
     public static final String NOMINEE_SUCCESSFULLY_UPDATED = "Nominee Successfully Updated";
     public static final String REFERENCE_SUCCESSFULLY_UPDATED = "Reference Successfully Updated";

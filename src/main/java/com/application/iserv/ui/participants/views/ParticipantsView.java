@@ -1,9 +1,9 @@
-package com.application.iserv.ui.agents.views;
+package com.application.iserv.ui.participants.views;
 
-import com.application.iserv.backend.services.AgentsServices;
+import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.tests.MainLayout;
-import com.application.iserv.ui.agents.forms.AgentForm;
-import com.application.iserv.ui.agents.models.AgentsModel;
+import com.application.iserv.ui.participants.forms.ParticipantsForm;
+import com.application.iserv.ui.participants.models.ParticipantsModel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -29,13 +29,13 @@ import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.*;
 
-@PageTitle("iServ | Agents")
-@Route(value = AGENTS_LOWER_CASE, layout = MainLayout.class)
+@PageTitle("iServ | Participants")
+@Route(value = PARTICIPANTS_LOWER_CASE, layout = MainLayout.class)
 @PermitAll
-public class AgentsView extends VerticalLayout {
+public class ParticipantsView extends VerticalLayout {
 
     // Grid
-    Grid<AgentsModel> agentsGrid = new Grid<>(AgentsModel.class);
+    Grid<ParticipantsModel> agentsGrid = new Grid<>(ParticipantsModel.class);
 
     // booleans
     boolean isAttendanceOpen = false;
@@ -45,7 +45,7 @@ public class AgentsView extends VerticalLayout {
     TextField searchAgent = new TextField();
 
     // Forms
-    AgentForm agentForm;
+    ParticipantsForm participantsForm;
 
     Select<String> status = new Select<>();
 
@@ -62,20 +62,20 @@ public class AgentsView extends VerticalLayout {
     HorizontalLayout dateBackHorizontalLayout;
 
     // Services
-    private final AgentsServices agentsServices;
+    private final ParticipantsServices participantsServices;
 
     // Longs
     Long statusValue = 0L;
 
     // ArrayList
-    List<AgentsModel> agentsModelList = new ArrayList<>();
+    List<ParticipantsModel> participantsModelList = new ArrayList<>();
 
     // Strings
     String date = "";
 
     @Autowired
-    public AgentsView(AgentsServices agentsServices) {
-        this.agentsServices = agentsServices;
+    public ParticipantsView(ParticipantsServices participantsServices) {
+        this.participantsServices = participantsServices;
 
         setSizeFull();
         addClassName(AGENTS_LIST_VIEW);
@@ -101,16 +101,16 @@ public class AgentsView extends VerticalLayout {
             datePicker.setVisible(false);
         }
 
-        agentForm.setVisible(false);
+        participantsForm.setVisible(false);
 
         removeClassName(ADDING_AGENT);
         removeClassName(EDITING_AGENTS);
     }
 
     private Component getAgentsContent() {
-        agentsHorizontalLayout = new HorizontalLayout(agentsGrid, agentForm);
+        agentsHorizontalLayout = new HorizontalLayout(agentsGrid, participantsForm);
         agentsHorizontalLayout.setFlexGrow(2, agentsGrid);
-        agentsHorizontalLayout.setFlexGrow(1, agentForm);
+        agentsHorizontalLayout.setFlexGrow(1, participantsForm);
 
         agentsHorizontalLayout.setSizeFull();
         agentsHorizontalLayout.addClassName(AGENTS_CONTENT_LAYOUT);
@@ -119,15 +119,15 @@ public class AgentsView extends VerticalLayout {
     }
 
     private void configureAgentsForm() {
-        agentForm = new AgentForm(agentsServices);
-        agentForm.setWidth("50%");
+        participantsForm = new ParticipantsForm(participantsServices);
+        participantsForm.setWidth("50%");
 
-        agentForm.addListener(AgentForm.CloseEvent.class, e -> {
+        participantsForm.addListener(ParticipantsForm.CloseEvent.class, e -> {
             agentsGrid.asSingleSelect().clear();
             closeComponents();
         });
-        agentForm.addListener(AgentForm.AgentUpdatedEvent.class, e -> {
-            Notification notification = new Notification(AGENT_SUCCESSFULLY_UPDATED);
+        participantsForm.addListener(ParticipantsForm.AgentUpdatedEvent.class, e -> {
+            Notification notification = new Notification(PARTICIPANT_SUCCESSFULLY_UPDATED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             notification.setDuration(5000);
@@ -137,8 +137,8 @@ public class AgentsView extends VerticalLayout {
 
         });
 
-        agentForm.addListener(AgentForm.AgentTerminatedEvent.class, e -> {
-            Notification notification = new Notification(AGENT_SUCCESSFULLY_TERMINATED);
+        participantsForm.addListener(ParticipantsForm.AgentTerminatedEvent.class, e -> {
+            Notification notification = new Notification(PARTICIPANT_SUCCESSFULLY_TERMINATED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             notification.setDuration(5000);
@@ -148,8 +148,8 @@ public class AgentsView extends VerticalLayout {
 
         });
 
-        agentForm.addListener(AgentForm.AgentAddedEvent.class, e -> {
-            Notification notification = new Notification(AGENT_SUCCESSFULLY_ADDED);
+        participantsForm.addListener(ParticipantsForm.AgentAddedEvent.class, e -> {
+            Notification notification = new Notification(PARTICIPANT_SUCCESSFULLY_ADDED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             notification.setDuration(5000);
@@ -161,8 +161,8 @@ public class AgentsView extends VerticalLayout {
 
         });
 
-        agentForm.addListener(AgentForm.CloseAttendanceFormEvent.class, e -> {
-            agentForm.setVisible(false);
+        participantsForm.addListener(ParticipantsForm.CloseAttendanceFormEvent.class, e -> {
+            participantsForm.setVisible(false);
 
             agentsGrid.asSingleSelect().clear();
 
@@ -171,7 +171,7 @@ public class AgentsView extends VerticalLayout {
 
         });
 
-        agentForm.addListener(AgentForm.AgentDaysWorkedUpdatedEvent.class, e -> {
+        participantsForm.addListener(ParticipantsForm.AgentDaysWorkedUpdatedEvent.class, e -> {
             Notification notification = new Notification(UPDATED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -193,12 +193,12 @@ public class AgentsView extends VerticalLayout {
             if (status.getValue() != null) {
                 if (status.getValue().equalsIgnoreCase(ACTIVE)) {
                     statusValue = 0L;
-                    agentsModelList = new ArrayList<>();
+                    participantsModelList = new ArrayList<>();
 
                     if (isAttendanceOpen && datePicker.getValue() != null) {
                         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
 
-                        agentsModelList = agentsServices.searchAttendance(
+                        participantsModelList = participantsServices.searchAttendance(
                                 datePicker.getValue().format(dateTimeFormatter),
                                 searchAgent.getValue(),
                                 statusValue
@@ -206,17 +206,38 @@ public class AgentsView extends VerticalLayout {
 
                     }
                     else {
-                        agentsModelList = agentsServices.searchAgents(searchAgent.getValue(), statusValue);
+                        participantsModelList = participantsServices
+                                .searchAgents(
+                                        searchAgent.getValue(),
+                                        statusValue,
+                                        false
+                                );
                     }
 
-                    agentsGrid.setItems(agentsModelList);
+                    agentsGrid.setItems(participantsModelList);
 
+                }
+                else if (status.getValue().equalsIgnoreCase(EXPIRED)) {
+                    statusValue = 0L;
+                    participantsModelList = new ArrayList<>();
+                    participantsModelList = participantsServices.
+                            searchAgents(
+                                    searchAgent.getValue(),
+                                    statusValue,
+                                    true
+                            );
+                    agentsGrid.setItems(participantsModelList);
                 }
                 else if (status.getValue().equalsIgnoreCase(TERMINATED)) {
                     statusValue = 1L;
-                    agentsModelList = new ArrayList<>();
-                    agentsModelList = agentsServices.searchAgents(searchAgent.getValue(), statusValue);
-                    agentsGrid.setItems(agentsModelList);
+                    participantsModelList = new ArrayList<>();
+                    participantsModelList = participantsServices.
+                            searchAgents(
+                                    searchAgent.getValue(),
+                                    statusValue,
+                                    false
+                            );
+                    agentsGrid.setItems(participantsModelList);
                 }
             }
         });
@@ -230,16 +251,16 @@ public class AgentsView extends VerticalLayout {
         status.addValueChangeListener(statusValueChangeEvent -> {
             if (!isAttendanceOpen) {
                 if (statusValueChangeEvent.getValue().equalsIgnoreCase(ACTIVE)) {
-                    agentsGrid.setItems(agentsServices.getAllAgents());
-                    agentForm.disableButtons(true);
+                    agentsGrid.setItems(participantsServices.getAllAgents());
+                    participantsForm.disableButtons(true);
                 }
                 else if (statusValueChangeEvent.getValue().equalsIgnoreCase(TERMINATED)) {
-                    agentsGrid.setItems(agentsServices.getAllTerminatedAgents());
-                    agentForm.disableButtons(false);
+                    agentsGrid.setItems(participantsServices.getAllTerminatedAgents());
+                    participantsForm.disableButtons(false);
                 }
                 else if (statusValueChangeEvent.getValue().equalsIgnoreCase(EXPIRED)) {
-                    agentsGrid.setItems(agentsServices.getAllExpiredAgents());
-                    agentForm.disableButtons(false);
+                    agentsGrid.setItems(participantsServices.getAllExpiredAgents());
+                    participantsForm.disableButtons(false);
                 }
             }
         });
@@ -273,7 +294,7 @@ public class AgentsView extends VerticalLayout {
 
         });
 
-        addAgentButton = new Button(ADD_AGENT);
+        addAgentButton = new Button(ADD_PARTICIPANT);
         addAgentButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addAgentButton.addClickListener(click -> {
             removeClassName(ADDING_AGENT);
@@ -283,7 +304,7 @@ public class AgentsView extends VerticalLayout {
 
         });
 
-        HorizontalLayout statusAttendanceLayout = new HorizontalLayout(status, addAgentButton);
+        HorizontalLayout statusAttendanceLayout = new HorizontalLayout(status, attendanceButton);
         statusAttendanceLayout.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
         statusAttendanceLayout.addClassName(STATUS_ATTENDANCE_LAYOUT);
 
@@ -304,15 +325,17 @@ public class AgentsView extends VerticalLayout {
             status.setValue(ACTIVE);
             status.setReadOnly(true);
 
-            if (agentForm.isVisible()) {
-                agentForm.setVisible(false);
+            if (participantsForm.isVisible()) {
+                participantsForm.setVisible(false);
             }
 
-            agentForm.hideAllComponents(true);
+            participantsForm.hideAllComponents(true);
 
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
 
-            date = datePicker.getValue().format(dateFormatter);
+            if (datePicker.getValue() != null) {
+                date = datePicker.getValue().format(dateFormatter);
+            }
 
         });
 
@@ -338,7 +361,7 @@ public class AgentsView extends VerticalLayout {
 
         dateBackHorizontalLayout = new HorizontalLayout(datePicker, backButton);
 
-        HorizontalLayout toolbar = new HorizontalLayout(searchAgent, attendanceButton, dateBackHorizontalLayout);
+        HorizontalLayout toolbar = new HorizontalLayout(searchAgent, addAgentButton, dateBackHorizontalLayout);
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         toolbar.addClassName(TOOLBAR);
 
@@ -361,7 +384,7 @@ public class AgentsView extends VerticalLayout {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
 
             agentsGrid.setItems(
-                    agentsServices.getAttendance(
+                    participantsServices.getAttendance(
                             datePicker.getValue().format(dateTimeFormatter)
                     ));
 
@@ -390,12 +413,12 @@ public class AgentsView extends VerticalLayout {
 
         configureAgentsGrid(AGENT_POSITION);
 
-        agentForm.changeLayout(false);
-        agentForm.showTab(IDENTIFICATION);
+        participantsForm.changeLayout(false);
+        participantsForm.showTab(IDENTIFICATION);
 
         agentsGrid.asSingleSelect().clear();
 
-        agentForm.resetTabs();
+        participantsForm.resetTabs();
 
         updateAgents();
 
@@ -406,10 +429,10 @@ public class AgentsView extends VerticalLayout {
         agentsGrid.addClassName(AGENTS_GRID);
 
         if (columns.equalsIgnoreCase(AGENT_POSITION)) {
-            agentsGrid.setColumns(AGENT, POSITION);
+            agentsGrid.setColumns(PARTICIPANT, POSITION);
         }
         else if (columns.equalsIgnoreCase(AGENT_ATTENDANCE)) {
-            agentsGrid.setColumns(AGENT, DAYS_WORKED_CAMEL_CASE);
+            agentsGrid.setColumns(PARTICIPANT, DAYS_WORKED_CAMEL_CASE);
         }
 
         agentsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
@@ -417,43 +440,43 @@ public class AgentsView extends VerticalLayout {
     }
 
     private void updateAgents() {
-        agentsModelList = agentsServices.getAllAgents();
-        agentsGrid.setItems(agentsModelList);
+        participantsModelList = participantsServices.getAllAgents();
+        agentsGrid.setItems(participantsModelList);
     }
 
     private void updateAttendance() {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
 
-        agentsGrid.setItems(agentsServices.getAttendance(
+        agentsGrid.setItems(participantsServices.getAttendance(
                 datePicker.getValue().format(dateTimeFormatter))
         );
 
     }
 
-    private void editAgent(AgentsModel agentsModel) {
+    private void editAgent(ParticipantsModel participantsModel) {
         addClassName(EDITING_AGENTS);
 
-        if (agentsModel == null) {
+        if (participantsModel == null) {
             closeComponents();
         }
         else {
             if (isAttendanceOpen) {
-                agentForm.setAgent(agentsModel, date);
-                agentForm.changeLayout(true);
-                agentForm.setVisible(true);
+                participantsForm.setAgent(participantsModel, date);
+                participantsForm.changeLayout(true);
+                participantsForm.setVisible(true);
             }
             else {
-                agentForm.setButtonText(false);
-                agentForm.setAgent(agentsModel, date);
-                agentForm.setVisible(true);
+                participantsForm.setButtonText(false);
+                participantsForm.setAgent(participantsModel, date);
+                participantsForm.setVisible(true);
             }
         }
     }
 
     private void openAddAgentForm() {
         agentsGrid.asSingleSelect().clear();
-        editAgent(new AgentsModel());
-        agentForm.setButtonText(true);
+        editAgent(new ParticipantsModel());
+        participantsForm.setButtonText(true);
     }
 
 }

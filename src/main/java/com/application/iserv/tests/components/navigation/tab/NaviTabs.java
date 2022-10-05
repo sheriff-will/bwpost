@@ -3,7 +3,7 @@ package com.application.iserv.tests.components.navigation.tab;
 
 import com.application.iserv.tests.util.UIUtils;
 import com.application.iserv.tests.util.css.Overflow;
-import com.application.iserv.ui.agents.views.AgentsView;
+import com.application.iserv.ui.participants.views.ParticipantsView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -94,7 +94,7 @@ public class NaviTabs extends Tabs {
 				if (getTabCount() > 0) {
 					setSelectedIndex(getTabCount() - 1);
 				} else {
-					UI.getCurrent().navigate(AgentsView.class);
+					UI.getCurrent().navigate(ParticipantsView.class);
 				}
 			}
 		}

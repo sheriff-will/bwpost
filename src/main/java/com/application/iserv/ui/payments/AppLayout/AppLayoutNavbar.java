@@ -1,6 +1,6 @@
 package com.application.iserv.ui.payments.AppLayout;
 
-import com.application.iserv.ui.agents.views.AgentsView;
+import com.application.iserv.ui.participants.views.ParticipantsView;
 import com.application.iserv.ui.payments.views.AuthorizeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
@@ -81,7 +81,7 @@ public class AppLayoutNavbar extends AppLayout {
 
     private Component[] createMenuItems() {
         return new Tab[] {
-                createTab("Agents", AgentsView.class),
+                createTab("Agents", ParticipantsView.class),
                 createTab("Payments", AuthorizeView.class)
         };
     }

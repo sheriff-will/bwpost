@@ -132,7 +132,7 @@ public class AuthorizeView extends VerticalLayout {
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
         searchAgent.addClassName(SEARCH_AGENT);
         searchAgent.addValueChangeListener(searchAgentValueChanged -> authorizeGrid.setItems(
-                authorizeService.searchRemunerationAgents(searchAgent.getValue(), date)
+                authorizeService.searchAuthorize(searchAgent.getValue(), date)
         ));
 
 
@@ -243,7 +243,7 @@ public class AuthorizeView extends VerticalLayout {
             authorizeGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
             authorizeGrid.setSizeFull();
 
-            authorizeGrid.setColumns(AGENT, AMOUNT);
+            authorizeGrid.setColumns(PARTICIPANT, AMOUNT);
 
             authorizeGrid.addComponentColumn(
                     status -> createBadge(status.getStatus())).setHeader(STATUS);
@@ -255,7 +255,7 @@ public class AuthorizeView extends VerticalLayout {
             authorizeGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
             authorizeGrid.setSizeFull();
 
-            authorizeGrid.setColumns(AGENT);
+            authorizeGrid.setColumns(PARTICIPANT);
 
             authorizeGrid.addComponentColumn(
                     status -> createBadge("-")).setHeader(CAPS_AMOUNT);

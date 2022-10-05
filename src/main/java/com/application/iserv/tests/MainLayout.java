@@ -1,6 +1,5 @@
 package com.application.iserv.tests;
 
-
 import com.application.iserv.security.services.SecurityService;
 import com.application.iserv.tests.components.FlexBoxLayout;
 import com.application.iserv.tests.components.navigation.bar.AppBar;
@@ -10,8 +9,8 @@ import com.application.iserv.tests.components.navigation.drawer.NaviItem;
 import com.application.iserv.tests.components.navigation.drawer.NaviMenu;
 import com.application.iserv.tests.util.css.Overflow;
 import com.application.iserv.tests.views.Statistics;
-import com.application.iserv.ui.agents.views.AgentsView;
 import com.application.iserv.ui.parameters.views.ParametersView;
+import com.application.iserv.ui.participants.views.ParticipantsView;
 import com.application.iserv.ui.payments.views.AuthorizeView;
 import com.application.iserv.ui.payments.views.HistoryView;
 import com.application.iserv.ui.payments.views.ReconcileView;
@@ -29,6 +28,8 @@ import com.vaadin.flow.server.ErrorHandler;
 import com.vaadin.flow.server.VaadinSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.application.iserv.ui.utils.Constants.*;
 
 @CssImport(value = "./styles/components/charts.css", themeFor = "vaadin-chart", include = "vaadin-chart-default-theme")
 @CssImport(value = "./styles/components/floating-action-button.css", themeFor = "vaadin-button")
@@ -122,15 +123,15 @@ public class MainLayout extends FlexBoxLayout
 	 */
 	private void initNaviItems() {
 		NaviMenu menu = naviDrawer.getMenu();
-		menu.addNaviItem(VaadinIcon.USERS, "Agents", AgentsView.class);
+		menu.addNaviItem(VaadinIcon.USERS, PARTICIPANTS, ParticipantsView.class);
 
-		NaviItem payments = menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", null);
-		menu.addNaviItem(payments, "Authorize", AuthorizeView.class);
-		menu.addNaviItem(payments, "Reconcile", ReconcileView.class);
-		menu.addNaviItem(payments, "History", HistoryView.class);
+		NaviItem payments = menu.addNaviItem(VaadinIcon.CREDIT_CARD, PAYMENTS, null);
+		menu.addNaviItem(payments, AUTHORIZE, AuthorizeView.class);
+		menu.addNaviItem(payments, RECONCILE, ReconcileView.class);
+		menu.addNaviItem(payments, HISTORY, HistoryView.class);
 
-		menu.addNaviItem(VaadinIcon.TOOLBOX, "Parameters", ParametersView.class);
-		menu.addNaviItem(VaadinIcon.CHART_3D, "Reports", Statistics.class);
+		menu.addNaviItem(VaadinIcon.TOOLBOX, PARAMETERS, ParametersView.class);
+		menu.addNaviItem(VaadinIcon.CHART_3D, REPORTS, Statistics.class);
 
 		payments.setSubItemsVisible(false);
 
@@ -249,7 +250,7 @@ public class MainLayout extends FlexBoxLayout
 		NaviItem active = getActiveItem(e);
 		if (active == null) {
 			if (tabBar.getTabCount() == 0) {
-				tabBar.addClosableTab("", AgentsView.class);
+				tabBar.addClosableTab("", ParticipantsView.class);
 			}
 		} else {
 			if (tabBar.getTabCount() > 0) {
@@ -280,33 +281,28 @@ public class MainLayout extends FlexBoxLayout
 			String title = active.getText();
 			getAppBar().setTitle(active.getText());
 
-			if (title.contains("Agents")) {
+			if (title.contains(PARTICIPANTS)) {
 				getAppBar().showTabs(false);
 			}
-			else if (title.contains("Authorize")) {
+			else if (title.contains(AUTHORIZE)) {
 				appBar.showRightTab("Authorize");
 				getAppBar().setTitle("Payments");
 				getAppBar().showTabs(true);
 			}
-			else if (title.contains("Reconcile")) {
+			else if (title.contains(RECONCILE)) {
 				getAppBar().setTitle("Payments");
 				appBar.showRightTab("Reconcile");
 				getAppBar().showTabs(true);
 			}
-			else if (title.contains("History")) {
+			else if (title.contains(HISTORY)) {
 				getAppBar().setTitle("Payments");
 				appBar.showRightTab("History");
 				getAppBar().showTabs(true);
 			}
-			else if (title.contains("Parameters")) {
+			else if (title.contains(PARAMETERS)) {
 				getAppBar().showTabs(false);
 			}
-
-			// TODO These are temporary
-			else if (title.contains("Reports")) {
-				getAppBar().showTabs(false);
-			}
-			else if (title.contains("Sign Out")) {
+			else if (title.contains(REPORTS)) {
 				getAppBar().showTabs(false);
 			}
 

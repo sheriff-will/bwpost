@@ -156,10 +156,10 @@ public class HistoryForm extends VerticalLayout {
         this.historyModel = historyModel;
         binder.readBean(historyModel);
 
-        String[] getFirstname = historyModel.getAgent().split(" ");
+        String[] getFirstname = historyModel.getParticipant().split(" ");
 
         firstname = getFirstname[0];
-        names = historyModel.getAgent();
+        names = historyModel.getParticipant();
         participantId = historyModel.getParticipantId();
 
         if (historyModel.getBonusAmount().equalsIgnoreCase("0")) {

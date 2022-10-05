@@ -1,4 +1,4 @@
-package com.application.iserv.ui.agents.models;
+package com.application.iserv.ui.participants.models;
 
 
 public class TestAgentsModel {

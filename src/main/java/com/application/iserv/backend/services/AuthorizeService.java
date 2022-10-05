@@ -65,9 +65,9 @@ public class AuthorizeService {
         authorizeRepository.updateRemunerationDetails(authorizeModel);
     }
 
-    public List<AuthorizeModel> searchRemunerationAgents(String agentNames, String date) {
+    public List<AuthorizeModel> searchAuthorize(String agentNames, String date) {
         List<Object[]> allRemunerationHistory = authorizeRepository
-                .searchForRemunerationAgents(agentNames, date);
+                .searchAuthorize(agentNames, date);
 
         List<AuthorizeModel> remunerationHistory = new ArrayList<>();
 

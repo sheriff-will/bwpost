@@ -1,10 +1,10 @@
-package com.application.iserv.ui.agents.forms;
+package com.application.iserv.ui.participants.forms;
 
 
-import com.application.iserv.backend.services.AgentsServices;
-import com.application.iserv.ui.agents.models.AgentsModel;
-import com.application.iserv.ui.agents.models.NomineesModel;
-import com.application.iserv.ui.agents.models.ReferenceModel;
+import com.application.iserv.backend.services.ParticipantsServices;
+import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.participants.models.NomineesModel;
+import com.application.iserv.ui.participants.models.ReferenceModel;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -39,7 +39,7 @@ import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.*;
 
-public class AgentForm extends VerticalLayout {
+public class ParticipantsForm extends VerticalLayout {
 
     // TODO Make duration always positive for expired agents
 
@@ -124,7 +124,7 @@ public class AgentForm extends VerticalLayout {
 
 
     // Binder
-    Binder<AgentsModel> agentsModelBinder = new Binder<>(AgentsModel.class);
+    Binder<ParticipantsModel> agentsModelBinder = new Binder<>(ParticipantsModel.class);
 
     // Layouts
     HorizontalLayout buttonsLayout;
@@ -138,8 +138,8 @@ public class AgentForm extends VerticalLayout {
     Dialog referenceDialog = new Dialog();
 
     // Models
-    private AgentsModel agentsModel;
-    private final AgentsServices agentsServices;
+    private ParticipantsModel participantsModel;
+    private final ParticipantsServices participantsServices;
 
     // Longs
     Long nomineeId;
@@ -158,8 +158,8 @@ public class AgentForm extends VerticalLayout {
     boolean isUpdateReference = false;
 
     @Autowired
-    public AgentForm(AgentsServices agentsServices) {
-        this.agentsServices = agentsServices;
+    public ParticipantsForm(ParticipantsServices participantsServices) {
+        this.participantsServices = participantsServices;
 
         configureDate();
         configureTabs();
@@ -387,26 +387,26 @@ public class AgentForm extends VerticalLayout {
 
     }
 
-    private void configureNullValues(AgentsModel agentsModel) {
+    private void configureNullValues(ParticipantsModel participantsModel) {
         if (alternateMobileNumber != null
                 && alternateMobileNumber.getValue().equalsIgnoreCase("null")) {
             alternateMobileNumber.clear();
         }
 
-        if (agentsModel.getMobileWalletProvider() != null) {
-            if (!agentsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+        if (participantsModel.getMobileWalletProvider() != null) {
+            if (!participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
                 paymentMethod.setValue(MOBILE_WALLET);
                 bankName.clear();
                 branch.clear();
                 accountNumber.clear();
 
             }
-            else if (!agentsModel.getBankName().equalsIgnoreCase("null")) {
+            else if (!participantsModel.getBankName().equalsIgnoreCase("null")) {
                 paymentMethod.setValue(BANK_EFT);
                 mobileWalletProvider.clear();
             }
-            else if (agentsModel.getBankName().equalsIgnoreCase("null")
-                    && agentsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+            else if (participantsModel.getBankName().equalsIgnoreCase("null")
+                    && participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
                 paymentMethod.setValue(CASH);
                 bankName.clear();
                 branch.clear();
@@ -442,13 +442,13 @@ public class AgentForm extends VerticalLayout {
     private void updateGridInfo() {
 
         // Nominees list
-        allNomineesList = agentsServices.getAllNominees();
+        allNomineesList = participantsServices.getAllNominees();
 
         // Nominees
         nomineesGrid.setItems(agentNomineesList);
 
         // References list
-        allReferencesList = agentsServices.getAllReferences();
+        allReferencesList = participantsServices.getAllReferences();
 
         // References
         referenceGrid.setItems(agentReferencesList);
@@ -458,7 +458,7 @@ public class AgentForm extends VerticalLayout {
     private void updateNomineesGrid() {
 
         // Nominees list
-        allNomineesList = agentsServices.getAllNominees();
+        allNomineesList = participantsServices.getAllNominees();
 
         configureNominees();
 
@@ -470,7 +470,7 @@ public class AgentForm extends VerticalLayout {
     private void updateReferenceGrid() {
 
         // References list
-        allReferencesList = agentsServices.getAllReferences();
+        allReferencesList = participantsServices.getAllReferences();
 
         configureReferences();
 
@@ -519,7 +519,7 @@ public class AgentForm extends VerticalLayout {
 
         removeNominee.addClickListener(click -> {
             removeNominee.setDisableOnClick(true);
-            agentsServices.removeNominee(nomineeId);
+            participantsServices.removeNominee(nomineeId);
 
             updateNomineesGrid();
 
@@ -580,7 +580,7 @@ public class AgentForm extends VerticalLayout {
 
         removeReference.addClickListener(click -> {
             removeReference.setDisableOnClick(true);
-            agentsServices.removeReference(referenceId);
+            participantsServices.removeReference(referenceId);
 
             updateReferenceGrid();
 
@@ -679,7 +679,7 @@ public class AgentForm extends VerticalLayout {
 
         // TODO Configure duration and remove static value "Kgatleng"
         // Contract duration
-        duration.setItems(agentsServices.getContractDuration("Kgatleng"));
+        duration.setItems(participantsServices.getContractDuration("Kgatleng"));
         duration.setItemLabelGenerator(String::toString);
 
         // Marital statuses
@@ -712,13 +712,13 @@ public class AgentForm extends VerticalLayout {
 
     }
 
-    public void setAgent(AgentsModel agentsModel, String monthDate) {
-        this.agentsModel = agentsModel;
-        agentsModelBinder.readBean(agentsModel);
+    public void setAgent(ParticipantsModel participantsModel, String monthDate) {
+        this.participantsModel = participantsModel;
+        agentsModelBinder.readBean(participantsModel);
 
-        if (agentsModel.getPlacementDate() != null && agentsModel.getCompletionDate() != null) {
+        if (participantsModel.getPlacementDate() != null && participantsModel.getCompletionDate() != null) {
             long monthsDifference = ChronoUnit.MONTHS.between(
-                    agentsModel.getPlacementDate(), agentsModel.getCompletionDate());
+                    participantsModel.getPlacementDate(), participantsModel.getCompletionDate());
 
             duration.setValue(monthsDifference+" Months");
         }
@@ -726,9 +726,9 @@ public class AgentForm extends VerticalLayout {
             duration.clear();
         }
 
-        configureNullValues(agentsModel);
+        configureNullValues(participantsModel);
 
-        participantId = agentsModel.getParticipantId();
+        participantId = participantsModel.getParticipantId();
 
         configureNominees();
         configureReferences();
@@ -1320,9 +1320,9 @@ public class AgentForm extends VerticalLayout {
 
         updateButton.addClickListener(click -> {
             if (daysWorked.getValue() != null && !daysWorked.isInvalid()) {
-                agentsServices.updateAttendance(
+                participantsServices.updateAttendance(
                         daysWorked.getValue(),
-                        agentsModel.getParticipantId(),
+                        participantsModel.getParticipantId(),
                         date
                 );
 
@@ -1357,7 +1357,7 @@ public class AgentForm extends VerticalLayout {
         );
 
         terminateButton.addClickListener(click -> {
-            agentsServices.terminateAgent(participantId);
+            participantsServices.terminateAgent(participantId);
 
             fireEvent(new AgentTerminatedEvent(this));
         });
@@ -1439,7 +1439,7 @@ public class AgentForm extends VerticalLayout {
         else {
 
             if (isUpdateNominee) {
-                String response = agentsServices.updateNominee(new NomineesModel(
+                String response = participantsServices.updateNominee(new NomineesModel(
                         nomineeId,
                         participantId,
                         nomineeFirstname.getValue(),
@@ -1471,7 +1471,7 @@ public class AgentForm extends VerticalLayout {
 
             }
             else {
-                String response = agentsServices.addNominee(new NomineesModel(
+                String response = participantsServices.addNominee(new NomineesModel(
                         nomineeId,
                         participantId,
                         nomineeFirstname.getValue(),
@@ -1566,7 +1566,7 @@ public class AgentForm extends VerticalLayout {
         else {
 
             if (isUpdateReference) {
-                String response = agentsServices.updateReference(new ReferenceModel(
+                String response = participantsServices.updateReference(new ReferenceModel(
                         referenceId,
                         participantId,
                         referenceFirstname.getValue(),
@@ -1597,7 +1597,7 @@ public class AgentForm extends VerticalLayout {
 
             }
             else {
-                String response = agentsServices.addReference(new ReferenceModel(
+                String response = participantsServices.addReference(new ReferenceModel(
                         referenceId,
                         participantId,
                         referenceFirstname.getValue(),
@@ -1710,7 +1710,7 @@ public class AgentForm extends VerticalLayout {
         }
 
 
-        String response = agentsServices.addAgent(new AgentsModel(
+        String response = participantsServices.addAgent(new ParticipantsModel(
                 participantId,
                 LocalDateTime.now(),
                 dateOfBirthLocalDate,
@@ -1746,8 +1746,8 @@ public class AgentForm extends VerticalLayout {
 
         updateAddAgent.setEnabled(true);
 
-        if (response.equalsIgnoreCase(AGENT_ALREADY_EXIST)) {
-            Notification notification = new Notification(AGENT_ALREADY_EXIST);
+        if (response.equalsIgnoreCase(PARTICIPANT_ALREADY_EXIST)) {
+            Notification notification = new Notification(PARTICIPANT_ALREADY_EXIST);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             notification.setDuration(5000);
@@ -1832,7 +1832,7 @@ public class AgentForm extends VerticalLayout {
         }
 
 
-        String response = agentsServices.updateAgent(new AgentsModel(
+        String response = participantsServices.updateAgent(new ParticipantsModel(
                 participantId,
                 LocalDateTime.now(),
                 dateOfBirthLocalDate,
@@ -1866,8 +1866,8 @@ public class AgentForm extends VerticalLayout {
 
         updateAddAgent.setEnabled(true);
 
-        if (response.equalsIgnoreCase(AGENT_ALREADY_EXIST)) {
-            Notification notification = new Notification(AGENT_ALREADY_EXIST);
+        if (response.equalsIgnoreCase(PARTICIPANT_ALREADY_EXIST)) {
+            Notification notification = new Notification(PARTICIPANT_ALREADY_EXIST);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             notification.setDuration(5000);
@@ -1916,53 +1916,53 @@ public class AgentForm extends VerticalLayout {
     }
 
     // Events
-    public static abstract class AddAgentFormEvent extends ComponentEvent<AgentForm> {
+    public static abstract class AddAgentFormEvent extends ComponentEvent<ParticipantsForm> {
 
-        private AgentsModel agentsModel;
+        private ParticipantsModel participantsModel;
 
-        protected AddAgentFormEvent(AgentForm source, AgentsModel agentsModel) {
+        protected AddAgentFormEvent(ParticipantsForm source, ParticipantsModel participantsModel) {
             super(source, false);
-            this.agentsModel = agentsModel;
+            this.participantsModel = participantsModel;
         }
 
-        public AgentsModel getAgents() {
-            return agentsModel;
+        public ParticipantsModel getAgents() {
+            return participantsModel;
         }
 
     }
 
     public static class AgentUpdatedEvent extends AddAgentFormEvent {
-        AgentUpdatedEvent(AgentForm source) {
+        AgentUpdatedEvent(ParticipantsForm source) {
             super(source, null);
         }
     }
 
     public static class AgentDaysWorkedUpdatedEvent extends AddAgentFormEvent {
-        AgentDaysWorkedUpdatedEvent(AgentForm source) {
+        AgentDaysWorkedUpdatedEvent(ParticipantsForm source) {
             super(source, null);
         }
     }
 
     public static class AgentTerminatedEvent extends AddAgentFormEvent {
-        AgentTerminatedEvent(AgentForm source) {
+        AgentTerminatedEvent(ParticipantsForm source) {
             super(source, null);
         }
     }
 
     public static class CloseEvent extends AddAgentFormEvent {
-        CloseEvent(AgentForm source) {
+        CloseEvent(ParticipantsForm source) {
             super(source, null);
         }
     }
 
     public static class CloseAttendanceFormEvent extends AddAgentFormEvent {
-        CloseAttendanceFormEvent(AgentForm source) {
+        CloseAttendanceFormEvent(ParticipantsForm source) {
             super(source, null);
         }
     }
 
     public static class AgentAddedEvent extends AddAgentFormEvent {
-        AgentAddedEvent(AgentForm source) {
+        AgentAddedEvent(ParticipantsForm source) {
             super(source, null);
         }
     }

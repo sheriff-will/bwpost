@@ -1,9 +1,9 @@
-package com.application.iserv.ui.agents.models;
+package com.application.iserv.ui.participants.models;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class AgentsModel {
+public class ParticipantsModel {
 
     Integer daysWorked;
     Long participantId;
@@ -12,19 +12,19 @@ public class AgentsModel {
     String firstname, lastname, identityNumber, gender, maritalStatus, mobileNumber,
             alternateMobileNumber, postalAddress, residentialAddress, education, placementOfficer,
             placementPlace, position, mobileWalletProvider, bankName,
-            branch, accountNumber, district, village, service, agent;
+            branch, accountNumber, district, village, service, participant;
 
-    public AgentsModel() {
+    public ParticipantsModel() {
 
     }
 
-    public AgentsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
-                       LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
-                       String identityNumber, String gender, String maritalStatus, String mobileNumber,
-                       String alternateMobileNumber, String postalAddress, String residentialAddress,
-                       String education, String placementOfficer, String placementPlace, String position,
-                       String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                       String district, String village, String service) {
+    public ParticipantsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
+                             LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
+                             String identityNumber, String gender, String maritalStatus, String mobileNumber,
+                             String alternateMobileNumber, String postalAddress, String residentialAddress,
+                             String education, String placementOfficer, String placementPlace, String position,
+                             String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                             String district, String village, String service) {
         this.participantId = participantId;
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
@@ -52,13 +52,13 @@ public class AgentsModel {
         this.service = service;
     }
 
-    public AgentsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
-                       LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
-                       String identityNumber, String gender, String maritalStatus, String mobileNumber,
-                       String alternateMobileNumber, String postalAddress, String residentialAddress,
-                       String education, String placementOfficer, String placementPlace, String position,
-                       String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                       String district, String village, String service, String agent) {
+    public ParticipantsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
+                             LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
+                             String identityNumber, String gender, String maritalStatus, String mobileNumber,
+                             String alternateMobileNumber, String postalAddress, String residentialAddress,
+                             String education, String placementOfficer, String placementPlace, String position,
+                             String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                             String district, String village, String service, String participant) {
         this.participantId = participantId;
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
@@ -84,17 +84,17 @@ public class AgentsModel {
         this.district = district;
         this.village = village;
         this.service = service;
-        this.agent = agent;
+        this.participant = participant;
     }
 
-    public AgentsModel(Integer daysWorked, Long participantId, LocalDateTime timestamp,
-                       LocalDate dateOfBirth, LocalDate placementDate, LocalDate completionDate,
-                       String firstname, String lastname, String identityNumber, String gender,
-                       String maritalStatus, String mobileNumber, String alternateMobileNumber,
-                       String postalAddress, String residentialAddress, String education,
-                       String placementOfficer, String placementPlace, String position,
-                       String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                       String district, String village, String service, String agent) {
+    public ParticipantsModel(Integer daysWorked, Long participantId, LocalDateTime timestamp,
+                             LocalDate dateOfBirth, LocalDate placementDate, LocalDate completionDate,
+                             String firstname, String lastname, String identityNumber, String gender,
+                             String maritalStatus, String mobileNumber, String alternateMobileNumber,
+                             String postalAddress, String residentialAddress, String education,
+                             String placementOfficer, String placementPlace, String position,
+                             String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                             String district, String village, String service, String participant) {
         this.daysWorked = daysWorked;
         this.participantId = participantId;
         this.timestamp = timestamp;
@@ -121,7 +121,7 @@ public class AgentsModel {
         this.district = district;
         this.village = village;
         this.service = service;
-        this.agent = agent;
+        this.participant = participant;
     }
 
     public Integer getDaysWorked() {
@@ -332,12 +332,12 @@ public class AgentsModel {
         this.service = service;
     }
 
-    public String getAgent() {
-        return agent;
+    public String getParticipant() {
+        return participant;
     }
 
-    public void setAgent(String agent) {
-        this.agent = agent;
+    public void setParticipant(String participant) {
+        this.participant = participant;
     }
 
     @Override
@@ -369,7 +369,7 @@ public class AgentsModel {
                 ", district='" + district + '\'' +
                 ", village='" + village + '\'' +
                 ", service='" + service + '\'' +
-                ", agent='" + agent + '\'' +
+                ", agent='" + participant + '\'' +
                 '}';
     }
 
