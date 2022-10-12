@@ -1,5 +1,6 @@
 package com.application.iserv.ui.participants.views;
 
+import com.application.iserv.StudentModel;
 import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.participants.forms.ParticipantsForm;
@@ -8,21 +9,34 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +67,7 @@ public class ParticipantsView extends VerticalLayout {
     DatePicker datePicker = new DatePicker();
 
     // Buttons
-    Button addAgentButton;
+    Button uploadCSV = new Button(UPLOAD);
     Button backButton = new Button(BACK);
     Button attendanceButton = new Button(ATTENDANCE);
 
@@ -73,6 +87,15 @@ public class ParticipantsView extends VerticalLayout {
     // Strings
     String date = "";
 
+    // MenuItem
+    MenuItem addAgentButton;
+
+    // Dialogs
+    Dialog uploadFileDialog = new Dialog();
+
+    // Upload
+    Upload upload = new Upload();
+
     @Autowired
     public ParticipantsView(ParticipantsServices participantsServices) {
         this.participantsServices = participantsServices;
@@ -80,6 +103,7 @@ public class ParticipantsView extends VerticalLayout {
         setSizeFull();
         addClassName(AGENTS_LIST_VIEW);
 
+        checkScreenSize();
         configureAgentsForm();
         configureAgentsGrid(AGENT_POSITION);
 
@@ -294,14 +318,24 @@ public class ParticipantsView extends VerticalLayout {
 
         });
 
-        addAgentButton = new Button(ADD_PARTICIPANT);
-        addAgentButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addAgentButton.addClickListener(click -> {
+        MenuBar menuBar = new MenuBar();
+        menuBar.setOpenOnHover(true);
+        menuBar.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
+
+        addAgentButton = menuBar.addItem("Add Participant");
+        SubMenu subMenu = addAgentButton.getSubMenu();
+        subMenu.addItem("Manually").addClickListener(click -> {
+
             removeClassName(ADDING_AGENT);
             removeClassName(EDITING_AGENTS);
 
             openAddAgentForm();
 
+        });
+        subMenu.add(new Hr());
+        subMenu.addItem("Import CSV File").addClickListener(click -> {
+            configureDialogs();
+            uploadFileDialog.open();
         });
 
         HorizontalLayout statusAttendanceLayout = new HorizontalLayout(status, attendanceButton);
@@ -361,7 +395,7 @@ public class ParticipantsView extends VerticalLayout {
 
         dateBackHorizontalLayout = new HorizontalLayout(datePicker, backButton);
 
-        HorizontalLayout toolbar = new HorizontalLayout(searchAgent, addAgentButton, dateBackHorizontalLayout);
+        HorizontalLayout toolbar = new HorizontalLayout(searchAgent, menuBar, dateBackHorizontalLayout);
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         toolbar.addClassName(TOOLBAR);
 
@@ -371,7 +405,7 @@ public class ParticipantsView extends VerticalLayout {
         Button terminateButton = new Button(TERMINATE);
         terminateButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
-        HorizontalLayout horizontalToolbar = new HorizontalLayout(verticalToolbar, terminateButton);
+        HorizontalLayout horizontalToolbar = new HorizontalLayout(verticalToolbar, terminateButton, upload);
         horizontalToolbar.addClassNames(HORIZONTAL_TOOLBAR);
         horizontalToolbar.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
 
@@ -477,6 +511,106 @@ public class ParticipantsView extends VerticalLayout {
         agentsGrid.asSingleSelect().clear();
         editAgent(new ParticipantsModel());
         participantsForm.setButtonText(true);
+    }
+
+    private void configureDialogs() {
+
+        uploadFileDialog = new Dialog();
+
+        // TODO Upload not finished
+        MemoryBuffer memoryBuffer = new MemoryBuffer();
+
+        upload = new Upload(memoryBuffer);
+        upload.setDropAllowed(true);
+        upload.setSizeFull();
+        upload.setAcceptedFileTypes(CSV_FORMAT);
+
+        upload.addFileRejectedListener(fileRejectedEvent -> {
+
+            Notification notification = Notification.show(
+                    CSV_ERROR_MESSAGE,
+                    5000,
+                    Notification.Position.MIDDLE
+            );
+
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+
+        });
+
+        upload.setMaxFiles(1);
+
+        final List<StudentModel>[] studentModelList = new List[]{new ArrayList<>()};
+
+        upload.addSucceededListener(event -> {
+
+            studentModelList[0] = new ArrayList<>();
+
+            InputStream fileData = memoryBuffer.getInputStream();
+
+            String line;
+            try (BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(fileData, StandardCharsets.UTF_8))) {
+
+                while ((line = bufferedReader.readLine()) != null) {
+
+                    String[] row = line.split(",");
+
+                    StudentModel studentModel = new StudentModel();
+                    studentModel.setStudent(row[0]);
+                    studentModel.setGrade(row[1]);
+                    studentModel.setPass_fail(row[2]);
+
+                    studentModelList[0].add(studentModel);
+
+                }
+
+                // Remove Header
+                studentModelList[0].remove(0);
+                System.err.println("student: "+ studentModelList[0]);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        uploadFileDialog.getHeader().add(
+                new Button(new Icon("lumo", "cross"), (e) -> {
+                    uploadFileDialog.close();
+                })
+        );
+
+        uploadFileDialog.addDialogCloseActionListener(dialogCloseActionEvent -> {
+            uploadFileDialog.close();
+        });
+
+        uploadCSV.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        uploadCSV.addClickListener(click -> {
+            uploadFileDialog.close();
+        });
+
+        uploadFileDialog.setHeaderTitle("Upload Participants CSV File");
+        uploadFileDialog.add(upload);
+        uploadFileDialog.getFooter().add(uploadCSV);
+
+    }
+
+    private void checkScreenSize() {
+
+        UI.getCurrent().getPage().addBrowserWindowResizeListener(browserWindowResizeEvent -> {
+            if (browserWindowResizeEvent.getWidth() > 500) {
+                uploadFileDialog.setWidth("70%");
+            }
+
+        });
+
+        UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails -> {
+            if (extendedClientDetails.getScreenWidth() > 500) {
+                uploadFileDialog.setWidth("70%");
+            }
+
+        });
+
     }
 
 }

@@ -1711,7 +1711,6 @@ public class ParticipantsForm extends VerticalLayout {
 
 
         String response = participantsServices.addAgent(new ParticipantsModel(
-                participantId,
                 LocalDateTime.now(),
                 dateOfBirthLocalDate,
                 placementDateLocalDate,

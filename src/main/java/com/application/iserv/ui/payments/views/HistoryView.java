@@ -58,7 +58,6 @@ public class HistoryView extends VerticalLayout {
         addClassName(HISTORY_PAYMENTS_VIEW);
         setSizeFull();
 
-
         configureHistoryForm();
         configureHistoryGrid();
 
@@ -265,8 +264,6 @@ public class HistoryView extends VerticalLayout {
         historyForm.setWidth("70%");
 
         historyForm.addListener(HistoryForm.CloseHistoryFormEvent.class, e -> closeComponents());
-
-        historyForm.addListener(HistoryForm.ExportStatementsEvent.class, e -> closeComponents());
     }
 
     private Component getContent() {

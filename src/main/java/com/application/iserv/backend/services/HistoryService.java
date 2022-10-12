@@ -103,7 +103,8 @@ public class HistoryService {
         return historyModelList;
     }
 
-    public void exportReport(String names, Long participantId) throws FileNotFoundException, JRException {
+    public void exportReport(String names, Long participantId)
+            throws FileNotFoundException, JRException {
         List<Object[]> allHistory = historyRepository.exportStatements(participantId);
 
         List<HistoryStatementModel> historyStatementModelList = new ArrayList<>();
@@ -134,6 +135,8 @@ public class HistoryService {
                     Double.parseDouble(row[3].toString()),
                     date,
                     String.valueOf(amount),
+                    "Name: "+row[5].toString()+" "+row[6].toString(),
+                    "Omang: "+row[7].toString(),
                     Integer.parseInt(row[1].toString()),
                     Integer.parseInt(row[2].toString()),
                     Integer.parseInt(row[4].toString())
@@ -160,13 +163,12 @@ public class HistoryService {
                 jrBeanCollectionDataSource
         );
 
-        // TODO Make constant
-
-        String path = "/home/sheriff-will/Documents/iServ Reports/";
+        // TODO Make constant but again user should choose where to save to.
+        String path = "/home/sheriff-will/Documents/iServ Documents/Statements/";
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm - dd MMMM yyyy");
 
-        String saveAs = path+names+" "+ LocalDateTime.now().format(dateFormatter)+".pdf";
+        String saveAs = path+LocalDateTime.now().format(dateFormatter)+".pdf"+" "+names;
 
         JasperExportManager.exportReportToPdfFile(jasperPrint, saveAs);
 

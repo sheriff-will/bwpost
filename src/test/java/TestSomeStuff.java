@@ -1,3 +1,4 @@
+import com.application.iserv.ui.participants.models.ParticipantsModel;
 import org.junit.Test;
 import org.springframework.util.ResourceUtils;
 
@@ -118,7 +119,7 @@ public class TestSomeStuff {
     @Test
     public void readCSVFile1() {
 
-        Path path = Path.of("src", "main", "resources", "students.csv");
+        Path path = Path.of("src", "main", "resources", "CSV Test Files/students.csv");
 
         try {
 
@@ -140,6 +141,87 @@ public class TestSomeStuff {
             throw new RuntimeException("Invalid csv line: "+line);
         }
         return new StudentModel(fields[0], fields[1], fields[2]);
+    }
+
+    @Test
+    public void readCSVFileParticipants() {
+
+        Path path = Path.of("src", "main", "resources", "CSV Test Files/participants.csv");
+
+        try {
+
+            List<ParticipantsModel> participantsModelList = Files.lines(path)
+                    .skip(1)
+                    .map(TestSomeStuff::getParticipants).toList();
+
+            System.err.println(participantsModelList);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private static ParticipantsModel getParticipants(String line) {
+        String[] fields = line.split(",");
+        if (fields.length != 23) {
+            throw new RuntimeException("Invalid csv line: "+line);
+        }
+
+        String dateOfBirth_str = fields[3];
+        String[] getDateOfBirth = dateOfBirth_str.split("-");
+
+        LocalDate dateOfBirth = LocalDate.of(
+                Integer.parseInt(getDateOfBirth[0]),
+                Integer.parseInt(getDateOfBirth[1]),
+                Integer.parseInt(getDateOfBirth[2])
+        );
+
+        String placementDate_str = fields[13];
+        String[] getPlacementDate = placementDate_str.split("-");
+
+        LocalDate placementDate = LocalDate.of(
+                Integer.parseInt(getPlacementDate[0]),
+                Integer.parseInt(getPlacementDate[1]),
+                Integer.parseInt(getPlacementDate[2])
+        );
+
+        String completionDate_str = fields[14];
+        String[] getCompletionDate = completionDate_str.split("-");
+
+        LocalDate completionDate = LocalDate.of(
+                Integer.parseInt(getCompletionDate[0]),
+                Integer.parseInt(getCompletionDate[1]),
+                Integer.parseInt(getCompletionDate[2])
+        );
+
+        return new ParticipantsModel(
+                LocalDateTime.now(),
+                dateOfBirth,
+                placementDate,
+                completionDate,
+                fields[0],
+                fields[1],
+                fields[2],
+                fields[4],
+                fields[5],
+                fields[6],
+                fields[7],
+                fields[8],
+                fields[9],
+                fields[10],
+                fields[11],
+                fields[12],
+                fields[19],
+                fields[15],
+                fields[16],
+                fields[17],
+                fields[18],
+                fields[20],
+                fields[21],
+                fields[22]
+
+        );
     }
 
 }

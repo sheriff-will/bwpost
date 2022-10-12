@@ -51,7 +51,8 @@ public class HistoryRepository {
 
         String sql = "SELECT remuneration_history.month," +
                 " remuneration_history.bonus_amount, remuneration_history.deduction_amount," +
-                " parameters.rate_per_day, attendance_history.days_worked " +
+                " parameters.rate_per_day, attendance_history.days_worked, " +
+                "participants.firstname, participants.lastname, participants.identity_number " +
                 "FROM remuneration_history, parameters, participants, attendance_history " +
                 "WHERE remuneration_history.participant_id = '"+participantId+"' " +
                 "AND participants.participant_id = remuneration_history.participant_id " +

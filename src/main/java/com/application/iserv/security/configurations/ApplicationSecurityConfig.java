@@ -30,7 +30,6 @@ public class ApplicationSecurityConfig extends VaadinWebSecurityConfigurerAdapte
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-
         setLoginView(http, LoginView.class);
 
     }
@@ -38,6 +37,7 @@ public class ApplicationSecurityConfig extends VaadinWebSecurityConfigurerAdapte
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/images/**");
+        web.ignoring().antMatchers("/signup/**");
         super.configure(web);
     }
 

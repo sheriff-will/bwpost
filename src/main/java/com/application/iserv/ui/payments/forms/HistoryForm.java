@@ -5,6 +5,7 @@ import com.application.iserv.backend.services.HistoryService;
 import com.application.iserv.ui.payments.models.HistoryModel;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -69,6 +70,7 @@ public class HistoryForm extends VerticalLayout {
     public HistoryForm(HistoryService historyService) {
         this.historyService = historyService;
 
+        checkScreenSize();
         configureButtons();
 
         setSizeFull();
@@ -206,6 +208,8 @@ public class HistoryForm extends VerticalLayout {
                 ButtonVariant.LUMO_PRIMARY
         );
 
+        exportStatements.setDisableOnClick(true);
+
         exportStatements.addClickListener(click -> {
 
             try {
@@ -249,19 +253,39 @@ public class HistoryForm extends VerticalLayout {
 
         statementDialog.addDialogCloseActionListener(dialogCloseActionEvent -> {
             statementDialog.close();
-            fireEvent(new ExportStatementsEvent(this));
+            exportStatements.setEnabled(true);
+            fireEvent(new CloseHistoryFormEvent(this));
         });
 
         OK.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         OK.addClickListener(click -> {
             statementDialog.close();
-            fireEvent(new ExportStatementsEvent(this));
+            exportStatements.setEnabled(true);
+            fireEvent(new CloseHistoryFormEvent(this));
         });
 
         statementDialog.setHeaderTitle("Exported");
         statementDialog.add(formLayout1);
         statementDialog.getFooter().add(OK);
+
+    }
+
+    private void checkScreenSize() {
+
+        UI.getCurrent().getPage().addBrowserWindowResizeListener(browserWindowResizeEvent -> {
+            if (browserWindowResizeEvent.getWidth() > 500) {
+                statementDialog.setWidth("70%");
+            }
+
+        });
+
+        UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails -> {
+            if (extendedClientDetails.getScreenWidth() > 500) {
+                statementDialog.setWidth("70%");
+            }
+
+        });
 
     }
 

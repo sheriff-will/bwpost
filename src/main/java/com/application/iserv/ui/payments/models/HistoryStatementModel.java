@@ -3,18 +3,21 @@ package com.application.iserv.ui.payments.models;
 public class HistoryStatementModel {
 
     Double ratePerDay;
-    String date, amount;
+    String date, amount, participant, identityNumber;
     Integer bonusAmount, deductionAmount, daysWorked;
 
     public HistoryStatementModel() {
 
     }
 
-    public HistoryStatementModel(Double ratePerDay, String date, String amount,
-                                 Integer bonusAmount, Integer deductionAmount, Integer daysWorked) {
+    public HistoryStatementModel(Double ratePerDay, String date, String amount, String participant,
+                                 String identityNumber, Integer bonusAmount, Integer deductionAmount,
+                                 Integer daysWorked) {
         this.ratePerDay = ratePerDay;
         this.date = date;
         this.amount = amount;
+        this.participant = participant;
+        this.identityNumber = identityNumber;
         this.bonusAmount = bonusAmount;
         this.deductionAmount = deductionAmount;
         this.daysWorked = daysWorked;
@@ -42,6 +45,22 @@ public class HistoryStatementModel {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getParticipant() {
+        return participant;
+    }
+
+    public void setParticipant(String participant) {
+        this.participant = participant;
+    }
+
+    public String getIdentityNumber() {
+        return identityNumber;
+    }
+
+    public void setIdentityNumber(String identityNumber) {
+        this.identityNumber = identityNumber;
     }
 
     public Integer getBonusAmount() {
@@ -74,6 +93,8 @@ public class HistoryStatementModel {
                 "ratePerDay=" + ratePerDay +
                 ", date='" + date + '\'' +
                 ", amount='" + amount + '\'' +
+                ", participant='" + participant + '\'' +
+                ", identityNumber='" + identityNumber + '\'' +
                 ", bonusAmount=" + bonusAmount +
                 ", deductionAmount=" + deductionAmount +
                 ", daysWorked=" + daysWorked +

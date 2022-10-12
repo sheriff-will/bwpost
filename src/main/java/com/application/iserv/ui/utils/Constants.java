@@ -35,6 +35,7 @@ public class Constants {
     public static final String SAVE = "Save";
     public static final String BACK = "Back";
     public static final String UPDATE = "Update";
+    public static final String UPLOAD = "Upload";
     public static final String UPDATED = "Updated";
     public static final String ADD = "Add";
     public static final String ADD_PARAMETER = "Add Parameter";
@@ -595,6 +596,8 @@ public class Constants {
                29.95,
                 "August 2022",
                 "300",
+                "Amogelang Mosane",
+                "743820931",
                 8,
                 9
                 ,9
@@ -604,6 +607,8 @@ public class Constants {
                 39.95,
                 "September 2022",
                 "560",
+                "Thabang Dithupa",
+                "910013265",
                 8,
                 9
                 ,9

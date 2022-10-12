@@ -18,6 +18,39 @@ public class ParticipantsModel {
 
     }
 
+    public ParticipantsModel(LocalDateTime timestamp, LocalDate dateOfBirth, LocalDate placementDate,
+                             LocalDate completionDate, String firstname, String lastname,
+                             String identityNumber, String gender, String maritalStatus, String mobileNumber,
+                             String alternateMobileNumber, String postalAddress, String residentialAddress,
+                             String education, String placementOfficer, String placementPlace,
+                             String position, String mobileWalletProvider, String bankName, String branch,
+                             String accountNumber, String district, String village, String service) {
+        this.timestamp = timestamp;
+        this.dateOfBirth = dateOfBirth;
+        this.placementDate = placementDate;
+        this.completionDate = completionDate;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.identityNumber = identityNumber;
+        this.gender = gender;
+        this.maritalStatus = maritalStatus;
+        this.mobileNumber = mobileNumber;
+        this.alternateMobileNumber = alternateMobileNumber;
+        this.postalAddress = postalAddress;
+        this.residentialAddress = residentialAddress;
+        this.education = education;
+        this.placementOfficer = placementOfficer;
+        this.placementPlace = placementPlace;
+        this.position = position;
+        this.mobileWalletProvider = mobileWalletProvider;
+        this.bankName = bankName;
+        this.branch = branch;
+        this.accountNumber = accountNumber;
+        this.district = district;
+        this.village = village;
+        this.service = service;
+    }
+
     public ParticipantsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
                              LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
                              String identityNumber, String gender, String maritalStatus, String mobileNumber,

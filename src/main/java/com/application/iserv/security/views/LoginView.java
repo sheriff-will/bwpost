@@ -1,21 +1,16 @@
 package com.application.iserv.security.views;
 
-
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterListener;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route("login")
 @PageTitle("Login | iServ")
-public class LoginView extends VerticalLayout implements BeforeEnterListener {
-
-    LoginForm loginForm = new LoginForm();
+public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     LoginOverlay loginOverlay = new LoginOverlay();
 
@@ -27,26 +22,24 @@ public class LoginView extends VerticalLayout implements BeforeEnterListener {
 
         LoginI18n loginI18n = LoginI18n.createDefault();
         LoginI18n.Form loginI18nForm = loginI18n.getForm();
-        loginI18nForm.setTitle("Login");
         loginI18n.setForm(loginI18nForm);
+        loginI18nForm.setForgotPassword("I don't have an account");
+        loginI18n.setAdditionalInformation(
+                "Please, contact maintenance@iServ.com if you're experiencing issues logging into your account");
 
-        loginForm.setAction("login");
-        loginForm.setI18n(loginI18n);
-        loginForm.setForgotPasswordButtonVisible(false);
-
-
-        Image logo = new Image();
-        logo.setWidth("15%");
-        logo.setSrc("images/logo.png");
 
         loginOverlay.setTitle("iServ");
         loginOverlay.setDescription("Serving the nation ");
         loginOverlay.setOpened(true);
         loginOverlay.setAction("login");
-        loginOverlay.setForgotPasswordButtonVisible(false);
+        loginOverlay.setForgotPasswordButtonVisible(true);
+        loginOverlay.setI18n(loginI18n);
+
+        loginOverlay.addForgotPasswordListener(forgotPasswordEvent -> {
+            getUI().ifPresent(ui -> ui.navigate("signup"));
+        });
 
         add(
-                logo,
                 loginOverlay
         );
 
@@ -61,6 +54,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterListener {
                 .containsKey("error")) {
             loginOverlay.setError(true);
         }
+
     }
 
 }
