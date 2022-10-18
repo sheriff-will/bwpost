@@ -5,6 +5,9 @@ import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.ui.participants.models.ParticipantsModel;
 import com.application.iserv.ui.participants.models.NomineesModel;
 import com.application.iserv.ui.participants.models.ReferenceModel;
+import com.application.iserv.ui.utils.ApplicationUserDataModel;
+import com.application.iserv.ui.utils.Commons;
+import com.application.iserv.ui.utils.SessionManager;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -41,7 +44,11 @@ import static com.application.iserv.ui.utils.Constants.*;
 
 public class ParticipantsForm extends VerticalLayout {
 
-    // TODO Make duration always positive for expired agents
+    // SessionManger
+    SessionManager sessionManager = new SessionManager();
+
+    // ApplicationUser
+    ApplicationUserDataModel applicationUserDataModel;
 
     // Grids
     Grid<NomineesModel> nomineesGrid = new Grid<>(NomineesModel.class);
@@ -91,7 +98,7 @@ public class ParticipantsForm extends VerticalLayout {
     Tabs tabs;
     Tab identification = new Tab(IDENTIFICATION);
     Tab educationTab = new Tab(EDUCATION);
-    Tab service = new Tab(SERVICE);
+    Tab service = new Tab(SERVICE_UPPER_CASE);
     Tab banking = new Tab(BANKING);
     Tab nominees = new Tab(NOMINEES);
     Tab references = new Tab(REFERENCES);
@@ -160,6 +167,8 @@ public class ParticipantsForm extends VerticalLayout {
     @Autowired
     public ParticipantsForm(ParticipantsServices participantsServices) {
         this.participantsServices = participantsServices;
+
+        applicationUserDataModel = sessionManager.getApplicationUserData();
 
         configureDate();
         configureTabs();
@@ -370,7 +379,6 @@ public class ParticipantsForm extends VerticalLayout {
             if (daysWorked.getValue() != null && !daysWorked.isEmpty()) {
                 int workingDaysValue = daysWorked.getValue();
 
-                // TODO Add regex as if statement
                 if (workingDaysValue > 20) {
                     daysWorked.setInvalid(true);
                     daysWorked.setErrorMessage("There are only 20 working days a month");
@@ -378,9 +386,18 @@ public class ParticipantsForm extends VerticalLayout {
                 else if (workingDaysValue < 0) {
                     daysWorked.setInvalid(true);
                     daysWorked.setErrorMessage("Enter valid working days");
-                } else {
+                }
+                else if (!Commons.validateNumbers(daysWorked.getValue().toString())) {
+                    daysWorked.setInvalid(true);
+                    daysWorked.setErrorMessage("Enter valid working days");
+                }
+                else {
                     daysWorked.setInvalid(false);
                 }
+            }
+            else {
+                daysWorked.setInvalid(true);
+                daysWorked.setErrorMessage("Enter valid working days");
             }
 
         });
@@ -677,9 +694,8 @@ public class ParticipantsForm extends VerticalLayout {
 
     private void configureLists() {
 
-        // TODO Configure duration and remove static value "Kgatleng"
         // Contract duration
-        duration.setItems(participantsServices.getContractDuration("Kgatleng"));
+        duration.setItems(participantsServices.getContractDuration(applicationUserDataModel.getDistrict()));
         duration.setItemLabelGenerator(String::toString);
 
         // Marital statuses
@@ -1095,7 +1111,7 @@ public class ParticipantsForm extends VerticalLayout {
             addButtonGridReferenceLayout.setVisible(false);
 
         }
-        else if (label.equalsIgnoreCase(SERVICE)) {
+        else if (label.equalsIgnoreCase(SERVICE_UPPER_CASE)) {
 
             // Showing
             placementOfficer.setVisible(true);
@@ -1732,11 +1748,9 @@ public class ParticipantsForm extends VerticalLayout {
                 bankNameValue,
                 branchValue,
                 accountNumberValue,
-
-                // TODO Configure district and village and service
-                "Kgatleng",
-                "Oodi",
-                IPELEGENG
+                applicationUserDataModel.getDistrict(),
+                applicationUserDataModel.getVillage(),
+                applicationUserDataModel.getService()
 
         ),
                 contractDates
@@ -1854,12 +1868,9 @@ public class ParticipantsForm extends VerticalLayout {
                 bankNameValue,
                 branchValue,
                 accountNumberValue,
-
-                // TODO Configure district and village and service
-                "Kgatleng",
-                "Oodi",
-                IPELEGENG
-
+                applicationUserDataModel.getDistrict(),
+                applicationUserDataModel.getVillage(),
+                applicationUserDataModel.getService()
         ));
 
 

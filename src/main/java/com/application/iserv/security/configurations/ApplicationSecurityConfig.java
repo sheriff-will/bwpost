@@ -31,13 +31,14 @@ public class ApplicationSecurityConfig extends VaadinWebSecurityConfigurerAdapte
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         setLoginView(http, LoginView.class);
-
+        http.formLogin().defaultSuccessUrl("/participants", true);
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/images/**");
-        web.ignoring().antMatchers("/signup/**");
+/*        web.ignoring().antMatchers("/api/v1/register/**");
+        web.ignoring().antMatchers("/api/v1/district/**");*/
         super.configure(web);
     }
 

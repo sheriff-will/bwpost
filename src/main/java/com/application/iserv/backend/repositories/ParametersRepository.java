@@ -1,6 +1,8 @@
 package com.application.iserv.backend.repositories;
 
 import com.application.iserv.ui.parameters.models.ParametersModel;
+import com.application.iserv.ui.utils.ApplicationUserDataModel;
+import com.application.iserv.ui.utils.SessionManager;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,14 +16,24 @@ import java.util.List;
 @Transactional
 public class ParametersRepository {
 
+    // SessionManager
+    SessionManager sessionManager = new SessionManager();
+
+    // ApplicationUser
+    ApplicationUserDataModel applicationUserDataModel;
+
     @PersistenceContext
     EntityManager entityManager;
 
     public List<Object[]> checkForParameter(ParametersModel parametersModel) {
+
+        applicationUserDataModel = sessionManager.getApplicationUserData();
+
         String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
                 "FROM parameters" +
                 " WHERE parameters.position = '"+parametersModel.getPosition()+"' " +
-                "AND parameters.village = 'Oodi' AND parameters.service = 'Ipelegeng'";
+                "AND parameters.village = '"+applicationUserDataModel.getVillage()+"' " +
+                "AND parameters.service = '"+applicationUserDataModel.getService()+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -34,11 +46,12 @@ public class ParametersRepository {
 
     public List<Object[]> checkUpdateParameter(ParametersModel parametersModel) {
 
-        // TODO Remove hardcoded village and service
+        applicationUserDataModel = sessionManager.getApplicationUserData();
+
         String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
                 "FROM parameters" +
-                " WHERE parameters.village = 'Oodi'" +
-                " AND parameters.service = 'Ipelegeng'";
+                " WHERE parameters.village = '"+applicationUserDataModel.getVillage()+"'" +
+                " AND parameters.service = '"+applicationUserDataModel.getService()+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -51,14 +64,17 @@ public class ParametersRepository {
 
     @Modifying
     public void addParameter(ParametersModel parametersModel) {
-        try {
 
-            // TODO Replace hardcoded district, village, service
+        applicationUserDataModel = sessionManager.getApplicationUserData();
+
+        try {
 
             String insertParameterSQL = "INSERT INTO parameters (rate_per_day, position, district, " +
                     "village, service) VALUES(" +
                     "'" + parametersModel.getRatePerDay() + "','" + parametersModel.getPosition() + "'," +
-                    "'Kgatleng','Oodi', 'Ipelegeng')";
+                    "'"+applicationUserDataModel.getDistrict()+"'," +
+                    "'"+applicationUserDataModel.getVillage()+"', " +
+                    "'"+applicationUserDataModel.getService()+"')";
 
             Query insertParameterQuery = entityManager.createNativeQuery(insertParameterSQL);
             insertParameterQuery.executeUpdate();
@@ -71,10 +87,12 @@ public class ParametersRepository {
 
     public List<Object[]> getParameters() {
 
-        // TODO Remove hardcoded village, service
+        applicationUserDataModel = sessionManager.getApplicationUserData();
+
         String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
                 "FROM parameters " +
-                "WHERE parameters.village = 'Oodi' AND parameters.service = 'Ipelegeng'";
+                "WHERE parameters.village = '"+applicationUserDataModel.getVillage()+"' " +
+                "AND parameters.service = '"+applicationUserDataModel.getService()+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -87,13 +105,17 @@ public class ParametersRepository {
 
     @Modifying
     public void updateParameter(ParametersModel parametersModel) {
+
+        applicationUserDataModel = sessionManager.getApplicationUserData();
+
         try {
 
             String updateParameterSQL = "UPDATE parameters SET " +
                     "rate_per_day = '" + parametersModel.getRatePerDay() + "'," +
                     " position = '" + parametersModel.getPosition() + "'" +
                     " WHERE parameter_id = '"+parametersModel.getParameterId()+"' " +
-                    "AND village = 'Oodi' AND service = 'Ipelegeng'";
+                    "AND village = '"+applicationUserDataModel.getVillage()+"' " +
+                    "AND service = '"+applicationUserDataModel.getService()+"'";
 
             Query updateParameterQuery = entityManager.createNativeQuery(updateParameterSQL);
             updateParameterQuery.executeUpdate();

@@ -26,7 +26,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -35,8 +35,8 @@ import java.util.List;
 import static com.application.iserv.ui.utils.Constants.*;
 
 @PageTitle("iServ | Payments")
+@RolesAllowed({"ROOT", "ADMIN"})
 @Route(value = AUTHORIZE_LOWER_CASE, layout = MainLayout.class)
-@PermitAll
 public class AuthorizeView extends VerticalLayout {
 
     // Tabs

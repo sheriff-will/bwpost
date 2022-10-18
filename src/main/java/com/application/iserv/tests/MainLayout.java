@@ -8,12 +8,12 @@ import com.application.iserv.tests.components.navigation.drawer.NaviDrawer;
 import com.application.iserv.tests.components.navigation.drawer.NaviItem;
 import com.application.iserv.tests.components.navigation.drawer.NaviMenu;
 import com.application.iserv.tests.util.css.Overflow;
-import com.application.iserv.tests.views.Statistics;
 import com.application.iserv.ui.parameters.views.ParametersView;
 import com.application.iserv.ui.participants.views.ParticipantsView;
 import com.application.iserv.ui.payments.views.AuthorizeView;
 import com.application.iserv.ui.payments.views.HistoryView;
 import com.application.iserv.ui.payments.views.ReconcileView;
+import com.application.iserv.ui.reports.ReportsView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.UI;
@@ -131,7 +131,7 @@ public class MainLayout extends FlexBoxLayout
 		menu.addNaviItem(payments, HISTORY, HistoryView.class);
 
 		menu.addNaviItem(VaadinIcon.TOOLBOX, PARAMETERS, ParametersView.class);
-		menu.addNaviItem(VaadinIcon.CHART_3D, REPORTS, Statistics.class);
+		menu.addNaviItem(VaadinIcon.CHART_3D, REPORTS, ReportsView.class);
 
 		payments.setSubItemsVisible(false);
 

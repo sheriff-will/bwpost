@@ -256,7 +256,6 @@ public class ParticipantsRepository {
 
     public List<String> retrieveDuration(String district) {
 
-        // TODO Remove hardcoded district 'Kgatleng'
         String sql = "SELECT contract_duration.duration " +
                 "FROM contract_duration " +
                 "WHERE contract_duration.district = '"+district+"'";

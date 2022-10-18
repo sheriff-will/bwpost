@@ -1,4 +1,8 @@
 import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.twilio.Twilio;
+import com.twilio.rest.verify.v2.Service;
+import com.twilio.rest.verify.v2.service.Verification;
+import com.twilio.rest.verify.v2.service.VerificationCheck;
 import org.junit.Test;
 import org.springframework.util.ResourceUtils;
 
@@ -10,8 +14,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TestSomeStuff {
+
+    String serviceSid;
 
     public static void main(String[] args) {
 
@@ -69,6 +77,9 @@ public class TestSomeStuff {
 
     @Test
     public void testTimeFormats() {
+
+        String[] a = LocalDate.now().toString().split("-");
+        System.err.println(a[0]+"-"+a[1]);
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm - dd MMMM yyyy");
 
@@ -222,6 +233,78 @@ public class TestSomeStuff {
                 fields[22]
 
         );
+    }
+
+    @Test
+    public void testTwilioVerify() {
+
+        // Secret: G7RCBfgG7PX0IxS4I8eBM6c5DBDyj86l sid: SK4f440c6cdb12fe7302024ca4c83763da
+        // Find your Account SID and Auth Token at twilio.com/console
+        // and set the environment variables. See http://twil.io/secure
+        String ACCOUNT_SID = System.getenv("ACb8c52dd2e863f42d010fc88c4274d133");
+        String AUTH_TOKEN = System.getenv("0e43dc9d1dec4b5c62fbf221d556c574");
+
+        // Create verification service
+        Twilio.init("ACb8c52dd2e863f42d010fc88c4274d133", "0e43dc9d1dec4b5c62fbf221d556c574");
+        Service service = Service.creator("My First Verify Service").create();
+
+        serviceSid = service.getSid();
+
+        System.err.println("Service Sid: "+serviceSid);
+
+        // Send verification token
+        Twilio.init("ACb8c52dd2e863f42d010fc88c4274d133", "0e43dc9d1dec4b5c62fbf221d556c574");
+        Verification verification = Verification.creator(
+                        service.getSid(),
+                        "+26776448866",
+                        "sms")
+                .create();
+
+        System.err.println("Verification Status: "+verification.getStatus());
+
+    }
+
+    @Test
+    public void checkVerificationToken() {
+
+        // Check Verification token
+        Twilio.init("ACb8c52dd2e863f42d010fc88c4274d133", "0e43dc9d1dec4b5c62fbf221d556c574");
+        VerificationCheck verificationCheck = VerificationCheck.creator(
+                        "VA16063a96c376a4a1f1aea7ee28eb9465")
+                .setTo("+26776448866")
+                .setCode("878986")
+                .create();
+
+        System.err.println("Verification Status: "+verificationCheck.getStatus());
+
+    }
+
+    @Test
+    public void testRegex() {
+        Pattern pattern = Pattern.compile("^[0-9]{1,45}$");
+        Matcher matcher = pattern.matcher("1");
+
+        if (matcher.find()) {
+            System.err.println("Matches");
+        }
+        else {
+            System.err.println("Does not Matches");
+        }
+    }
+
+    @Test
+    public void compareDates() {
+
+        LocalDate completionDate = LocalDate.of(
+                2022,
+                10,
+                18
+        );
+
+        int compare = completionDate.compareTo(LocalDate.now());
+
+        System.err.println(compare);
+
     }
 
 }

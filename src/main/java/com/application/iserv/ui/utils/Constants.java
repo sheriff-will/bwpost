@@ -23,7 +23,7 @@ public class Constants {
     public static final String IDENTIFICATION = "Identification";
     public static final String EDUCATION = "Education";
     public static final String PLACEMENT_PLACE = "Placement Place";
-    public static final String SERVICE = "Service";
+    public static final String SERVICE_UPPER_CASE = "Service";
     public static final String BANKING = "Banking";
     public static final String NOMINEES = "Nominees";
     public static final String REFERENCES = "References";
@@ -160,6 +160,10 @@ public class Constants {
     public static final String NOMINEE_SUCCESSFULLY_REMOVED = "Nominee Successfully Removed";
     public static final String PARAMETER_SUCCESSFULLY_REMOVED = "Parameter Successfully Removed";
     public static final String REFERENCE_SUCCESSFULLY_REMOVED = "Reference Successfully Removed";
+    public static final String APPLICATION_USER = "application_user";
+    public static final String DISTRICT = "district";
+    public static final String VILLAGE = "village";
+    public static final String SERVICE = "service";
 
 
 

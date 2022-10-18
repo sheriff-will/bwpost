@@ -43,9 +43,9 @@ import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.*;
 
+@PermitAll
 @PageTitle("iServ | Participants")
 @Route(value = PARTICIPANTS_LOWER_CASE, layout = MainLayout.class)
-@PermitAll
 public class ParticipantsView extends VerticalLayout {
 
     // Grid

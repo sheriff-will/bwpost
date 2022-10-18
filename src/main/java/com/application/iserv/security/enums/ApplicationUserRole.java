@@ -6,12 +6,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.application.iserv.security.enums.ApplicationUserPermission.FIELD_AGENT_READ;
-import static com.application.iserv.security.enums.ApplicationUserPermission.SUPERVISOR_READ;
+import static com.application.iserv.security.enums.ApplicationUserPermission.*;
 
 public enum ApplicationUserRole {
-    SUPERVISOR(Sets.newHashSet(SUPERVISOR_READ, SUPERVISOR_READ, FIELD_AGENT_READ, FIELD_AGENT_READ)),
-    FIELD_AGENT(Sets.newHashSet(FIELD_AGENT_READ, FIELD_AGENT_READ));
+
+    SUPERVISOR(Sets.newHashSet(SUPERVISOR_READ, SUPERVISOR_WRITE)),
+    ADMIN(Sets.newHashSet(ADMIN_READ, ADMIN_WRITE, SUPERVISOR_READ, SUPERVISOR_WRITE)),
+    ROOT(Sets.newHashSet(ROOT_READ, ROOT_WRITE, ADMIN_READ, ADMIN_WRITE, SUPERVISOR_READ, SUPERVISOR_WRITE));
 
     private final Set<ApplicationUserPermission> permissions;
 
@@ -30,4 +31,5 @@ public enum ApplicationUserRole {
         permissions.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
         return permissions;
     }
+
 }

@@ -1,6 +1,5 @@
 package com.application.iserv.ui.payments.views;
 
-
 import com.application.iserv.StudentModel;
 import com.application.iserv.tests.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -13,7 +12,7 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +24,8 @@ import java.util.List;
 import static com.application.iserv.ui.utils.Constants.*;
 
 @PageTitle("iServ | Payments")
+@RolesAllowed({"ROOT", "ADMIN"})
 @Route(value = RECONCILE_LOWER_CASE, layout = MainLayout.class)
-@PermitAll
 public class ReconcileView extends VerticalLayout {
 
     // Upload

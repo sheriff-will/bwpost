@@ -152,7 +152,7 @@ public class ParticipantsServices {
         List<Object[]> checkAgent = participantsRepository.checkForAgent(participantsModel);
 
         if (checkAgent.isEmpty()) {
-            participantsRepository.addNewAgent(participantsModel, contractDates); // TODO Remove hardcoded date
+            participantsRepository.addNewAgent(participantsModel, contractDates);
             response = SUCCESSFUL;
         }
         else {
