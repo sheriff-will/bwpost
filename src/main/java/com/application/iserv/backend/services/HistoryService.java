@@ -3,6 +3,7 @@ package com.application.iserv.backend.services;
 import com.application.iserv.backend.repositories.HistoryRepository;
 import com.application.iserv.ui.payments.models.HistoryModel;
 import com.application.iserv.ui.payments.models.HistoryStatementModel;
+import com.application.iserv.ui.utils.Commons;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,12 @@ public class HistoryService {
             String paymentMode = "";
 
             if (!row[11].toString().equalsIgnoreCase("null")) {
-                provider = "Orange Money"; // TODO Remove hardcode Orange money
+                provider = Commons.getPhoneNumberCarrier("+"+row[11].toString());
+
+                if (provider.equalsIgnoreCase("")) {
+                    provider = "No Provider";
+                }
+
                 paymentMode = "Mobile Wallet";
             }
             else if (!row[12].toString().equalsIgnoreCase("null")) {
@@ -202,7 +208,11 @@ public class HistoryService {
             String paymentMode = "";
 
             if (!row[11].toString().equalsIgnoreCase("null")) {
-                provider = "Orange Money"; // TODO Remove hardcode Orange money
+                provider = Commons.getPhoneNumberCarrier("+"+row[11].toString());
+
+                if (provider.equalsIgnoreCase("")) {
+                    provider = "No Provider";
+                }
                 paymentMode = "Mobile Wallet";
             }
             else if (!row[12].toString().equalsIgnoreCase("null")) {

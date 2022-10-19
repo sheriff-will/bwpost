@@ -21,8 +21,6 @@ public class TestRepository {
     public void addNewAgent(ParticipantsModel participantsModel, List<String> contractDates) {
         try {
 
-            // TODO Replace hardcoded parameterId
-
             // Insert to participants
             String insertAgentSQL = "INSERT INTO participants (firstname, lastname, identity_number, " +
                     "date_of_birth, gender, marital_status, mobile_number, alternate_mobile_number," +

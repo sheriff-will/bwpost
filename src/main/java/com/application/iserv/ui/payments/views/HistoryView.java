@@ -29,6 +29,8 @@ import static com.application.iserv.ui.utils.Constants.*;
 @Route(value = HISTORY_LOWER_CASE, layout = MainLayout.class)
     public class HistoryView extends VerticalLayout {
 
+    // TODO Save payment method to history
+
     // TextFields
     TextField searchAgent = new TextField();
 

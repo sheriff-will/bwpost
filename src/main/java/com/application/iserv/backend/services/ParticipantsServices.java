@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.*;
@@ -152,7 +153,8 @@ public class ParticipantsServices {
         List<Object[]> checkAgent = participantsRepository.checkForAgent(participantsModel);
 
         if (checkAgent.isEmpty()) {
-            participantsRepository.addNewAgent(participantsModel, contractDates);
+            BigInteger parameterId = getParameterId(participantsModel.getPosition());
+            participantsRepository.addNewAgent(participantsModel, contractDates, parameterId);
             response = SUCCESSFUL;
         }
         else {
@@ -749,6 +751,12 @@ public class ParticipantsServices {
 
     public void updateAttendance(Integer daysWorked, Long participantId, String date) {
         participantsRepository.updateAttendance(daysWorked, participantId, date);
+    }
+
+    // Parameter
+    public BigInteger getParameterId(String position) {
+        List<BigInteger> parameter = participantsRepository.getParameterId(position);
+        return parameter.get(0);
     }
 
 }

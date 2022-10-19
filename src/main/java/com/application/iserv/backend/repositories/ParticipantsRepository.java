@@ -3,6 +3,8 @@ package com.application.iserv.backend.repositories;
 import com.application.iserv.ui.participants.models.ParticipantsModel;
 import com.application.iserv.ui.participants.models.NomineesModel;
 import com.application.iserv.ui.participants.models.ReferenceModel;
+import com.application.iserv.ui.utils.ApplicationUserDataModel;
+import com.application.iserv.ui.utils.SessionManager;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,11 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.math.BigInteger;
 import java.util.List;
 
 @Repository
 @Transactional
 public class ParticipantsRepository {
+
+    // SessionManager
+    SessionManager sessionManager = new SessionManager();
+
+    // ApplicationUser
+    ApplicationUserDataModel applicationUserDataModel;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -139,10 +148,9 @@ public class ParticipantsRepository {
     }
 
     @Modifying
-    public void addNewAgent(ParticipantsModel participantsModel, List<String> contractDates) {
+    public void addNewAgent(ParticipantsModel participantsModel,
+                            List<String> contractDates, BigInteger parameterId) {
         try {
-
-            // TODO Replace hardcoded parameterId
 
             // Insert to participants
             String insertAgentSQL = "INSERT INTO participants (firstname, lastname, identity_number, " +
@@ -160,7 +168,7 @@ public class ParticipantsRepository {
                     "'" + participantsModel.getPlacementDate() + "','" + participantsModel.getCompletionDate() + "'," +
                     "'" + participantsModel.getMobileWalletProvider() + "','" + participantsModel.getBankName() + "'," +
                     "'" + participantsModel.getBranch() + "','" + participantsModel.getAccountNumber() + "'," +
-                    "'" + participantsModel.getTimestamp() + "','0', '1')";
+                    "'" + participantsModel.getTimestamp() + "','0', '"+parameterId+"')";
 
             Query insertAgentQuery = entityManager.createNativeQuery(insertAgentSQL);
             insertAgentQuery.executeUpdate();
@@ -504,6 +512,27 @@ public class ParticipantsRepository {
             throw new RuntimeException(e.getMessage());
         }
 
+    }
+
+    // Parameter
+    public List<BigInteger> getParameterId(String position) {
+
+        applicationUserDataModel = sessionManager.getApplicationUserData();
+
+        String sql = "SELECT parameter_id " +
+                "FROM parameters " +
+                "WHERE parameters.position = '"+position+"' " +
+                "AND parameters.district = '"+applicationUserDataModel.getDistrict()+"' " +
+                "AND parameters.village = '"+applicationUserDataModel.getVillage()+"' " +
+                "AND parameters.service = '"+applicationUserDataModel.getService()+"'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<BigInteger>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 }

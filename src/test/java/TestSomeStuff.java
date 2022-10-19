@@ -1,4 +1,8 @@
 import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberToCarrierMapper;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import com.twilio.Twilio;
 import com.twilio.rest.verify.v2.Service;
 import com.twilio.rest.verify.v2.service.Verification;
@@ -14,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -304,6 +309,46 @@ public class TestSomeStuff {
         int compare = completionDate.compareTo(LocalDate.now());
 
         System.err.println(compare);
+
+    }
+
+    @Test
+    public void getNameForNumber() {
+
+        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+
+        Phonenumber.PhoneNumber phoneNumber;
+
+        try {
+            phoneNumber = phoneNumberUtil.parse("+26772291792",
+                    Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name());
+        } catch (NumberParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        PhoneNumberToCarrierMapper phoneNumberToCarrierMapper = PhoneNumberToCarrierMapper.getInstance();
+
+        System.err.println("number: "+phoneNumberToCarrierMapper.getNameForNumber(phoneNumber, Locale.ENGLISH));
+
+    }
+
+    @Test
+    public void validatePhoneNumber() {
+
+        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+
+        Phonenumber.PhoneNumber phoneNumber;
+
+        try {
+            phoneNumber = phoneNumberUtil.parse("+26772291792",
+                    Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name());
+        } catch (NumberParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        PhoneNumberToCarrierMapper phoneNumberToCarrierMapper = PhoneNumberToCarrierMapper.getInstance();
+
+        System.err.println("number: "+phoneNumberToCarrierMapper.getNameForNumber(phoneNumber, Locale.ENGLISH));
 
     }
 
