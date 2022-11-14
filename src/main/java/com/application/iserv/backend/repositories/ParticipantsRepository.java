@@ -81,6 +81,8 @@ public class ParticipantsRepository {
     public void updateAgentDetails(ParticipantsModel participantsModel) {
         try {
 
+            List<BigInteger> parameterId = getParameterId(participantsModel.getPosition());
+
             String updateAgentSQL = "UPDATE participants SET " +
                     "firstname = '" + participantsModel.getFirstname() + "'," +
                     " lastname = '" + participantsModel.getLastname() + "'," +
@@ -102,7 +104,8 @@ public class ParticipantsRepository {
                     " branch = '" + participantsModel.getBranch() + "'," +
                     " account_number = '" + participantsModel.getAccountNumber() + "'," +
                     " timestamp = '" + participantsModel.getTimestamp() + "'," +
-                    " is_terminated = '0'" +
+                    " is_terminated = '0'," +
+                    " parameter_id = '"+parameterId.get(0) + "' "+
                     " WHERE participant_id = '" + participantsModel.getParticipantId() + "'";
 
             Query updateAgentQuery = entityManager.createNativeQuery(updateAgentSQL);

@@ -3,6 +3,8 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberToCarrierMapper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import com.twilio.Twilio;
 import com.twilio.rest.verify.v2.Service;
 import com.twilio.rest.verify.v2.service.Verification;
@@ -13,10 +15,13 @@ import org.springframework.util.ResourceUtils;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -86,9 +91,9 @@ public class TestSomeStuff {
         String[] a = LocalDate.now().toString().split("-");
         System.err.println(a[0]+"-"+a[1]);
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm - dd MMMM yyyy");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
 
-        System.err.println(LocalDateTime.now().format(dateFormatter));
+        System.err.println(LocalDate.now().format(dateFormatter));
     }
 
     @Test
@@ -349,6 +354,97 @@ public class TestSomeStuff {
         PhoneNumberToCarrierMapper phoneNumberToCarrierMapper = PhoneNumberToCarrierMapper.getInstance();
 
         System.err.println("number: "+phoneNumberToCarrierMapper.getNameForNumber(phoneNumber, Locale.ENGLISH));
+
+    }
+
+    @Test
+    public void encodeImage() {
+        // /home/sheriff-will/IdeaProjects/iserv/src/test/java/images
+        String imgPath = "src/test/java/images/car.jpg";
+
+        try {
+            // Read image from file
+            FileInputStream fileInputStream = new FileInputStream(imgPath);
+
+            // Get byte array from image stream
+            int bufLength = 2048;
+            byte[] buffer = new byte[2048];
+            byte[] data;
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            int readLength;
+
+            while ((readLength = fileInputStream.read(buffer, 0, bufLength)) != -1) {
+                outputStream.write(buffer, 0, readLength);
+            }
+
+            data = outputStream.toByteArray();
+            String imgString = Base64.getEncoder().withoutPadding().encodeToString(data);
+
+            outputStream.close();
+            fileInputStream.close();
+
+            System.err.println(imgString);
+
+            // Decode Img
+            byte[] decodedImg = Base64.getDecoder().decode(imgString);
+
+            System.err.println("decoded img: "+decodedImg);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Test
+    public void testOpenCSVRead() throws Exception {
+
+       // Path filePath = Path.of("src", "main", "resources", "CSV Test Files/students.csv");
+        Path filePath = Paths.get(ClassLoader.getSystemResource("csv/students.csv").toURI());
+
+        try (Reader reader = Files.newBufferedReader(filePath)) {
+            try (CSVReader csvReader = new CSVReader(reader)) {
+                List<String[]> s = csvReader.readAll();
+                for (int i = 0; i < s.size(); i++) {
+                    System.err.println(s.get(i));
+                }
+            }
+        }
+
+    }
+
+    @Test
+    public void testWriteCsv() {
+
+        String path = "participants.csv";
+
+        try {
+         //   Path path1 = Paths.get(ClassLoader.getSystemResource("csv/participants.csv").toURI());
+
+            File file = new File(path);
+
+            FileWriter fileWriter = new FileWriter(file);
+
+            CSVWriter csvWriter = new CSVWriter(fileWriter);
+
+            List<String[]> data = new ArrayList<>();
+            data.add(new String[]{"Name", "Mark", "Pass/Fail"});
+            data.add(new String[]{"Stacy Hart", "80", "Pass"});
+            data.add(new String[]{"John Doe", "40", "Fail"});
+
+            csvWriter.writeAll(data);
+
+            csvWriter.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void getPath() {
 
     }
 

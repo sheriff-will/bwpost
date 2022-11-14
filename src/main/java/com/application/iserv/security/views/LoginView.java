@@ -92,6 +92,9 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             phoneNumber.setVisible(true);
             verify.setText("Continue");
 
+            phoneNumber.setPlaceholder("");
+
+
             signupDialog.open();
         });
 
@@ -249,7 +252,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                     verify.setText("Verify");
 
                     username = phoneNumber.getValue();
-                    phoneNumber.setLabel("Enter verification code sent to: "+phoneNumber.getValue());
+                    phoneNumber.setLabel("Enter code sent to: "+phoneNumber.getValue());
+                    phoneNumber.setPlaceholder("Verification code");
 
                     phoneNumber.clear();
                     signupDialog.setHeaderTitle("Hello, "+getName[1]);

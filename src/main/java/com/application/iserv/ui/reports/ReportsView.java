@@ -26,6 +26,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import javax.annotation.security.PermitAll;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @PermitAll
 @PageTitle("iServ | Reports")
@@ -35,6 +37,9 @@ public class ReportsView extends Main {
     // Services
     private final ReportsService reportsService;
 
+    // Strings
+    String date;
+
     public ReportsView(ReportsService reportsService) {
         this.reportsService = reportsService;
 
@@ -42,7 +47,17 @@ public class ReportsView extends Main {
 
         setSizeFull();
 
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+
+        date = LocalDate.now().format(dateFormatter);
+
         PaymentStatusModel paymentStatusModel = reportsService.getPaymentStatuses();
+
+        // Header
+        HorizontalLayout header = createHeader(
+                "Payments Status",
+                "Payment status for "+date
+        );
 
         double approvedPercentage = Double.parseDouble(paymentStatusModel.getApproved())
                 / paymentStatusModel.getStatusSize() * 100;
@@ -70,15 +85,15 @@ public class ReportsView extends Main {
                 createHighlight("Pending Payments",
                         paymentStatusModel.getPending(),
                         pendingPercentage,
-                        false),
-                createHighlight("On Hold Payments",
-                        paymentStatusModel.getOnHold(),
-                        onHoldPercentage,
                         false)
         );
         board.addRow(createViewEvents());
         board.addRow(createServiceHealth(), createResponseTimes());
-        add(board);
+
+        header.getStyle().set("padding-left", "24px");
+
+        add(new VerticalLayout(header, board));
+
     }
 
     private Component createHighlight(String title, String value, Double percentage, boolean showIcon) {
@@ -212,20 +227,20 @@ public class ReportsView extends Main {
     }
 
     private Component createResponseTimes() {
-        HorizontalLayout header = createHeader("Attendance", "Average attendance for the month");
+        HorizontalLayout header = createHeader("Attendance", "Average attendance for "+date);
 
         // Chart
-        Chart chart = new Chart(ChartType.PIE);
+        Chart chart = new Chart(ChartType.BULLET);
         Configuration conf = chart.getConfiguration();
         conf.getChart().setStyledMode(true);
         chart.setThemeName("gradient");
 
         AttendanceAverageModel attendanceAverageModel = reportsService.getAttendanceAverage();
 
-        DataSeries series = new DataSeries();
-        series.add(new DataSeriesItem("Days Worked", attendanceAverageModel.getDaysWorked()));
-        series.add(new DataSeriesItem("Days Missed", attendanceAverageModel.getDaysMissed()));
-        conf.addSeries(series);
+        conf.addSeries(new ListSeries("Days Worked", attendanceAverageModel.getDaysWorked()));
+        conf.addSeries(new ListSeries("Days Missed", attendanceAverageModel.getDaysMissed()));
+
+        conf.getyAxis().setTitle("Percentage");
 
         // Add it all together
         VerticalLayout serviceHealth = new VerticalLayout(header, chart);

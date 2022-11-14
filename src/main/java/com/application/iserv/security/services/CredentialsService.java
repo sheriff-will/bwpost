@@ -2,9 +2,15 @@ package com.application.iserv.security.services;
 
 import com.application.iserv.security.Repositories.CredentialsRepository;
 import com.application.iserv.security.models.RegisterAgentModel;
+import com.opencsv.CSVWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.SUCCESSFUL;
@@ -69,6 +75,32 @@ public class CredentialsService {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void export(HttpServletResponse httpServletResponse) {
+
+        try {
+            //   Path path1 = Paths.get(ClassLoader.getSystemResource("csv/participants.csv").toURI());
+
+            File file = new File(httpServletResponse.getOutputStream().toString());
+
+            FileWriter fileWriter = new FileWriter(file);
+
+            CSVWriter csvWriter = new CSVWriter(fileWriter);
+
+            List<String[]> data = new ArrayList<>();
+            data.add(new String[]{"Name", "Mark", "Pass/Fail"});
+            data.add(new String[]{"Stacy Hart", "80", "Pass"});
+            data.add(new String[]{"John Doe", "40", "Fail"});
+
+            csvWriter.writeAll(data);
+
+            csvWriter.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

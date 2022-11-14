@@ -5,6 +5,7 @@ import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.participants.forms.ParticipantsForm;
 import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.opencsv.CSVWriter;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -29,13 +30,11 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -208,6 +207,17 @@ public class ParticipantsView extends VerticalLayout {
 
     }
 
+    private InputStream getStream(File file) {
+        FileInputStream stream;
+
+        try {
+            stream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return stream;
+    }
+
     private Component getToolbar() {
         searchAgent.setPlaceholder(SEARCH_AGENT_HINT);
         searchAgent.setClearButtonVisible(true);
@@ -289,15 +299,47 @@ public class ParticipantsView extends VerticalLayout {
             }
         });
 
+        MenuBar menuBar = new MenuBar();
+        menuBar.setOpenOnHover(true);
+        menuBar.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
+
         attendanceButton.addClassName(ATTENDANCE_BUTTON);
-        attendanceButton.addThemeVariants(ButtonVariant.MATERIAL_OUTLINED);
+        attendanceButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         attendanceButton.setDisableOnClick(true);
         attendanceButton.addClickListener(click -> {
-            datePicker.setVisible(true);
+           /* datePicker.setVisible(true);
             backButton.setVisible(true);
             isAttendanceButtonClicked = true;
             dateBackHorizontalLayout.setVisible(true);
-            addClassName(ATTENDANCE_BUTTON_CLICKED);
+            menuBar.setVisible(false);
+            addClassName(ATTENDANCE_BUTTON_CLICKED);*/
+
+            try {
+                //   Path path1 = Paths.get(ClassLoader.getSystemResource("csv/participants.csv").toURI());
+
+                String path = "participants.csv";
+
+                File file = new File(path);
+
+                StreamResource streamResource = new StreamResource(file.getName(), () -> getStream(file));
+
+                FileWriter fileWriter = new FileWriter(file);
+
+                CSVWriter csvWriter = new CSVWriter(fileWriter);
+
+                List<String[]> data = new ArrayList<>();
+                data.add(new String[]{"Name", "Mark", "Pass/Fail"});
+                data.add(new String[]{"Stacy Hart", "80", "Pass"});
+                data.add(new String[]{"John Doe", "40", "Fail"});
+
+                csvWriter.writeAll(data);
+
+                csvWriter.close();
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         });
 
         backButton.addThemeVariants(ButtonVariant.MATERIAL_OUTLINED);
@@ -314,17 +356,15 @@ public class ParticipantsView extends VerticalLayout {
                     ATTENDANCE_BUTTON_CLICKED
             );
 
+            menuBar.setVisible(true);
+
             configureBackButton();
 
         });
 
-        MenuBar menuBar = new MenuBar();
-        menuBar.setOpenOnHover(true);
-        menuBar.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
-
-        addAgentButton = menuBar.addItem("Add Participant");
+        addAgentButton = menuBar.addItem("Participant");
         SubMenu subMenu = addAgentButton.getSubMenu();
-        subMenu.addItem("Manually").addClickListener(click -> {
+        subMenu.addItem("Add Manually").addClickListener(click -> {
 
             removeClassName(ADDING_AGENT);
             removeClassName(EDITING_AGENTS);
@@ -337,10 +377,15 @@ public class ParticipantsView extends VerticalLayout {
             configureDialogs();
             uploadFileDialog.open();
         });
+        subMenu.add(new Hr());
+        subMenu.addItem("Export Participants").addClickListener(click -> {
+            exportParticipants();
+        });
 
         HorizontalLayout statusAttendanceLayout = new HorizontalLayout(status, attendanceButton);
         statusAttendanceLayout.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
         statusAttendanceLayout.addClassName(STATUS_ATTENDANCE_LAYOUT);
+
 
         DatePicker.DatePickerI18n dateFormat = new DatePicker.DatePickerI18n();
         dateFormat.setDateFormat(SIMPLE_MONTH_DATE_FORMAT);
@@ -401,6 +446,8 @@ public class ParticipantsView extends VerticalLayout {
 
         VerticalLayout verticalToolbar = new VerticalLayout(statusAttendanceLayout, toolbar);
         verticalToolbar.addClassName(VERTICAL_TOOLBAR);
+        verticalToolbar.setMargin(false);
+        verticalToolbar.setPadding(false);
 
         Button terminateButton = new Button(TERMINATE);
         terminateButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -410,6 +457,10 @@ public class ParticipantsView extends VerticalLayout {
         horizontalToolbar.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
 
         return verticalToolbar;
+    }
+
+    private void exportParticipants() {
+
     }
 
     private void addAttendanceToAgents() {
@@ -571,6 +622,7 @@ public class ParticipantsView extends VerticalLayout {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
         });
 
         uploadFileDialog.getHeader().add(

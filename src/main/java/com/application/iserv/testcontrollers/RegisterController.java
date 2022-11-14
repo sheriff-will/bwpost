@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping(path = "/api/v1")
 public class RegisterController {
@@ -48,10 +50,18 @@ public class RegisterController {
 
     }
 
-    @GetMapping("/district")
-    public void district() {
-       //credentialsService.getCacheData();
-       // System.err.println("Data: "+credentialsService.getApplicationUser1());
+    @GetMapping("/download")
+    public void district(HttpServletResponse response) {
+
+        /*response.setContentType("application/csv");
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=csv.csv";
+        response.setHeader(headerKey, headerValue);
+        */
+        credentialsService.export(response);
+        response.setHeader("Content-Disposition", "attachment; filename=participants.csv");
+
 
     }
 

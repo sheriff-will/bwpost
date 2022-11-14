@@ -10,6 +10,7 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
@@ -98,6 +99,22 @@ public class NaviDrawer extends Div
 		Tab ipelegeng = new Tab(IPELEGENG);
 		Tab tireloSechaba = new Tab(TIRELO_SECHABA);
 
+		TextField names = new TextField();
+		names.setValue("Will Mangwa");
+		names.setReadOnly(true);
+
+		TextField district = new TextField();
+		district.setValue("Kgatleng");
+		district.setReadOnly(true);
+
+		names.getStyle()
+				.set("padding-top", "0")
+				.set("padding-bottom", "0");
+
+		district.getStyle()
+				.set("padding-top", "0")
+				.set("padding-bottom", "0");
+
 		ipelegeng.getStyle()
 				.set("font-weight", "400");
 
@@ -109,6 +126,10 @@ public class NaviDrawer extends Div
 		Tabs tabs = new Tabs(ipelegeng, tireloSechaba);
 		tabs.getStyle()
 				.set("margin-bottom", "var(--lumo-space-l)");
+
+		VerticalLayout verticalLayout = new VerticalLayout(names, district);
+		verticalLayout.setMargin(false);
+		verticalLayout.setPadding(false);
 
 		mainContent.add(tabs);
 
