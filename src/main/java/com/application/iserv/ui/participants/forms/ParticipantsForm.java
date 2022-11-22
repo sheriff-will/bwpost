@@ -1,9 +1,9 @@
 package com.application.iserv.ui.participants.forms;
 
-
 import com.application.iserv.backend.services.ParticipantsServices;
-import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.parameters.models.ParametersModel;
 import com.application.iserv.ui.participants.models.NomineesModel;
+import com.application.iserv.ui.participants.models.ParticipantsModel;
 import com.application.iserv.ui.participants.models.ReferenceModel;
 import com.application.iserv.ui.utils.ApplicationUserDataModel;
 import com.application.iserv.ui.utils.Commons;
@@ -66,7 +66,7 @@ public class ParticipantsForm extends VerticalLayout {
     ComboBox<String> position = new ComboBox<>(POSITION_UPPER_CASE);
     ComboBox<String> relationship = new ComboBox<>(RELATIONSHIP);
     ComboBox<String> paymentMethod = new ComboBox<>(PAYMENT_METHOD);
-    ComboBox<String> duration = new ComboBox<>(CONTRACT_DURATION);
+    ComboBox<String> mobileWalletProvider = new ComboBox<>(PRIMARY_MOBILE);
 
 
     // TextFields
@@ -88,10 +88,10 @@ public class ParticipantsForm extends VerticalLayout {
     TextField nomineeIdentityNumber = new TextField(ID_NUMBER);
     TextField nomineeMobileNumber = new TextField(PRIMARY_MOBILE);
     TextField nomineePostalAddress = new TextField(POSTAL_ADDRESS);
-    TextField mobileWalletProvider = new TextField(PRIMARY_MOBILE);
     TextField bankName = new TextField(BANK_NAME);
     TextField branch = new TextField(BRANCH);
     TextField accountNumber = new TextField(ACCOUNT_NUMBER);
+    TextField duration = new TextField(CONTRACT_DURATION);
 
 
     // Tabs
@@ -115,6 +115,7 @@ public class ParticipantsForm extends VerticalLayout {
     List<ReferenceModel> allReferencesList = new ArrayList<>();
     List<ReferenceModel> agentReferencesList = new ArrayList<>();
     List<String> contractDates = new ArrayList<>();
+    List<ParametersModel> parametersModelList = new ArrayList<>();
 
     // Buttons
     Button updateAddAgent = new Button();
@@ -164,6 +165,8 @@ public class ParticipantsForm extends VerticalLayout {
     boolean isUpdateNominee = false;
     boolean isUpdateReference = false;
 
+    int duration_int;
+
     @Autowired
     public ParticipantsForm(ParticipantsServices participantsServices) {
         this.participantsServices = participantsServices;
@@ -188,6 +191,8 @@ public class ParticipantsForm extends VerticalLayout {
         daysWorked.setMin(0);
         daysWorked.setMax(20);
         daysWorked.setVisible(false);
+
+        duration.setReadOnly(true);
 
         FormLayout formLayout = new FormLayout(
                 daysWorked,
@@ -344,7 +349,7 @@ public class ParticipantsForm extends VerticalLayout {
         });
 
         duration.addValueChangeListener(durationValueChange -> {
-            if (placementDate.getValue() != null
+            if (placementDate.getValue() != null && !durationValueChange.getValue().isEmpty()
                     && !placementDate.isEmpty() && duration.getValue() != null) {
                 DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
@@ -400,6 +405,33 @@ public class ParticipantsForm extends VerticalLayout {
                 daysWorked.setErrorMessage("Enter valid working days");
             }
 
+        });
+
+        mobileWalletProvider.addValueChangeListener(mobileWalletValueChangeEvent -> {
+
+            if (mobileWalletProvider.getValue() != null && mobileWalletProvider.getValue().length() == 8) {
+                String carrier = Commons.getPhoneNumberCarrier(mobileWalletValueChangeEvent.getValue());
+
+                if (!carrier.isEmpty()) {
+                    mobileWalletProvider.setHelperText(carrier);
+                }
+            }
+            else {
+                mobileWalletProvider.setHelperText("");
+            }
+
+        });
+
+        position.addValueChangeListener(positionValueChangeEvent -> {
+            if (positionValueChangeEvent.getValue() != null) {
+                for (int i = 0; i < parametersModelList.size(); i++) {
+                    if (positionValueChangeEvent.getValue()
+                            .equalsIgnoreCase(parametersModelList.get(i).getPosition())) {
+                        duration.setValue(parametersModelList.get(i).getDuration());
+                        break;
+                    }
+                }
+            }
         });
 
     }
@@ -694,10 +726,6 @@ public class ParticipantsForm extends VerticalLayout {
 
     private void configureLists() {
 
-        // Contract duration
-        duration.setItems(participantsServices.getContractDuration(applicationUserDataModel.getDistrict()));
-        duration.setItemLabelGenerator(String::toString);
-
         // Marital statuses
         maritalStatus.setItems(getMaritalStatuses());
         maritalStatus.setItemLabelGenerator(String::toString);
@@ -728,15 +756,40 @@ public class ParticipantsForm extends VerticalLayout {
 
     }
 
-    public void setAgent(ParticipantsModel participantsModel, String monthDate) {
+    public void setAgent(ParticipantsModel participantsModel,
+                         String monthDate, List<ParametersModel> parametersModels) {
         this.participantsModel = participantsModel;
+
+        parametersModelList = parametersModels;
+
+        boolean addAlternateNumber = false;
+        if (participantsModel.getAlternateMobileNumber() != null
+                && !participantsModel.getAlternateMobileNumber().equalsIgnoreCase("null")) {
+            addAlternateNumber = true;
+        }
+
+        if (addAlternateNumber) {
+            mobileWalletProvider.setItems(
+                    participantsModel.getMobileNumber(),
+                    participantsModel.getAlternateMobileNumber());
+        }
+        else {
+            if (participantsModel.getMobileNumber() != null) {
+                mobileWalletProvider.setItems(participantsModel.getMobileNumber());
+            }
+        }
+
+        if (participantsModel.getFirstname() == null) {
+            mobileWalletProvider.setItems();
+        }
+
         agentsModelBinder.readBean(participantsModel);
 
         if (participantsModel.getPlacementDate() != null && participantsModel.getCompletionDate() != null) {
             long monthsDifference = ChronoUnit.MONTHS.between(
                     participantsModel.getPlacementDate(), participantsModel.getCompletionDate());
 
-            duration.setValue(monthsDifference+" Months");
+            duration.setValue(Math.abs(-monthsDifference)+" Months");
         }
         else {
             duration.clear();
@@ -772,27 +825,151 @@ public class ParticipantsForm extends VerticalLayout {
         }
     }
 
-    public void disableButtons(boolean isEnabled) {
+    public void disableButtons(boolean isEnabled, boolean isTerminated) {
         if (isEnabled) {
-            updateAddAgent.setEnabled(true);
-            terminateButton.setEnabled(true);
-            addNomineeButton.setEnabled(true);
-            addReferenceButton.setEnabled(true);
+
+            terminateButton.setText(TERMINATE);
+            terminateButton.getThemeNames().clear();
+            terminateButton.addThemeVariants(
+                    ButtonVariant.LUMO_PRIMARY,
+                    ButtonVariant.LUMO_ERROR);
+
+            backButton.setText(BACK);
+            backButton.getThemeNames().clear();
+            backButton.addThemeVariants(
+                    ButtonVariant.LUMO_PRIMARY,
+                    ButtonVariant.LUMO_CONTRAST
+            );
+            backButton.setVisible(true);
+
+            updateAddAgent.setVisible(true);
+            terminateButton.setVisible(true);
+            addNomineeButton.setVisible(true);
+            addReferenceButton.setVisible(true);
             saveNominee.setEnabled(true);
             saveReference.setEnabled(true);
-            removeReference.setEnabled(true);
             removeNominee.setEnabled(true);
+            removeReference.setEnabled(true);
+
+            firstname.setReadOnly(false);
+            lastname.setReadOnly(false);
+            identityNumber.setReadOnly(false);
+            dateOfBirth.setReadOnly(false);
+            gender.setReadOnly(false);
+            maritalStatus.setReadOnly(false);
+            mobileNumber.setReadOnly(false);
+            alternateMobileNumber.setReadOnly(false);
+            postalAddress.setReadOnly(false);
+            residentialAddress.setReadOnly(false);
+
+            education.setReadOnly(false);
+
+            placementOfficer.setReadOnly(false);
+            placementPlace.setReadOnly(false);
+            position.setReadOnly(false);
+            placementDate.setReadOnly(false);
+
+            paymentMethod.setReadOnly(false);
+            mobileWalletProvider.setReadOnly(false);
+            bankName.setReadOnly(false);
+            branch.setReadOnly(false);
+            accountNumber.setReadOnly(false);
+
         }
-        else {
-            updateAddAgent.setEnabled(false);
-            terminateButton.setEnabled(false);
-            addNomineeButton.setEnabled(false);
-            addReferenceButton.setEnabled(false);
+        else if (isTerminated) {
+
+            terminateButton.setText("Back");
+            terminateButton.getThemeNames().clear();
+            terminateButton.addThemeVariants(
+                    ButtonVariant.LUMO_PRIMARY,
+                    ButtonVariant.LUMO_CONTRAST);
+
+            backButton.setText("Reinstate");
+            backButton.getThemeNames().clear();
+            backButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            backButton.setVisible(false);
+
+            updateAddAgent.setVisible(false);
+            terminateButton.setVisible(false);
+            addNomineeButton.setVisible(false);
+            addReferenceButton.setVisible(false);
             saveNominee.setEnabled(false);
             saveReference.setEnabled(false);
             removeNominee.setEnabled(false);
             removeReference.setEnabled(false);
+
+            firstname.setReadOnly(true);
+            lastname.setReadOnly(true);
+            identityNumber.setReadOnly(true);
+            dateOfBirth.setReadOnly(true);
+            gender.setReadOnly(true);
+            maritalStatus.setReadOnly(true);
+            mobileNumber.setReadOnly(true);
+            alternateMobileNumber.setReadOnly(true);
+            postalAddress.setReadOnly(true);
+            residentialAddress.setReadOnly(true);
+
+            education.setReadOnly(true);
+
+            placementOfficer.setReadOnly(true);
+            placementPlace.setReadOnly(true);
+            position.setReadOnly(true);
+            placementDate.setReadOnly(true);
+
+            paymentMethod.setReadOnly(true);
+            mobileWalletProvider.setReadOnly(true);
+            bankName.setReadOnly(true);
+            branch.setReadOnly(true);
+            accountNumber.setReadOnly(true);
         }
+        else {
+
+            terminateButton.setText("Back");
+            terminateButton.getThemeNames().clear();
+            terminateButton.addThemeVariants(
+                    ButtonVariant.LUMO_PRIMARY,
+                    ButtonVariant.LUMO_CONTRAST);
+
+            backButton.setText("Reinstate");
+            backButton.getThemeNames().clear();
+            backButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            backButton.setVisible(true);
+
+            updateAddAgent.setVisible(false);
+            terminateButton.setVisible(false);
+            addNomineeButton.setVisible(false);
+            addReferenceButton.setVisible(false);
+            saveNominee.setEnabled(false);
+            saveReference.setEnabled(false);
+            removeNominee.setEnabled(false);
+            removeReference.setEnabled(false);
+
+            firstname.setReadOnly(true);
+            lastname.setReadOnly(true);
+            identityNumber.setReadOnly(true);
+            dateOfBirth.setReadOnly(true);
+            gender.setReadOnly(true);
+            maritalStatus.setReadOnly(true);
+            mobileNumber.setReadOnly(true);
+            alternateMobileNumber.setReadOnly(true);
+            postalAddress.setReadOnly(true);
+            residentialAddress.setReadOnly(true);
+
+            education.setReadOnly(true);
+
+            placementOfficer.setReadOnly(true);
+            placementPlace.setReadOnly(true);
+            position.setReadOnly(true);
+            placementDate.setReadOnly(true);
+
+            paymentMethod.setReadOnly(true);
+            mobileWalletProvider.setReadOnly(true);
+            bankName.setReadOnly(true);
+            branch.setReadOnly(true);
+            accountNumber.setReadOnly(true);
+
+        }
+
     }
 
     public void hideAllComponents(boolean isHideAll) {
@@ -1151,7 +1328,6 @@ public class ParticipantsForm extends VerticalLayout {
             // Showing
             paymentMethod.setVisible(true);
 
-
             // Hiding
             firstname.setVisible(false);
             lastname.setVisible(false);
@@ -1200,6 +1376,22 @@ public class ParticipantsForm extends VerticalLayout {
                     bankName.setVisible(true);
                     branch.setVisible(true);
                     accountNumber.setVisible(true);
+                }
+            }
+
+            List<String> numbers = new ArrayList<>();
+
+            if (!mobileNumber.getValue().isEmpty()) {
+                numbers.add(mobileNumber.getValue());
+            }
+
+            if (!alternateMobileNumber.getValue().isEmpty()) {
+                numbers.add(alternateMobileNumber.getValue());
+            }
+
+            if (!numbers.isEmpty()) {
+                if (!nominees.isEnabled()) {
+                    mobileWalletProvider.setItems(numbers);
                 }
             }
 
@@ -1365,7 +1557,34 @@ public class ParticipantsForm extends VerticalLayout {
                 ButtonVariant.LUMO_CONTRAST
         );
 
-        backButton.addClickListener(event -> fireEvent(new CloseEvent(this)));
+        backButton.addClickListener(event -> {
+            if (backButton.getText().equalsIgnoreCase("Reinstate")) {
+
+                String[] getDuration = duration.getValue().split(" ");
+                duration_int = Integer.parseInt(getDuration[0]);
+
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+                contractDates = new ArrayList<>();
+                for (int i = 1; i < duration_int + 1; i++) {
+                    contractDates.add(LocalDate.now().plusMonths(i).format(dateFormatter));
+                }
+
+                participantsServices.reinstateParticipant(participantId, contractDates);
+
+                Notification notification = new Notification("Reinstated");
+                notification.setPosition(Notification.Position.BOTTOM_CENTER);
+                notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+                notification.setDuration(5000);
+                notification.open();
+
+                fireEvent(new CloseAndUpdateEvent(this));
+
+            }
+            else {
+                fireEvent(new CloseEvent(this));
+            }
+        });
 
         terminateButton.addThemeVariants(
                 ButtonVariant.LUMO_PRIMARY,
@@ -1373,9 +1592,16 @@ public class ParticipantsForm extends VerticalLayout {
         );
 
         terminateButton.addClickListener(click -> {
-            participantsServices.terminateAgent(participantId);
 
-            fireEvent(new AgentTerminatedEvent(this));
+            if (terminateButton.getText().equalsIgnoreCase("Back")) {
+                fireEvent(new CloseEvent(this));
+            }
+            else {
+                participantsServices.terminateAgent(participantId);
+
+                fireEvent(new AgentTerminatedEvent(this));
+            }
+
         });
 
         buttonsLayout = new HorizontalLayout(updateButton, attendanceBackButton);
@@ -1750,7 +1976,8 @@ public class ParticipantsForm extends VerticalLayout {
                 accountNumberValue,
                 applicationUserDataModel.getDistrict(),
                 applicationUserDataModel.getVillage(),
-                applicationUserDataModel.getService()
+                applicationUserDataModel.getService(),
+                duration.getValue()
 
         ),
                 contractDates
@@ -1870,7 +2097,8 @@ public class ParticipantsForm extends VerticalLayout {
                 accountNumberValue,
                 applicationUserDataModel.getDistrict(),
                 applicationUserDataModel.getVillage(),
-                applicationUserDataModel.getService()
+                applicationUserDataModel.getService(),
+                duration.getValue()
         ));
 
 
@@ -1961,6 +2189,12 @@ public class ParticipantsForm extends VerticalLayout {
 
     public static class CloseEvent extends AddAgentFormEvent {
         CloseEvent(ParticipantsForm source) {
+            super(source, null);
+        }
+    }
+
+    public static class CloseAndUpdateEvent extends AddAgentFormEvent {
+        CloseAndUpdateEvent(ParticipantsForm source) {
             super(source, null);
         }
     }

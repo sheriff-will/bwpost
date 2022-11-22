@@ -29,7 +29,8 @@ public class ParametersRepository {
 
         applicationUserDataModel = sessionManager.getApplicationUserData();
 
-        String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
+        String sql = "SELECT parameters.parameter_id, parameters.position," +
+                " parameters.rate_per_day, parameters.duration " +
                 "FROM parameters" +
                 " WHERE parameters.position = '"+parametersModel.getPosition()+"' " +
                 "AND parameters.village = '"+applicationUserDataModel.getVillage()+"' " +
@@ -48,7 +49,8 @@ public class ParametersRepository {
 
         applicationUserDataModel = sessionManager.getApplicationUserData();
 
-        String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
+        String sql = "SELECT parameters.parameter_id, parameters.position, " +
+                "parameters.rate_per_day, parameters.duration " +
                 "FROM parameters" +
                 " WHERE parameters.village = '"+applicationUserDataModel.getVillage()+"'" +
                 " AND parameters.service = '"+applicationUserDataModel.getService()+"'";
@@ -69,12 +71,15 @@ public class ParametersRepository {
 
         try {
 
+            int duration = (int) Double.parseDouble(parametersModel.getDuration());
+
             String insertParameterSQL = "INSERT INTO parameters (rate_per_day, position, district, " +
-                    "village, service) VALUES(" +
-                    "'" + parametersModel.getRatePerDay() + "','" + parametersModel.getPosition() + "'," +
+                    "village, service, duration) VALUES(" +
+                    "'" + parametersModel.getDailyRatePerDay() + "','" + parametersModel.getPosition() + "'," +
                     "'"+applicationUserDataModel.getDistrict()+"'," +
                     "'"+applicationUserDataModel.getVillage()+"', " +
-                    "'"+applicationUserDataModel.getService()+"')";
+                    "'"+applicationUserDataModel.getService()+"', " +
+                    "'"+ duration +" Months" +"')";
 
             Query insertParameterQuery = entityManager.createNativeQuery(insertParameterSQL);
             insertParameterQuery.executeUpdate();
@@ -89,10 +94,10 @@ public class ParametersRepository {
 
         applicationUserDataModel = sessionManager.getApplicationUserData();
 
-        String sql = "SELECT parameters.parameter_id, parameters.position, parameters.rate_per_day " +
+        String sql = "SELECT parameters.parameter_id, parameters.position, " +
+                "parameters.rate_per_day, parameters.duration " +
                 "FROM parameters " +
-                "WHERE parameters.village = '"+applicationUserDataModel.getVillage()+"' " +
-                "AND parameters.service = '"+applicationUserDataModel.getService()+"'";
+                "WHERE parameters.service = '"+applicationUserDataModel.getService()+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -110,10 +115,13 @@ public class ParametersRepository {
 
         try {
 
+            int duration = (int) Double.parseDouble(parametersModel.getDuration());
+
             String updateParameterSQL = "UPDATE parameters SET " +
-                    "rate_per_day = '" + parametersModel.getRatePerDay() + "'," +
-                    " position = '" + parametersModel.getPosition() + "'" +
-                    " WHERE parameter_id = '"+parametersModel.getParameterId()+"' " +
+                    "rate_per_day = '" + parametersModel.getDailyRatePerDay() + "', " +
+                    "position = '" + parametersModel.getPosition() + "', " +
+                    "duration = '" + duration +" Months" + "' " +
+                    "WHERE parameter_id = '"+parametersModel.getParameterId()+"' " +
                     "AND village = '"+applicationUserDataModel.getVillage()+"' " +
                     "AND service = '"+applicationUserDataModel.getService()+"'";
 

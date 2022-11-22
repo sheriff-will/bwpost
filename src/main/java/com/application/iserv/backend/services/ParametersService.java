@@ -44,9 +44,10 @@ public class ParametersService {
         for(Object[] row : allParameters) {
 
             ParametersModel parametersModel = new ParametersModel(
-                    row[1].toString(),
                     Long.parseLong(row[0].toString()),
-                    Double.parseDouble(row[2].toString())
+                    Double.parseDouble(row[2].toString()),
+                    row[1].toString(),
+                    row[3].toString()
             );
 
             parameters.add(parametersModel);

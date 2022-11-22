@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -88,12 +87,18 @@ public class TestSomeStuff {
     @Test
     public void testTimeFormats() {
 
-        String[] a = LocalDate.now().toString().split("-");
+        /*String[] a = LocalDate.now().toString().split("-");
         System.err.println(a[0]+"-"+a[1]);
+*/
+       /* DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+        System.err.println(LocalDate.now().plusMonths(6));*/
 
-        System.err.println(LocalDate.now().format(dateFormatter));
+        double a = 787.765;
+
+        int b = (int) a;
+
+        System.err.println(b);
     }
 
     @Test
@@ -240,7 +245,8 @@ public class TestSomeStuff {
                 fields[18],
                 fields[20],
                 fields[21],
-                fields[22]
+                fields[22],
+                fields[23]
 
         );
     }

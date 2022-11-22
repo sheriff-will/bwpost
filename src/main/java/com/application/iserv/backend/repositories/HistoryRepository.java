@@ -9,7 +9,7 @@ import javax.persistence.Query;
 import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.APPROVED;
-import static com.application.iserv.ui.utils.Constants.DECLINED;
+import static com.application.iserv.ui.utils.Constants.DENIED;
 
 @Repository
 @Transactional
@@ -33,7 +33,7 @@ public class HistoryRepository {
                 "AND participants.participant_id = attendance_history.participant_id " +
                 "AND participants.parameter_id = parameters.parameter_id " +
                 "AND (remuneration_history.status = '"+APPROVED+"' " +
-                "OR remuneration_history.status = '"+DECLINED+"') " +
+                "OR remuneration_history.status = '"+ DENIED +"') " +
                 "AND remuneration_history.month = '"+date+"' " +
                 "AND attendance_history.date = '"+date+"' " +
                 "AND participants.is_terminated = '0'";
@@ -86,7 +86,7 @@ public class HistoryRepository {
                 "AND participants.participant_id = attendance_history.participant_id " +
                 "AND participants.parameter_id = parameters.parameter_id " +
                 "AND (remuneration_history.status = '"+APPROVED+"' " +
-                "OR remuneration_history.status = '"+DECLINED+"') " +
+                "OR remuneration_history.status = '"+ DENIED +"') " +
                 "AND remuneration_history.month = '"+date+"' " +
                 "AND attendance_history.date = '"+date+"' " +
                 "AND participants.is_terminated = '0'";

@@ -12,7 +12,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
@@ -23,9 +22,9 @@ import static com.application.iserv.ui.utils.Constants.*;
 public class AuthorizeForm extends FormLayout {
 
     // TextFields
-    IntegerField bonusAmount = new IntegerField();
+    TextField bonusAmount = new TextField();
     TextField bonusReason = new TextField();
-    IntegerField deductionAmount = new IntegerField();
+    TextField deductionAmount = new TextField();
     TextField deductionReason = new TextField();
     TextField statusReason = new TextField(REASON);
 
@@ -64,7 +63,7 @@ public class AuthorizeForm extends FormLayout {
 
         status.addValueChangeListener(statusValueChangedEvent -> {
             if (statusValueChangedEvent.getValue() != null) {
-                if (statusValueChangedEvent.getValue().equalsIgnoreCase(DECLINED)) {
+                if (statusValueChangedEvent.getValue().equalsIgnoreCase(DENY)) {
                     if (!statusReason.isEmpty()
                             && statusReason.getValue().equalsIgnoreCase("null")) {
                         statusReason.clear();
@@ -92,14 +91,32 @@ public class AuthorizeForm extends FormLayout {
 
     public void setAuthorize(AuthorizeModel authorizeModel) {
         this.authorizeModel = authorizeModel;
+
         binder.readBean(authorizeModel);
 
-        if (bonusAmount.getValue().equals(0)) {
+        if (!authorizeModel.getStatusReason().equalsIgnoreCase("null")) {
+            statusReason.setValue(authorizeModel.getStatusReason());
+        }
+
+        if (authorizeModel.getStatus().equalsIgnoreCase(APPROVED)) {
+            status.setValue(APPROVE);
+        }
+        else if (authorizeModel.getStatus().equalsIgnoreCase(DENIED)) {
+            status.setValue(DENY);
+        }
+        else if (authorizeModel.getStatus().equalsIgnoreCase(HOLD)) {
+            status.setValue(HOLD);
+        }
+        else if (authorizeModel.getStatus().equalsIgnoreCase(PENDING)) {
+            status.setValue(PEND);
+        }
+
+        if (bonusAmount.getValue().equals("0")) {
             bonusAmount.clear();
             bonusReason.clear();
         }
 
-        if (deductionAmount.getValue().equals(0)) {
+        if (deductionAmount.getValue().equals("0")) {
             deductionAmount.clear();
             deductionReason.clear();
         }
@@ -121,11 +138,11 @@ public class AuthorizeForm extends FormLayout {
             deductionReason.setEnabled(true);
         }
 
-        if (bonusAmount.getValue() != null) {
+        if (bonusAmount.getValue() != null && !bonusAmount.isEmpty()) {
             deductionAmount.setEnabled(false);
             deductionReason.setEnabled(false);
         }
-        else if (deductionAmount.getValue() != null) {
+        else if (deductionAmount.getValue() != null && !deductionAmount.isEmpty()) {
             bonusAmount.setEnabled(false);
             bonusReason.setEnabled(false);
         }
@@ -214,7 +231,7 @@ public class AuthorizeForm extends FormLayout {
 
     private void validateFields() {
         if (status.getValue() != null) {
-            if (status.getValue().equalsIgnoreCase(DECLINED)) {
+            if (status.getValue().equalsIgnoreCase(DENIED)) {
                 if (statusReason.isEmpty()) {
                     Notification notification = new Notification("Enter reason for denial");
                     notification.setPosition(Notification.Position.BOTTOM_CENTER);
@@ -228,6 +245,28 @@ public class AuthorizeForm extends FormLayout {
                 else {
                     updateRemuneration();
                 }
+            }
+            else if (bonusAmount != null && !bonusAmount.isEmpty()
+                    && bonusReason != null && bonusReason.isEmpty()) {
+                Notification notification = new Notification("Enter reason for bonus");
+                notification.setPosition(Notification.Position.BOTTOM_CENTER);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notification.setDuration(5000);
+                notification.open();
+
+                bonusReason.setInvalid(true);
+                save.setEnabled(true);
+            }
+            else if (deductionAmount != null && !deductionAmount.isEmpty()
+                    && deductionReason != null && deductionReason.isEmpty()) {
+                Notification notification = new Notification("Enter reason for deduction");
+                notification.setPosition(Notification.Position.BOTTOM_CENTER);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notification.setDuration(5000);
+                notification.open();
+
+                deductionReason.setInvalid(true);
+                save.setEnabled(true);
             }
             else {
                 updateRemuneration();
@@ -247,12 +286,13 @@ public class AuthorizeForm extends FormLayout {
             statusReason_str = statusReason.getValue();
         }
 
-        int bonusAmount_int;
+        String bonusAmount_str;
         if (bonusAmount.isEmpty()) {
-            bonusAmount_int = 0;
+            bonusAmount_str = "0";
         }
         else {
-            bonusAmount_int = bonusAmount.getValue();
+            // todo validate bonusAmount
+            bonusAmount_str = bonusAmount.getValue();
         }
 
         String bonusAmountReason_str;
@@ -263,12 +303,13 @@ public class AuthorizeForm extends FormLayout {
             bonusAmountReason_str = bonusReason.getValue();
         }
 
-        int deductionAmount_int;
+        String deductionAmount_str;
         if (deductionAmount.isEmpty()) {
-            deductionAmount_int = 0;
+            deductionAmount_str = "0";
         }
         else {
-            deductionAmount_int = deductionAmount.getValue();
+            // todo validate deductionAmount
+            deductionAmount_str = deductionAmount.getValue();
         }
 
         String deductionAmountReason_str;
@@ -279,21 +320,46 @@ public class AuthorizeForm extends FormLayout {
             deductionAmountReason_str = deductionReason.getValue();
         }
 
-        authorizeService.updateRemuneration(new AuthorizeModel(
-                bonusAmount_int,
-                deductionAmount_int,
-                authorizeModel.getRemunerationHistoryId(),
-                authorizeModel.getParticipantId(),
-                status.getValue(),
-                statusReason_str,
-                authorizeModel.getClaimed(),
-                bonusAmountReason_str,
-                deductionAmountReason_str
-        ));
+        String statusValue = status.getValue();
 
-        save.setEnabled(true);
+        if (status.getValue().equalsIgnoreCase(APPROVE)) {
+            statusValue = APPROVED;
+        }
+        else if (status.getValue().equalsIgnoreCase(DENY)) {
+            statusValue = DENIED;
+        }
+        else if (status.getValue().equalsIgnoreCase(HOLD)) {
+            statusValue = HOLD;
+        }
+        else if (status.getValue().equalsIgnoreCase(PEND)) {
+            statusValue = PENDING;
+        }
 
-        fireEvent(new RemunerationUpdatedEvent(this));
+        System.err.println("value: "+statusReason.getValue());
+
+        if (statusValue.equalsIgnoreCase(DENIED)
+                && statusReason.getValue().isEmpty()) {
+            statusReason.setInvalid(true);
+            save.setEnabled(true);
+        }
+        else {
+            authorizeService.updateRemuneration(new AuthorizeModel(
+                    bonusAmount_str,
+                    deductionAmount_str,
+                    authorizeModel.getRemunerationHistoryId(),
+                    authorizeModel.getParticipantId(),
+                    statusValue,
+                    statusReason_str,
+                    authorizeModel.getClaimed(),
+                    bonusAmountReason_str,
+                    deductionAmountReason_str
+            ));
+
+            save.setEnabled(true);
+
+            fireEvent(new RemunerationUpdatedEvent(this));
+
+        }
 
     }
 

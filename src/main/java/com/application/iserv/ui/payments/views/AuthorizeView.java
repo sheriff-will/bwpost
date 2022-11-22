@@ -6,12 +6,18 @@ import com.application.iserv.ui.payments.forms.AuthorizeForm;
 import com.application.iserv.ui.payments.models.AuthorizeModel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
+import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.notification.Notification;
@@ -64,7 +70,13 @@ public class AuthorizeView extends VerticalLayout {
     // Arrays
     List<AuthorizeModel> authorizeModelList = new ArrayList<>();
 
+    // ComboBox
+    ComboBox<String> placementPlaceFilter = new ComboBox<>();
+
     private final AuthorizeService authorizeService;
+
+    // Dialogs
+    Dialog approveAllDialog = new Dialog();
 
     // Strings
     String date;
@@ -78,6 +90,8 @@ public class AuthorizeView extends VerticalLayout {
 
         tabs = new Tabs(authorize, reconcile, history);
 
+        configureDialogs();
+        checkScreenSize();
         configureAuthorizeForm();
         configureAuthorizeGrid();
 
@@ -103,6 +117,29 @@ public class AuthorizeView extends VerticalLayout {
 
     private Component getToolbar() {
 
+        placementPlaceFilter.setPlaceholder("Filter by place");
+        placementPlaceFilter.setClearButtonVisible(true);
+
+        placementPlaceFilter.addValueChangeListener(placeValueChangeEvent -> {
+
+            searchAgent.clear();
+
+            if (placeValueChangeEvent.getValue() == null) {
+                updateAgentsPaymentsList();
+            }
+            else {
+                authorizeGrid.setItems(
+                        authorizeService.filterRemunerationHistoryByPlace(
+                                date,
+                                placeValueChangeEvent.getValue()));
+            }
+
+        });
+
+        // Placement places
+        placementPlaceFilter.setItems(getPlaces());
+        placementPlaceFilter.setItemLabelGenerator(String::toString);
+
         MenuBar menuBar = new MenuBar();
         menuBar.setOpenOnHover(true);
 
@@ -110,8 +147,9 @@ public class AuthorizeView extends VerticalLayout {
         SubMenu subMenu = options.getSubMenu();
         subMenu.addItem("Download");
         subMenu.add(new Hr());
-        subMenu.addItem("Approve All").addClickListener(click -> {
-            if (!authorizeModelList.isEmpty()) {
+        subMenu.addItem("Approve Menu").addClickListener(click -> {
+
+            /*if (!authorizeModelList.isEmpty()) {
                 authorizeService.approveAllRemuneration(authorizeModelList);
 
                 updateAgentsPaymentsList();
@@ -123,6 +161,8 @@ public class AuthorizeView extends VerticalLayout {
                 notification.open();
 
             }
+            */
+            approveAllDialog.open();
         });
 
         menuBar.setEnabled(false);
@@ -135,7 +175,6 @@ public class AuthorizeView extends VerticalLayout {
                 authorizeService.searchAuthorize(searchAgent.getValue(), date)
         ));
 
-
         DatePicker.DatePickerI18n dateFormat = new DatePicker.DatePickerI18n();
         dateFormat.setDateFormat(SIMPLE_MONTH_DATE_FORMAT);
 
@@ -143,6 +182,8 @@ public class AuthorizeView extends VerticalLayout {
         datePicker.setPlaceholder(DATE);
         datePicker.addValueChangeListener(datePickerValueChangeEvent -> {
             isDateSelected = true;
+
+            searchAgent.clear();
 
             menuBar.setEnabled(true);
             configureAuthorizeGrid();
@@ -161,7 +202,19 @@ public class AuthorizeView extends VerticalLayout {
 
             date = datePickerLocalDate.format(dateFormatter);
 
-            updateAgentsPaymentsList();
+            if (placementPlaceFilter.getValue() != null) {
+                authorizeGrid.asSingleSelect().clear();
+
+                authorizeModelList = authorizeService
+                        .filterRemunerationHistoryByPlace(
+                                date,
+                                placementPlaceFilter.getValue());
+                authorizeGrid.setItems(authorizeModelList);
+
+            }
+            else {
+                updateAgentsPaymentsList();
+            }
 
         });
 
@@ -169,6 +222,8 @@ public class AuthorizeView extends VerticalLayout {
         datePicker1.setPlaceholder(DATE);
         datePicker1.addValueChangeListener(datePickerValueChangeEvent -> {
             isDateSelected = true;
+
+            searchAgent.clear();
 
             menuBar.setEnabled(true);
             configureAuthorizeGrid();
@@ -187,7 +242,19 @@ public class AuthorizeView extends VerticalLayout {
 
             date = datePickerLocalDate.format(dateFormatter);
 
-            updateAgentsPaymentsList();
+            if (placementPlaceFilter.getValue() != null) {
+                authorizeGrid.asSingleSelect().clear();
+
+                authorizeModelList = authorizeService
+                        .filterRemunerationHistoryByPlace(
+                                date,
+                                placementPlaceFilter.getValue());
+                authorizeGrid.setItems(authorizeModelList);
+
+            }
+            else {
+                updateAgentsPaymentsList();
+            }
 
         });
 
@@ -226,7 +293,11 @@ public class AuthorizeView extends VerticalLayout {
             }
         });
 
-        HorizontalLayout searchDateMenuLayout = new HorizontalLayout(searchAgent, datePicker, menuBar);
+        HorizontalLayout searchDateMenuLayout = new HorizontalLayout(
+                searchAgent,
+                datePicker,
+                placementPlaceFilter,
+                menuBar);
         searchDateMenuLayout.setAlignItems(Alignment.BASELINE);
         searchDateMenuLayout.addClassName(SEARCH_DATE_MENU_LAYOUT);
 
@@ -237,13 +308,56 @@ public class AuthorizeView extends VerticalLayout {
 
     }
 
+    private void configureDialogs() {
+
+        approveAllDialog = new Dialog();
+
+        CheckboxGroup<String> checkboxGroup = new CheckboxGroup<>();
+        checkboxGroup.setLabel("Approve");
+        checkboxGroup.setItems(HOLD, DENIED, PENDING);
+        checkboxGroup.select(HOLD, PENDING);
+        checkboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
+
+
+        approveAllDialog.getHeader().add(
+                new Button(new Icon("lumo", "cross"), (e) -> {
+                    approveAllDialog.close();
+                })
+        );
+
+        approveAllDialog.addDialogCloseActionListener(dialogCloseActionEvent -> {
+            approveAllDialog.close();
+        });
+
+        approveAllDialog.add(checkboxGroup);
+
+    }
+
+    private void checkScreenSize() {
+
+        UI.getCurrent().getPage().addBrowserWindowResizeListener(browserWindowResizeEvent -> {
+            if (browserWindowResizeEvent.getWidth() > 500) {
+                approveAllDialog.setWidth("70%");
+            }
+
+        });
+
+        UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails -> {
+            if (extendedClientDetails.getScreenWidth() > 500) {
+                approveAllDialog.setWidth("70%");
+            }
+
+        });
+
+    }
+
     private void configureAuthorizeGrid() {
 
         if (isDateSelected) {
             authorizeGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
             authorizeGrid.setSizeFull();
 
-            authorizeGrid.setColumns(PARTICIPANT, AMOUNT);
+            authorizeGrid.setColumns(PARTICIPANT, AMOUNT, TOTAL_NET_CAMEL_CASE);
 
             authorizeGrid.addComponentColumn(
                     status -> createBadge(status.getStatus())).setHeader(STATUS);
@@ -259,6 +373,9 @@ public class AuthorizeView extends VerticalLayout {
 
             authorizeGrid.addComponentColumn(
                     status -> createBadge("-")).setHeader(CAPS_AMOUNT);
+
+            authorizeGrid.addComponentColumn(
+                    status -> createBadge("-")).setHeader(TOTAL_NET);
 
             authorizeGrid.addComponentColumn(
                     status -> createBadge("-")).setHeader(STATUS);
@@ -285,8 +402,8 @@ public class AuthorizeView extends VerticalLayout {
                 label = new Span(APPROVED);
                 label.getElement().getThemeList().add(BADGE_SUCCESSFUL);
             }
-            else if (approval.equalsIgnoreCase(DECLINED)) {
-                label = new Span(DECLINED);
+            else if (approval.equalsIgnoreCase(DENIED)) {
+                label = new Span(DENIED);
                 label.getElement().getThemeList().add(BADGE_ERROR);
             }
             else if (approval.equalsIgnoreCase(PENDING)) {
@@ -364,7 +481,7 @@ public class AuthorizeView extends VerticalLayout {
 
                 addClassName(VIEWING_AUTHORIZE);
 
-                if (authorizeModel.getStatus().equalsIgnoreCase(DECLINED)) {
+                if (authorizeModel.getStatus().equalsIgnoreCase(DENIED)) {
                     authorizeForm.hideStatusReason(true);
                 }
                 else {

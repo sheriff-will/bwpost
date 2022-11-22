@@ -3,12 +3,14 @@ package com.application.iserv.ui.parameters.views;
 import com.application.iserv.backend.services.ParametersService;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.parameters.models.ParametersModel;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -35,7 +37,8 @@ public class ParametersView extends VerticalLayout {
     TextField position = new TextField(POSITION_UPPER_CASE);
 
     // IntegerField
-    NumberField ratePerDay = new NumberField(RATE_PER_DAY);
+    NumberField duration = new NumberField(DURATION);
+    NumberField dailyRatePerDay = new NumberField(DAILY_RATE_PER_DAY_CAMEL_CASE);
 
     // Dialogs
     Dialog parameterDialog = new Dialog();
@@ -77,7 +80,10 @@ public class ParametersView extends VerticalLayout {
     private void editParameter(ParametersModel parametersModel) {
         if (parametersModel != null) {
             position.setValue(parametersModel.getPosition());
-            ratePerDay.setValue(parametersModel.getRatePerDay());
+            dailyRatePerDay.setValue(parametersModel.getDailyRatePerDay());
+
+            String[] getDuration = parametersModel.getDuration().split("");
+            duration.setValue(Double.parseDouble(getDuration[0]));
 
             parameterId = parametersModel.getParameterId();
 
@@ -109,7 +115,8 @@ public class ParametersView extends VerticalLayout {
 
         addParameter.addClickListener(click -> {
             position.clear();
-            ratePerDay.clear();
+            dailyRatePerDay.clear();
+            duration.clear();
             removeParameter.setVisible(false);
 
             saveParameter.setText(ADD);
@@ -154,8 +161,18 @@ public class ParametersView extends VerticalLayout {
 
         FormLayout addParameterForm = new FormLayout(
                 position,
-                ratePerDay
+                dailyRatePerDay,
+                duration
         );
+
+        duration.setMax(12);
+        duration.setMin(1);
+        duration.setHasControls(true);
+        duration.setHelperText("Number Of Months");
+
+        addParameterForm.setColspan(position, 2);
+        addParameterForm.setColspan(dailyRatePerDay, 2);
+        addParameterForm.setColspan(duration, 2);
 
         parameterDialog.getHeader().add(
                 new Button(new Icon("lumo", "cross"), (e) -> {
@@ -189,9 +206,20 @@ public class ParametersView extends VerticalLayout {
             saveParameter.setEnabled(true);
 
         }
-        else if (ratePerDay.getValue() == null) {
-            ratePerDay.setInvalid(true);
+        else if (dailyRatePerDay.getValue() == null) {
+            dailyRatePerDay.setInvalid(true);
             Notification notification = new Notification("Enter Rate Per Day");
+            notification.setPosition(Notification.Position.BOTTOM_CENTER);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            notification.setDuration(5000);
+            notification.open();
+
+            saveParameter.setEnabled(true);
+
+        }
+        else if (duration.isInvalid() || duration.getValue() == null) {
+            duration.setInvalid(true);
+            Notification notification = new Notification("Enter number of months");
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             notification.setDuration(5000);
@@ -206,16 +234,18 @@ public class ParametersView extends VerticalLayout {
 
             if (saveParameter.getText().equalsIgnoreCase(UPDATE)) {
                 response = parametersService.updateParameter(new ParametersModel(
-                        position.getValue(),
                         parameterId,
-                        ratePerDay.getValue()
+                        dailyRatePerDay.getValue(),
+                        position.getValue(),
+                        duration.getValue().toString()
                 ));
 
             }
             else {
                 response = parametersService.addParameter(new ParametersModel(
+                        dailyRatePerDay.getValue(),
                         position.getValue(),
-                        ratePerDay.getValue()
+                        duration.getValue().toString()
                 ));
 
             }
@@ -261,9 +291,33 @@ public class ParametersView extends VerticalLayout {
     }
 
     private void configureParametersGrid() {
-        parametersGrid.setColumns(POSITION, RATE_PER_DAY_CAMEL_CASE);
+        parametersGrid.setColumns(POSITION);
         parametersGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
+        parametersGrid.addComponentColumn(
+                dailyRatePerDay -> createDailyRateLabel(dailyRatePerDay.getDailyRatePerDay()))
+                .setHeader(DAILY_RATE_PER_DAY_CAMEL_CASE);
+
+        parametersGrid.addComponentColumn(
+                        duration -> createDurationLabel(duration.getDuration()))
+                .setHeader(DURATION);
+
+    }
+
+    private Component createDailyRateLabel(double dailyRatePerDay) {
+
+        Label label = new Label();
+        label.setText(String.valueOf(dailyRatePerDay));
+
+        return label;
+    }
+
+    private Component createDurationLabel(String duration) {
+
+        Label label = new Label();
+        label.setText(String.valueOf(duration));
+
+        return label;
     }
 
 }

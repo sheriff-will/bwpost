@@ -35,7 +35,7 @@ public class Commons {
 
         try {
             phoneNumber = phoneNumberUtil.parse(
-                    phone,
+                    "+267"+phone,
                     Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name()
             );
         } catch (NumberParseException e) {

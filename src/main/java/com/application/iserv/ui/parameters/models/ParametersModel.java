@@ -2,31 +2,25 @@ package com.application.iserv.ui.parameters.models;
 
 public class ParametersModel {
 
-    String position;
     Long parameterId;
-    double ratePerDay;
+    double dailyRatePerDay;
+    String position, duration;
 
     public ParametersModel() {
 
     }
 
-    public ParametersModel(String position, double ratePerDay) {
+    public ParametersModel(double dailyRatePerDay, String position, String duration) {
+        this.dailyRatePerDay = dailyRatePerDay;
         this.position = position;
-        this.ratePerDay = ratePerDay;
+        this.duration = duration;
     }
 
-    public ParametersModel(String position, Long parameterId, double ratePerDay) {
-        this.position = position;
+    public ParametersModel(Long parameterId, double dailyRatePerDay, String position, String duration) {
         this.parameterId = parameterId;
-        this.ratePerDay = ratePerDay;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
+        this.dailyRatePerDay = dailyRatePerDay;
         this.position = position;
+        this.duration = duration;
     }
 
     public Long getParameterId() {
@@ -37,20 +31,37 @@ public class ParametersModel {
         this.parameterId = parameterId;
     }
 
-    public double getRatePerDay() {
-        return ratePerDay;
+    public double getDailyRatePerDay() {
+        return dailyRatePerDay;
     }
 
-    public void setRatePerDay(double ratePerDay) {
-        this.ratePerDay = ratePerDay;
+    public void setDailyRatePerDay(double dailyRatePerDay) {
+        this.dailyRatePerDay = dailyRatePerDay;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     @Override
     public String toString() {
         return "ParametersModel{" +
-                "position='" + position + '\'' +
-                ", parameterId=" + parameterId +
-                ", ratePerDay=" + ratePerDay +
+                "parameterId=" + parameterId +
+                ", dailyRatePerDay=" + dailyRatePerDay +
+                ", position='" + position + '\'' +
+                ", duration='" + duration + '\'' +
                 '}';
     }
 

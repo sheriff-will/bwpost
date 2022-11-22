@@ -12,7 +12,7 @@ public class ParticipantsModel {
     String firstname, lastname, identityNumber, gender, maritalStatus, mobileNumber,
             alternateMobileNumber, postalAddress, residentialAddress, education, placementOfficer,
             placementPlace, position, mobileWalletProvider, bankName,
-            branch, accountNumber, district, village, service, participant;
+            branch, accountNumber, district, village, service, duration, participant;
 
     public ParticipantsModel() {
 
@@ -22,9 +22,9 @@ public class ParticipantsModel {
                              LocalDate completionDate, String firstname, String lastname,
                              String identityNumber, String gender, String maritalStatus, String mobileNumber,
                              String alternateMobileNumber, String postalAddress, String residentialAddress,
-                             String education, String placementOfficer, String placementPlace,
-                             String position, String mobileWalletProvider, String bankName, String branch,
-                             String accountNumber, String district, String village, String service) {
+                             String education, String placementOfficer, String placementPlace, String position,
+                             String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                             String district, String village, String service, String duration) {
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
         this.placementDate = placementDate;
@@ -49,6 +49,7 @@ public class ParticipantsModel {
         this.district = district;
         this.village = village;
         this.service = service;
+        this.duration = duration;
     }
 
     public ParticipantsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
@@ -57,7 +58,7 @@ public class ParticipantsModel {
                              String alternateMobileNumber, String postalAddress, String residentialAddress,
                              String education, String placementOfficer, String placementPlace, String position,
                              String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                             String district, String village, String service) {
+                             String district, String village, String service, String duration) {
         this.participantId = participantId;
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
@@ -83,6 +84,7 @@ public class ParticipantsModel {
         this.district = district;
         this.village = village;
         this.service = service;
+        this.duration = duration;
     }
 
     public ParticipantsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
@@ -91,7 +93,7 @@ public class ParticipantsModel {
                              String alternateMobileNumber, String postalAddress, String residentialAddress,
                              String education, String placementOfficer, String placementPlace, String position,
                              String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                             String district, String village, String service, String participant) {
+                             String district, String village, String service, String duration, String participant) {
         this.participantId = participantId;
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
@@ -117,6 +119,7 @@ public class ParticipantsModel {
         this.district = district;
         this.village = village;
         this.service = service;
+        this.duration = duration;
         this.participant = participant;
     }
 
@@ -127,7 +130,7 @@ public class ParticipantsModel {
                              String postalAddress, String residentialAddress, String education,
                              String placementOfficer, String placementPlace, String position,
                              String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                             String district, String village, String service, String participant) {
+                             String district, String village, String service, String duration, String participant) {
         this.daysWorked = daysWorked;
         this.participantId = participantId;
         this.timestamp = timestamp;
@@ -154,6 +157,7 @@ public class ParticipantsModel {
         this.district = district;
         this.village = village;
         this.service = service;
+        this.duration = duration;
         this.participant = participant;
     }
 
@@ -365,6 +369,14 @@ public class ParticipantsModel {
         this.service = service;
     }
 
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
     public String getParticipant() {
         return participant;
     }
@@ -375,7 +387,7 @@ public class ParticipantsModel {
 
     @Override
     public String toString() {
-        return "AgentsModel{" +
+        return "ParticipantsModel{" +
                 "daysWorked=" + daysWorked +
                 ", participantId=" + participantId +
                 ", timestamp=" + timestamp +
@@ -402,7 +414,8 @@ public class ParticipantsModel {
                 ", district='" + district + '\'' +
                 ", village='" + village + '\'' +
                 ", service='" + service + '\'' +
-                ", agent='" + participant + '\'' +
+                ", duration='" + duration + '\'' +
+                ", participant='" + participant + '\'' +
                 '}';
     }
 

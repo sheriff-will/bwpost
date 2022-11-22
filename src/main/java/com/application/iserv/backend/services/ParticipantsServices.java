@@ -1,8 +1,8 @@
 package com.application.iserv.backend.services;
 
 import com.application.iserv.backend.repositories.ParticipantsRepository;
-import com.application.iserv.ui.participants.models.ParticipantsModel;
 import com.application.iserv.ui.participants.models.NomineesModel;
+import com.application.iserv.ui.participants.models.ParticipantsModel;
 import com.application.iserv.ui.participants.models.ReferenceModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.application.iserv.ui.utils.Constants.*;
@@ -102,8 +101,9 @@ public class ParticipantsServices {
                         row[25].toString(),
                         row[26].toString(),
                         row[27].toString(),
+                        row[28].toString(),
                         row[1].toString()+" "+row[2].toString()
-                );
+                        );
 
                 agents.add(participantsModel);
 
@@ -224,10 +224,170 @@ public class ParticipantsServices {
                     row[25].toString(),
                     row[26].toString(),
                     row[27].toString(),
+                    row[28].toString(),
                     row[1].toString()+" "+row[2].toString()
             );
 
             agents.add(participantsModel);
+
+        }
+
+        return agents;
+    }
+
+    public List<ParticipantsModel> filterTerminatedAgentsByPlace(String place) {
+        List<Object[]> allAgents = participantsRepository.filterTerminatedAgentsByPlace(place);
+
+        List<ParticipantsModel> agents = new ArrayList<>();
+
+        for(Object[] row : allAgents) {
+
+            String dateOfBirth_str = row[4].toString();
+            String[] getDateOfBirth = dateOfBirth_str.split("-");
+
+            LocalDate dateOfBirth = LocalDate.of(
+                    Integer.parseInt(getDateOfBirth[0]),
+                    Integer.parseInt(getDateOfBirth[1]),
+                    Integer.parseInt(getDateOfBirth[2])
+            );
+
+            String placementDate_str = row[14].toString();
+            String[] getPlacementDate = placementDate_str.split("-");
+
+            LocalDate placementDate = LocalDate.of(
+                    Integer.parseInt(getPlacementDate[0]),
+                    Integer.parseInt(getPlacementDate[1]),
+                    Integer.parseInt(getPlacementDate[2])
+            );
+
+            String completionDate_str = row[15].toString();
+            String[] getCompletionDate = completionDate_str.split("-");
+
+            LocalDate completionDate = LocalDate.of(
+                    Integer.parseInt(getCompletionDate[0]),
+                    Integer.parseInt(getCompletionDate[1]),
+                    Integer.parseInt(getCompletionDate[2])
+            );
+
+            ParticipantsModel participantsModel = new ParticipantsModel(
+                    Long.parseLong(row[0].toString()),
+                    LocalDateTime.parse(row[20].toString()),
+                    dateOfBirth,
+                    placementDate,
+                    completionDate,
+                    row[1].toString(),
+                    row[2].toString(),
+                    row[3].toString(),
+                    row[5].toString(),
+                    row[6].toString(),
+                    row[7].toString(),
+                    row[8].toString(),
+                    row[9].toString(),
+                    row[10].toString(),
+                    row[11].toString(),
+                    row[12].toString(),
+                    row[13].toString(),
+                    row[24].toString(),
+                    row[16].toString(),
+                    row[17].toString(),
+                    row[18].toString(),
+                    row[19].toString(),
+                    row[25].toString(),
+                    row[26].toString(),
+                    row[27].toString(),
+                    row[28].toString(),
+                    row[1].toString()+" "+row[2].toString()
+            );
+
+            agents.add(participantsModel);
+
+        }
+
+        return agents;
+    }
+
+    public List<ParticipantsModel> filterAgentsByPlace(String place) {
+
+        List<Object[]> allAgents = participantsRepository.filterAgentsByPlace(place);
+
+        List<ParticipantsModel> agents = new ArrayList<>();
+
+        for(Object[] row : allAgents) {
+
+            String dateOfBirth_str = row[4].toString();
+            String[] getDateOfBirth = dateOfBirth_str.split("-");
+
+            LocalDate dateOfBirth = LocalDate.of(
+                    Integer.parseInt(getDateOfBirth[0]),
+                    Integer.parseInt(getDateOfBirth[1]),
+                    Integer.parseInt(getDateOfBirth[2])
+            );
+
+            String placementDate_str = row[14].toString();
+            String[] getPlacementDate = placementDate_str.split("-");
+
+            LocalDate placementDate = LocalDate.of(
+                    Integer.parseInt(getPlacementDate[0]),
+                    Integer.parseInt(getPlacementDate[1]),
+                    Integer.parseInt(getPlacementDate[2])
+            );
+
+            String completionDate_str = row[15].toString();
+            String[] getCompletionDate = completionDate_str.split("-");
+            String completionYear = getCompletionDate[0];
+            String completionMonth = getCompletionDate[1];
+
+            LocalDate completionDate = LocalDate.of(
+                    Integer.parseInt(getCompletionDate[0]),
+                    Integer.parseInt(getCompletionDate[1]),
+                    Integer.parseInt(getCompletionDate[2])
+            );
+
+            LocalDate todayLocalDate = LocalDate.now();
+            String[] todayLocalDate_str = todayLocalDate.toString().split("-");
+            String todayYear = todayLocalDate_str[0];
+            String todayMonth = todayLocalDate_str[1];
+
+            String compareTodayDate_str = todayYear+todayMonth;
+            String compareCompletionDate_str = completionYear+completionMonth;
+
+            int dateDifference = Integer.parseInt(compareTodayDate_str)
+                    - Integer.parseInt(compareCompletionDate_str);
+
+            if (dateDifference <= 0) {
+                ParticipantsModel participantsModel = new ParticipantsModel(
+                        Long.parseLong(row[0].toString()),
+                        LocalDateTime.parse(row[20].toString()),
+                        dateOfBirth,
+                        placementDate,
+                        completionDate,
+                        row[1].toString(),
+                        row[2].toString(),
+                        row[3].toString(),
+                        row[5].toString(),
+                        row[6].toString(),
+                        row[7].toString(),
+                        row[8].toString(),
+                        row[9].toString(),
+                        row[10].toString(),
+                        row[11].toString(),
+                        row[12].toString(),
+                        row[13].toString(),
+                        row[24].toString(),
+                        row[16].toString(),
+                        row[17].toString(),
+                        row[18].toString(),
+                        row[19].toString(),
+                        row[25].toString(),
+                        row[26].toString(),
+                        row[27].toString(),
+                        row[28].toString(),
+                        row[1].toString()+" "+row[2].toString()
+                );
+
+                agents.add(participantsModel);
+
+            }
 
         }
 
@@ -309,6 +469,7 @@ public class ParticipantsServices {
                             row[25].toString(),
                             row[26].toString(),
                             row[27].toString(),
+                            row[28].toString(),
                             row[1].toString()+" "+row[2].toString()
                     );
 
@@ -344,6 +505,7 @@ public class ParticipantsServices {
                             row[25].toString(),
                             row[26].toString(),
                             row[27].toString(),
+                            row[28].toString(),
                             row[1].toString()+" "+row[2].toString()
                     );
 
@@ -436,6 +598,7 @@ public class ParticipantsServices {
                         row[25].toString(),
                         row[26].toString(),
                         row[27].toString(),
+                        row[28].toString(),
                         row[1].toString()+" "+row[2].toString()
                 );
 
@@ -446,6 +609,98 @@ public class ParticipantsServices {
         }
 
         return agents;
+    }
+
+    public List<ParticipantsModel> filterExpiredAgentsByPlace(String place) {
+
+        List<Object[]> allAgents = participantsRepository.filterAgentsByPlace(place);
+
+        List<ParticipantsModel> agents = new ArrayList<>();
+
+        for(Object[] row : allAgents) {
+
+            String dateOfBirth_str = row[4].toString();
+            String[] getDateOfBirth = dateOfBirth_str.split("-");
+
+            LocalDate dateOfBirth = LocalDate.of(
+                    Integer.parseInt(getDateOfBirth[0]),
+                    Integer.parseInt(getDateOfBirth[1]),
+                    Integer.parseInt(getDateOfBirth[2])
+            );
+
+            String placementDate_str = row[14].toString();
+            String[] getPlacementDate = placementDate_str.split("-");
+
+            LocalDate placementDate = LocalDate.of(
+                    Integer.parseInt(getPlacementDate[0]),
+                    Integer.parseInt(getPlacementDate[1]),
+                    Integer.parseInt(getPlacementDate[2])
+            );
+
+            String completionDate_str = row[15].toString();
+            String[] getCompletionDate = completionDate_str.split("-");
+            String completionYear = getCompletionDate[0];
+            String completionMonth = getCompletionDate[1];
+
+            LocalDate completionDate = LocalDate.of(
+                    Integer.parseInt(getCompletionDate[0]),
+                    Integer.parseInt(getCompletionDate[1]),
+                    Integer.parseInt(getCompletionDate[2])
+            );
+
+            LocalDate todayLocalDate = LocalDate.now();
+            String[] todayLocalDate_str = todayLocalDate.toString().split("-");
+            String todayYear = todayLocalDate_str[0];
+            String todayMonth = todayLocalDate_str[1];
+
+            String compareTodayDate_str = todayYear+todayMonth;
+            String compareCompletionDate_str = completionYear+completionMonth;
+
+            int dateDifference = Integer.parseInt(compareTodayDate_str)
+                    - Integer.parseInt(compareCompletionDate_str);
+
+            if (dateDifference > 0) {
+                ParticipantsModel participantsModel = new ParticipantsModel(
+                        Long.parseLong(row[0].toString()),
+                        LocalDateTime.parse(row[20].toString()),
+                        dateOfBirth,
+                        placementDate,
+                        completionDate,
+                        row[1].toString(),
+                        row[2].toString(),
+                        row[3].toString(),
+                        row[5].toString(),
+                        row[6].toString(),
+                        row[7].toString(),
+                        row[8].toString(),
+                        row[9].toString(),
+                        row[10].toString(),
+                        row[11].toString(),
+                        row[12].toString(),
+                        row[13].toString(),
+                        row[24].toString(),
+                        row[16].toString(),
+                        row[17].toString(),
+                        row[18].toString(),
+                        row[19].toString(),
+                        row[25].toString(),
+                        row[26].toString(),
+                        row[27].toString(),
+                        row[28].toString(),
+                        row[1].toString()+" "+row[2].toString()
+                );
+
+                agents.add(participantsModel);
+
+            }
+
+        }
+
+        return agents;
+    }
+
+    public void reinstateParticipant(Long participantId, List<String> contractDates) {
+        participantsRepository.reinstateParticipant(participantId, contractDates);
     }
 
 
@@ -642,7 +897,7 @@ public class ParticipantsServices {
             );
 
             ParticipantsModel participantsModel = new ParticipantsModel(
-                    Integer.parseInt(row[28].toString()),
+                    Integer.parseInt(row[29].toString()),
                     Long.parseLong(row[0].toString()),
                     LocalDateTime.parse(row[20].toString()),
                     dateOfBirth,
@@ -668,6 +923,79 @@ public class ParticipantsServices {
                     row[25].toString(),
                     row[26].toString(),
                     row[27].toString(),
+                    row[28].toString(),
+                    row[1].toString()+" "+row[2].toString()
+            );
+
+            agents.add(participantsModel);
+
+        }
+
+        return agents;
+    }
+
+    public List<ParticipantsModel> getAttendanceByPlace(String date, String place) {
+        List<Object[]> allAgents = participantsRepository.getAttendanceByPlace(date, place);
+
+        List<ParticipantsModel> agents = new ArrayList<>();
+
+        for(Object[] row : allAgents) {
+
+            String dateOfBirth_str = row[4].toString();
+            String[] getDateOfBirth = dateOfBirth_str.split("-");
+
+            LocalDate dateOfBirth = LocalDate.of(
+                    Integer.parseInt(getDateOfBirth[0]),
+                    Integer.parseInt(getDateOfBirth[1]),
+                    Integer.parseInt(getDateOfBirth[2])
+            );
+
+            String placementDate_str = row[14].toString();
+            String[] getPlacementDate = placementDate_str.split("-");
+
+            LocalDate placementDate = LocalDate.of(
+                    Integer.parseInt(getPlacementDate[0]),
+                    Integer.parseInt(getPlacementDate[1]),
+                    Integer.parseInt(getPlacementDate[2])
+            );
+
+            String completionDate_str = row[15].toString();
+            String[] getCompletionDate = completionDate_str.split("-");
+
+            LocalDate completionDate = LocalDate.of(
+                    Integer.parseInt(getCompletionDate[0]),
+                    Integer.parseInt(getCompletionDate[1]),
+                    Integer.parseInt(getCompletionDate[2])
+            );
+
+            ParticipantsModel participantsModel = new ParticipantsModel(
+                    Integer.parseInt(row[29].toString()),
+                    Long.parseLong(row[0].toString()),
+                    LocalDateTime.parse(row[20].toString()),
+                    dateOfBirth,
+                    placementDate,
+                    completionDate,
+                    row[1].toString(),
+                    row[2].toString(),
+                    row[3].toString(),
+                    row[5].toString(),
+                    row[6].toString(),
+                    row[7].toString(),
+                    row[8].toString(),
+                    row[9].toString(),
+                    row[10].toString(),
+                    row[11].toString(),
+                    row[12].toString(),
+                    row[13].toString(),
+                    row[24].toString(),
+                    row[16].toString(),
+                    row[17].toString(),
+                    row[18].toString(),
+                    row[19].toString(),
+                    row[25].toString(),
+                    row[26].toString(),
+                    row[27].toString(),
+                    row[28].toString(),
                     row[1].toString()+" "+row[2].toString()
             );
 
@@ -713,7 +1041,7 @@ public class ParticipantsServices {
             );
 
             ParticipantsModel participantsModel = new ParticipantsModel(
-                    Integer.parseInt(row[28].toString()),
+                    Integer.parseInt(row[29].toString()),
                     Long.parseLong(row[0].toString()),
                     LocalDateTime.parse(row[20].toString()),
                     dateOfBirth,
@@ -739,6 +1067,7 @@ public class ParticipantsServices {
                     row[25].toString(),
                     row[26].toString(),
                     row[27].toString(),
+                    row[28].toString(),
                     row[1].toString()+" "+row[2].toString()
             );
 

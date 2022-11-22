@@ -42,6 +42,32 @@ public class AuthorizeRepository {
         }
     }
 
+    public List<Object[]> filterRemunerationHistoryByPlace(String date, String place) {
+
+        String sql = "SELECT remuneration_history.remuneration_history_id, remuneration_history.status, " +
+                "remuneration_history.status_reason, remuneration_history.claimed, " +
+                "remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
+                "remuneration_history.deduction_amount, remuneration_history.deduction_reason," +
+                " remuneration_history.participant_id, participants.firstname, participants.lastname, " +
+                "parameters.rate_per_day, attendance_history.days_worked " +
+                "FROM remuneration_history, participants, parameters, attendance_history " +
+                "WHERE remuneration_history.participant_id = participants.participant_id " +
+                "AND participants.participant_id = attendance_history.participant_id " +
+                "AND participants.parameter_id = parameters.parameter_id " +
+                "AND remuneration_history.month = '"+date+"' " +
+                "AND attendance_history.date = '"+date+"' " +
+                "AND parameters.village = '"+place+"' " +
+                "AND participants.is_terminated = '0'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     public List<Object[]> searchAuthorize(String agentNames, String date) {
 
         String sql = "SELECT remuneration_history.remuneration_history_id, remuneration_history.status, " +

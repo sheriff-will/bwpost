@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -39,7 +40,7 @@ public class ParticipantsRepository {
                 "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
                 "participants.account_number, participants.timestamp, participants.is_terminated, " +
                 "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
-                "parameters.village, parameters.service " +
+                "parameters.village, parameters.service, parameters.duration " +
                 "FROM participants, parameters" +
                 " WHERE participants.parameter_id = parameters.parameter_id " +
                 "AND participants.is_terminated = '0'";
@@ -201,7 +202,7 @@ public class ParticipantsRepository {
 
                 String insertRemunerationSQL = "INSERT INTO remuneration_history (month, status, status_reason, " +
                         "claimed, bonus_amount, bonus_reason, deduction_amount, deduction_reason, participant_id) " +
-                        "VALUES('"+month+"', 'Hold', 'null', 'No', '0', 'null', '0', 'null', " +
+                        "VALUES('"+month+"', 'Pending', 'null', 'No', '0', 'null', '0', 'null', " +
                         "'"+query.getResultList().get(0)+"')";
 
                 Query insertRemunerationQuery = entityManager.createNativeQuery(insertRemunerationSQL);
@@ -226,10 +227,62 @@ public class ParticipantsRepository {
                 "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
                 "participants.account_number, participants.timestamp, participants.is_terminated, " +
                 "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
-                "parameters.village, parameters.service " +
+                "parameters.village, parameters.service, parameters.duration " +
                 "FROM participants, parameters" +
                 " WHERE participants.parameter_id = parameters.parameter_id " +
                 "AND participants.is_terminated = '1'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<Object[]> filterTerminatedAgentsByPlace(String place) {
+
+        String sql = "SELECT participants.participant_id, participants.firstname, " +
+                "participants.lastname, participants.identity_number, participants.date_of_birth, " +
+                "participants.gender, participants.marital_status, participants.mobile_number," +
+                " participants.alternate_mobile_number, participants.postal_address, " +
+                "participants.residential_address, participants.education, participants.placement_officer," +
+                " participants.placement_place, participants.placement_date, participants.completion_date, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, participants.timestamp, participants.is_terminated, " +
+                "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
+                "parameters.village, parameters.service, parameters.duration " +
+                "FROM participants, parameters" +
+                " WHERE participants.parameter_id = parameters.parameter_id " +
+                "AND parameters.village = '"+place+"' " +
+                "AND participants.is_terminated = '1'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<Object[]> filterAgentsByPlace(String place) {
+
+        String sql = "SELECT participants.participant_id, participants.firstname, " +
+                "participants.lastname, participants.identity_number, participants.date_of_birth, " +
+                "participants.gender, participants.marital_status, participants.mobile_number," +
+                " participants.alternate_mobile_number, participants.postal_address, " +
+                "participants.residential_address, participants.education, participants.placement_officer," +
+                " participants.placement_place, participants.placement_date, participants.completion_date, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, participants.timestamp, participants.is_terminated, " +
+                "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
+                "parameters.village, parameters.service, parameters.duration " +
+                "FROM participants, parameters" +
+                " WHERE participants.parameter_id = parameters.parameter_id " +
+                "AND parameters.village = '"+place+"' " +
+                "AND participants.is_terminated = '0'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -250,7 +303,7 @@ public class ParticipantsRepository {
                 "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
                 "participants.account_number, participants.timestamp, participants.is_terminated, " +
                 "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
-                "parameters.village, parameters.service " +
+                "parameters.village, parameters.service, parameters.duration " +
                 "FROM participants, parameters" +
                 " WHERE participants.parameter_id = parameters.parameter_id " +
                 "AND (participants.firstname LIKE '%"+agentNames+"%' OR participants.lastname LIKE '%"+agentNames+"%')" +
@@ -280,6 +333,53 @@ public class ParticipantsRepository {
         }
     }
 
+    @Modifying
+    public void reinstateParticipant(Long participantId, List<String> contractDates) {
+        try {
+
+            long duration = Long.parseLong(String.valueOf(contractDates.size()));
+
+            String completionDate = LocalDate.now().plusMonths(duration).toString();
+
+            String updateAgentSQL = "UPDATE participants SET " +
+                    "placement_date = '" + LocalDate.now() + "', " +
+                    "completion_date = '" + completionDate + "' " +
+                    "WHERE participant_id = '" + participantId + "'";
+
+            Query updateAgentQuery = entityManager.createNativeQuery(updateAgentSQL);
+            updateAgentQuery.executeUpdate();
+
+            // Insert to attendance_history
+            for (int i = 0; i < contractDates.size(); i++) {
+                String date = contractDates.get(i);
+                String insertAttendanceSQL = "INSERT INTO attendance_history " +
+                        "(date, days_worked, participant_id) VALUES(" +
+                        "'" + date + "','20', '" + participantId +"')";
+
+                Query insertAttendanceQuery = entityManager.createNativeQuery(insertAttendanceSQL);
+                insertAttendanceQuery.executeUpdate();
+
+            }
+
+            // Insert to remuneration_history
+            for (int i = 0; i < contractDates.size(); i++) {
+                String month = contractDates.get(i);
+
+                String insertRemunerationSQL = "INSERT INTO remuneration_history (month, status, status_reason, " +
+                        "claimed, bonus_amount, bonus_reason, deduction_amount, deduction_reason, participant_id) " +
+                        "VALUES('"+month+"', 'Pending', 'null', 'No', '0', 'null', '0', 'null', " +
+                        "'"+ participantId +"')";
+
+                Query insertRemunerationQuery = entityManager.createNativeQuery(insertRemunerationSQL);
+                insertRemunerationQuery.executeUpdate();
+
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
 
     // Nominee
     @Modifying
@@ -454,12 +554,39 @@ public class ParticipantsRepository {
                 "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
                 "participants.account_number, participants.timestamp, participants.is_terminated, " +
                 "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
-                "parameters.village, parameters.service, attendance_history.days_worked " +
+                "parameters.village, parameters.service, parameters.duration, attendance_history.days_worked " +
                 "FROM participants, parameters, attendance_history" +
                 " WHERE participants.parameter_id = parameters.parameter_id " +
                 "AND participants.is_terminated = '0'" +
                 "AND participants.participant_id = attendance_history.participant_id " +
                 "AND attendance_history.date = '"+date+"'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<Object[]>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<Object[]> getAttendanceByPlace(String date, String place) {
+        String sql = "SELECT participants.participant_id, participants.firstname, " +
+                "participants.lastname, participants.identity_number, participants.date_of_birth, " +
+                "participants.gender, participants.marital_status, participants.mobile_number," +
+                " participants.alternate_mobile_number, participants.postal_address, " +
+                "participants.residential_address, participants.education, participants.placement_officer," +
+                " participants.placement_place, participants.placement_date, participants.completion_date, " +
+                "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
+                "participants.account_number, participants.timestamp, participants.is_terminated, " +
+                "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
+                "parameters.village, parameters.service, parameters.duration, attendance_history.days_worked " +
+                "FROM participants, parameters, attendance_history" +
+                " WHERE participants.parameter_id = parameters.parameter_id " +
+                "AND participants.is_terminated = '0'" +
+                "AND participants.participant_id = attendance_history.participant_id " +
+                "AND attendance_history.date = '"+date+"' " +
+                "AND parameters.village = '"+place+"'";
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -480,7 +607,7 @@ public class ParticipantsRepository {
                 "participants.mobile_wallet_provider, participants.bank_name, participants.branch, " +
                 "participants.account_number, participants.timestamp, participants.is_terminated, " +
                 "parameters.parameter_id, parameters.rate_per_day, parameters.position, parameters.district, " +
-                "parameters.village, parameters.service, attendance_history.days_worked " +
+                "parameters.village, parameters.service, parameters.duration, attendance_history.days_worked " +
                 "FROM participants, parameters, attendance_history" +
                 " WHERE participants.parameter_id = parameters.parameter_id " +
                 "AND participants.is_terminated = '0'" +

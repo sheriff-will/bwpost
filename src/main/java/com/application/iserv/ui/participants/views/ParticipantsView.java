@@ -1,15 +1,17 @@
 package com.application.iserv.ui.participants.views;
 
 import com.application.iserv.StudentModel;
+import com.application.iserv.backend.services.ParametersService;
 import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.tests.MainLayout;
+import com.application.iserv.ui.parameters.models.ParametersModel;
 import com.application.iserv.ui.participants.forms.ParticipantsForm;
 import com.application.iserv.ui.participants.models.ParticipantsModel;
-import com.opencsv.CSVWriter;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -30,7 +32,6 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
@@ -57,6 +58,9 @@ public class ParticipantsView extends VerticalLayout {
     // TextFields
     TextField searchAgent = new TextField();
 
+    // ComboBox
+    ComboBox<String> placementPlaceFilter = new ComboBox<>();
+
     // Forms
     ParticipantsForm participantsForm;
 
@@ -75,12 +79,14 @@ public class ParticipantsView extends VerticalLayout {
     HorizontalLayout dateBackHorizontalLayout;
 
     // Services
+    private final ParametersService parametersService;
     private final ParticipantsServices participantsServices;
 
     // Longs
     Long statusValue = 0L;
 
     // ArrayList
+    List<ParametersModel> parametersModelList = new ArrayList<>();
     List<ParticipantsModel> participantsModelList = new ArrayList<>();
 
     // Strings
@@ -96,12 +102,15 @@ public class ParticipantsView extends VerticalLayout {
     Upload upload = new Upload();
 
     @Autowired
-    public ParticipantsView(ParticipantsServices participantsServices) {
+    public ParticipantsView(ParametersService parametersService,
+                            ParticipantsServices participantsServices) {
+        this.parametersService = parametersService;
         this.participantsServices = participantsServices;
 
         setSizeFull();
         addClassName(AGENTS_LIST_VIEW);
 
+        updateLists();
         checkScreenSize();
         configureAgentsForm();
         configureAgentsGrid(AGENT_POSITION);
@@ -115,6 +124,16 @@ public class ParticipantsView extends VerticalLayout {
         closeComponents();
 
         agentsGrid.asSingleSelect().addValueChangeListener(e -> editAgent(e.getValue()));
+
+    }
+
+    private void updateLists() {
+        // Placement places
+        placementPlaceFilter.setItems(getPlaces());
+        placementPlaceFilter.setItemLabelGenerator(String::toString);
+
+        // Parameters list
+        parametersModelList = parametersService.getParameters();
 
     }
 
@@ -150,35 +169,33 @@ public class ParticipantsView extends VerticalLayout {
             closeComponents();
         });
         participantsForm.addListener(ParticipantsForm.AgentUpdatedEvent.class, e -> {
+            updateAgents();
+
             Notification notification = new Notification(PARTICIPANT_SUCCESSFULLY_UPDATED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             notification.setDuration(5000);
             notification.open();
-
-            updateAgents();
-
         });
 
         participantsForm.addListener(ParticipantsForm.AgentTerminatedEvent.class, e -> {
+            updateAgents();
+
             Notification notification = new Notification(PARTICIPANT_SUCCESSFULLY_TERMINATED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             notification.setDuration(5000);
             notification.open();
-
-            updateAgents();
-
         });
 
         participantsForm.addListener(ParticipantsForm.AgentAddedEvent.class, e -> {
+            updateAgents();
+
             Notification notification = new Notification(PARTICIPANT_SUCCESSFULLY_ADDED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             notification.setDuration(5000);
             notification.open();
-
-            updateAgents();
 
             closeComponents();
 
@@ -195,14 +212,20 @@ public class ParticipantsView extends VerticalLayout {
         });
 
         participantsForm.addListener(ParticipantsForm.AgentDaysWorkedUpdatedEvent.class, e -> {
+            updateAttendance();
+
             Notification notification = new Notification(UPDATED);
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             notification.setDuration(5000);
             notification.open();
 
-            updateAttendance();
+        });
 
+        participantsForm.addListener(ParticipantsForm.CloseAndUpdateEvent.class, e -> {
+            agentsGrid.setItems(participantsServices.getAllExpiredAgents());
+            agentsGrid.asSingleSelect().clear();
+            closeComponents();
         });
 
     }
@@ -282,39 +305,72 @@ public class ParticipantsView extends VerticalLayout {
         status.addComponents(ACTIVE, new Hr());
         status.addComponents(EXPIRED, new Hr());
 
-        status.addValueChangeListener(statusValueChangeEvent -> {
-            if (!isAttendanceOpen) {
-                if (statusValueChangeEvent.getValue().equalsIgnoreCase(ACTIVE)) {
-                    agentsGrid.setItems(participantsServices.getAllAgents());
-                    participantsForm.disableButtons(true);
-                }
-                else if (statusValueChangeEvent.getValue().equalsIgnoreCase(TERMINATED)) {
-                    agentsGrid.setItems(participantsServices.getAllTerminatedAgents());
-                    participantsForm.disableButtons(false);
-                }
-                else if (statusValueChangeEvent.getValue().equalsIgnoreCase(EXPIRED)) {
-                    agentsGrid.setItems(participantsServices.getAllExpiredAgents());
-                    participantsForm.disableButtons(false);
-                }
-            }
-        });
-
         MenuBar menuBar = new MenuBar();
         menuBar.setOpenOnHover(true);
         menuBar.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
+
+        status.addValueChangeListener(statusValueChangeEvent -> {
+            searchAgent.clear();
+
+            if (!isAttendanceOpen) {
+
+                agentsGrid.asSingleSelect().clear();
+                closeComponents();
+
+                if (statusValueChangeEvent.getValue().equalsIgnoreCase(ACTIVE)) {
+
+                    if (placementPlaceFilter.getValue() != null) {
+                        agentsGrid.setItems(
+                                participantsServices.filterAgentsByPlace(placementPlaceFilter.getValue()));
+                    }
+                    else {
+                        agentsGrid.setItems(participantsServices.getAllAgents());
+                    }
+
+                    participantsForm.disableButtons(true, false);
+                    menuBar.setVisible(true);
+                }
+                else if (statusValueChangeEvent.getValue().equalsIgnoreCase(TERMINATED)) {
+
+                    if (placementPlaceFilter.getValue() != null) {
+                        agentsGrid.setItems(participantsServices
+                                .filterTerminatedAgentsByPlace(placementPlaceFilter.getValue()));
+                    }
+                    else {
+                        agentsGrid.setItems(participantsServices.getAllTerminatedAgents());
+                    }
+
+                    participantsForm.disableButtons(false, true);
+                    menuBar.setVisible(false);
+                }
+                else if (statusValueChangeEvent.getValue().equalsIgnoreCase(EXPIRED)) {
+
+                    if (placementPlaceFilter.getValue() != null) {
+                        agentsGrid.setItems(participantsServices
+                                .filterExpiredAgentsByPlace(placementPlaceFilter.getValue()));
+                    }
+                    else {
+                        agentsGrid.setItems(participantsServices.getAllExpiredAgents());
+                    }
+
+                    participantsForm.disableButtons(false, false);
+                    menuBar.setVisible(false);
+                }
+            }
+        });
 
         attendanceButton.addClassName(ATTENDANCE_BUTTON);
         attendanceButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         attendanceButton.setDisableOnClick(true);
         attendanceButton.addClickListener(click -> {
-           /* datePicker.setVisible(true);
+            datePicker.setVisible(true);
             backButton.setVisible(true);
             isAttendanceButtonClicked = true;
             dateBackHorizontalLayout.setVisible(true);
             menuBar.setVisible(false);
-            addClassName(ATTENDANCE_BUTTON_CLICKED);*/
+            addClassName(ATTENDANCE_BUTTON_CLICKED);
 
-            try {
+        /*    try {
                 //   Path path1 = Paths.get(ClassLoader.getSystemResource("csv/participants.csv").toURI());
 
                 String path = "participants.csv";
@@ -339,7 +395,7 @@ public class ParticipantsView extends VerticalLayout {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
+*/
         });
 
         backButton.addThemeVariants(ButtonVariant.MATERIAL_OUTLINED);
@@ -386,13 +442,15 @@ public class ParticipantsView extends VerticalLayout {
         statusAttendanceLayout.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
         statusAttendanceLayout.addClassName(STATUS_ATTENDANCE_LAYOUT);
 
-
         DatePicker.DatePickerI18n dateFormat = new DatePicker.DatePickerI18n();
         dateFormat.setDateFormat(SIMPLE_MONTH_DATE_FORMAT);
 
         datePicker.setI18n(dateFormat);
         datePicker.setPlaceholder(DATE);
         datePicker.addValueChangeListener(datePickerValueChangeEvent -> {
+
+            searchAgent.clear();
+
             configureAgentsGrid(AGENT_ATTENDANCE);
 
             addAttendanceToAgents();
@@ -437,10 +495,65 @@ public class ParticipantsView extends VerticalLayout {
             }
         });
 
-
         dateBackHorizontalLayout = new HorizontalLayout(datePicker, backButton);
 
-        HorizontalLayout toolbar = new HorizontalLayout(searchAgent, menuBar, dateBackHorizontalLayout);
+        placementPlaceFilter.setPlaceholder("Filter by place");
+        placementPlaceFilter.setClearButtonVisible(true);
+
+        placementPlaceFilter.addValueChangeListener(placeValueChangeEvent -> {
+
+            searchAgent.clear();
+
+            if (placeValueChangeEvent.getValue() == null) {
+                if (isAttendanceOpen) {
+                    updateAttendance();
+                }
+                else {
+                    if (status.getValue() != null) {
+                        if (status.getValue().equalsIgnoreCase(ACTIVE)) {
+                            agentsGrid.setItems(participantsServices.getAllAgents());
+                        }
+                        else if (status.getValue().equalsIgnoreCase(EXPIRED)) {
+                            agentsGrid.setItems(participantsServices.getAllExpiredAgents());
+                        }
+                        else if (status.getValue().equalsIgnoreCase(TERMINATED)) {
+                            agentsGrid.setItems(participantsServices.getAllTerminatedAgents());
+                        }
+                    }
+                }
+            }
+            else {
+                if (isAttendanceOpen) {
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+
+                    agentsGrid.setItems(
+                            participantsServices.getAttendanceByPlace(
+                                    datePicker.getValue().format(dateTimeFormatter),
+                                    placeValueChangeEvent.getValue()
+                            ));
+                }
+                else {
+                    if (status.getValue() != null) {
+                        if (status.getValue().equalsIgnoreCase(ACTIVE)) {
+                            agentsGrid.setItems(
+                                    participantsServices.filterAgentsByPlace(placementPlaceFilter.getValue()));
+                        }
+                        else if (status.getValue().equalsIgnoreCase(EXPIRED)) {
+                            agentsGrid.setItems(participantsServices
+                                    .filterExpiredAgentsByPlace(placementPlaceFilter.getValue()));
+                        }
+                        else if (status.getValue().equalsIgnoreCase(TERMINATED)) {
+                            agentsGrid.setItems(participantsServices
+                                    .filterTerminatedAgentsByPlace(placementPlaceFilter.getValue()));
+
+                        }
+                    }
+                }
+            }
+
+        });
+
+        HorizontalLayout toolbar = new HorizontalLayout(searchAgent, placementPlaceFilter, menuBar, dateBackHorizontalLayout);
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         toolbar.addClassName(TOOLBAR);
 
@@ -527,6 +640,7 @@ public class ParticipantsView extends VerticalLayout {
     private void updateAgents() {
         participantsModelList = participantsServices.getAllAgents();
         agentsGrid.setItems(participantsModelList);
+
     }
 
     private void updateAttendance() {
@@ -546,13 +660,13 @@ public class ParticipantsView extends VerticalLayout {
         }
         else {
             if (isAttendanceOpen) {
-                participantsForm.setAgent(participantsModel, date);
+                participantsForm.setAgent(participantsModel, date, parametersModelList);
                 participantsForm.changeLayout(true);
                 participantsForm.setVisible(true);
             }
             else {
                 participantsForm.setButtonText(false);
-                participantsForm.setAgent(participantsModel, date);
+                participantsForm.setAgent(participantsModel, date, parametersModelList);
                 participantsForm.setVisible(true);
             }
         }

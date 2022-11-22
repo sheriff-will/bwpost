@@ -59,6 +59,8 @@ public class Constants {
     public static final String TERMINATED = "Terminated";
     public static final String EXPIRED = "Expired";
     public static final String STATUS = "Status";
+    public static final String TOTAL_NET_CAMEL_CASE = "totalNet";
+    public static final String TOTAL_NET = "Total Net";
     public static final String CONTRACT_STATUS = "Contract Status";
     public static final String AGENT_POSITION = "agent_position";
     public static final String SIMPLE_DATE_FORMAT = "dd MMMM yyyy";
@@ -74,7 +76,8 @@ public class Constants {
     public static final String CONTRACT_DURATION = "Contract Duration";
     public static final String PAYMENT_METHOD = "Payment Method";
     public static final String POSITION_UPPER_CASE = "Position";
-    public static final String RATE_PER_DAY_CAMEL_CASE = "ratePerDay";
+    public static final String DAILY_RATE_PER_DAY_CAMEL_CASE = "Daily Rate / Day";
+    public static final String DURATION = "Duration";
     public static final String ATTENDANCE_LOWER_CASE = "attendance";
     public static final String ATTENDANCE = "Attendance";
     public static final String START_TIME = "Start Time";
@@ -84,7 +87,7 @@ public class Constants {
     public static final String ABSENT = "Absent";
     public static final String EXPORT_STATEMENTS = "Export Statements";
     public static final String RATE = "Rate/day";
-    public static final String RATE_PER_DAY = "Rate Per Day";
+    public static final String RATE_PER_DAY = "Daily Rate Per Day";
     public static final String DAYS_WORKED_CAMEL_CASE= "daysWorked";
     public static final String DAYS_WORKED = "Days Worked";
     public static final String BASE_SALARY = "Base Salary";
@@ -110,7 +113,7 @@ public class Constants {
     public static final String YES = "Yes";
     public static final String NO = "No";
     public static final String APPROVED = "Approved";
-    public static final String DECLINED = "Declined";
+    public static final String DENIED = "Denied";
     public static final String PENDING = "Pending";
     public static final String ON_HOLD = "On hold";
     public static final String REASON = "Reason";
@@ -271,10 +274,10 @@ public class Constants {
 
     public static List<String> getStatuses() {
         return List.of(
-                APPROVED,
-                DECLINED,
+                APPROVE,
+                DENY,
                 HOLD,
-                PENDING
+                PEND
         );
     }
 
@@ -578,13 +581,15 @@ public class Constants {
     public static List<ParametersModel> getTestParameters() {
 
         ParametersModel parameters1 = new ParametersModel(
+                39.98,
                 "Supervisor",
-                39.98
+                "6 Months"
         );
 
         ParametersModel parameters2 = new ParametersModel(
+                28.00,
                 "Field Agent",
-                28.00
+                "6 Months"
         );
 
         return List.of(

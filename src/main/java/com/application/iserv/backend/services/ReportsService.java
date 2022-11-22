@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.application.iserv.ui.utils.Constants.*;
+
 @Service
 public class ReportsService {
 
@@ -35,16 +37,16 @@ public class ReportsService {
         int onHold = 0;
 
         for (int i = 0; i < paymentStatuses.size(); i++) {
-            if (paymentStatuses.get(i).equalsIgnoreCase("Approved")) {
+            if (paymentStatuses.get(i).equalsIgnoreCase(APPROVED)) {
                 approved++;
             }
-            else if (paymentStatuses.get(i).equalsIgnoreCase("Declined")) {
+            else if (paymentStatuses.get(i).equalsIgnoreCase(DENIED)) {
                 denied++;
             }
-            else if (paymentStatuses.get(i).equalsIgnoreCase("Pending")) {
+            else if (paymentStatuses.get(i).equalsIgnoreCase(PENDING)) {
                 pending++;
             }
-            else if (paymentStatuses.get(i).equalsIgnoreCase("Hold")) {
+            else if (paymentStatuses.get(i).equalsIgnoreCase(HOLD)) {
                 onHold++;
             }
 

@@ -2,10 +2,10 @@ package com.application.iserv.ui.payments.models;
 
 public class AuthorizeModel {
 
-    double amount;
-    int bonusAmount, deductionAmount;
+    double amount, totalNet;
     Long remunerationHistoryId, participantId;
-    String status, statusReason, claimed, bonusReason, deductionReason, participant;
+    String bonusAmount, deductionAmount, status, statusReason,
+            claimed, bonusReason, deductionReason, participant;
 
     public AuthorizeModel() {
 
@@ -15,7 +15,7 @@ public class AuthorizeModel {
         this.participant = participant;
     }
 
-    public AuthorizeModel(int bonusAmount, int deductionAmount, Long remunerationHistoryId,
+    public AuthorizeModel(String bonusAmount, String deductionAmount, Long remunerationHistoryId,
                           Long participantId, String status, String statusReason, String claimed,
                           String bonusReason, String deductionReason) {
         this.bonusAmount = bonusAmount;
@@ -29,10 +29,11 @@ public class AuthorizeModel {
         this.deductionReason = deductionReason;
     }
 
-    public AuthorizeModel(double amount, int bonusAmount, int deductionAmount, Long remunerationHistoryId,
-                          Long participantId, String status, String statusReason, String claimed,
-                          String bonusReason, String deductionReason, String participant) {
+    public AuthorizeModel(double amount, double totalNet, String bonusAmount, String deductionAmount,
+                          Long remunerationHistoryId, Long participantId, String status, String statusReason,
+                          String claimed, String bonusReason, String deductionReason, String participant) {
         this.amount = amount;
+        this.totalNet = totalNet;
         this.bonusAmount = bonusAmount;
         this.deductionAmount = deductionAmount;
         this.remunerationHistoryId = remunerationHistoryId;
@@ -53,20 +54,12 @@ public class AuthorizeModel {
         this.amount = amount;
     }
 
-    public int getBonusAmount() {
-        return bonusAmount;
+    public double getTotalNet() {
+        return totalNet;
     }
 
-    public void setBonusAmount(int bonusAmount) {
-        this.bonusAmount = bonusAmount;
-    }
-
-    public int getDeductionAmount() {
-        return deductionAmount;
-    }
-
-    public void setDeductionAmount(int deductionAmount) {
-        this.deductionAmount = deductionAmount;
+    public void setTotalNet(double totalNet) {
+        this.totalNet = totalNet;
     }
 
     public Long getRemunerationHistoryId() {
@@ -83,6 +76,22 @@ public class AuthorizeModel {
 
     public void setParticipantId(Long participantId) {
         this.participantId = participantId;
+    }
+
+    public String getBonusAmount() {
+        return bonusAmount;
+    }
+
+    public void setBonusAmount(String bonusAmount) {
+        this.bonusAmount = bonusAmount;
+    }
+
+    public String getDeductionAmount() {
+        return deductionAmount;
+    }
+
+    public void setDeductionAmount(String deductionAmount) {
+        this.deductionAmount = deductionAmount;
     }
 
     public String getStatus() {
@@ -137,16 +146,17 @@ public class AuthorizeModel {
     public String toString() {
         return "AuthorizeModel{" +
                 "amount=" + amount +
-                ", bonusAmount=" + bonusAmount +
-                ", deductionAmount=" + deductionAmount +
+                ", totalNet=" + totalNet +
                 ", remunerationHistoryId=" + remunerationHistoryId +
                 ", participantId=" + participantId +
+                ", bonusAmount='" + bonusAmount + '\'' +
+                ", deductionAmount='" + deductionAmount + '\'' +
                 ", status='" + status + '\'' +
                 ", statusReason='" + statusReason + '\'' +
                 ", claimed='" + claimed + '\'' +
                 ", bonusReason='" + bonusReason + '\'' +
                 ", deductionReason='" + deductionReason + '\'' +
-                ", agent='" + participant + '\'' +
+                ", participant='" + participant + '\'' +
                 '}';
     }
 
