@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 public class ApplicationUserDataModel {
 
-    String district, village, service;
+    String username, district, village, service;
 
 }

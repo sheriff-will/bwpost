@@ -24,7 +24,7 @@ public class AuthorizeRepository {
                 "remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
                 "remuneration_history.deduction_amount, remuneration_history.deduction_reason," +
                 " remuneration_history.participant_id, participants.firstname, participants.lastname, " +
-                "parameters.rate_per_day, attendance_history.days_worked " +
+                "parameters.rate_per_day, attendance_history.days_worked, participants.identity_number " +
                 "FROM remuneration_history, participants, parameters, attendance_history " +
                 "WHERE remuneration_history.participant_id = participants.participant_id " +
                 "AND participants.participant_id = attendance_history.participant_id " +
@@ -49,7 +49,7 @@ public class AuthorizeRepository {
                 "remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
                 "remuneration_history.deduction_amount, remuneration_history.deduction_reason," +
                 " remuneration_history.participant_id, participants.firstname, participants.lastname, " +
-                "parameters.rate_per_day, attendance_history.days_worked " +
+                "parameters.rate_per_day, attendance_history.days_worked, participants.identity_number " +
                 "FROM remuneration_history, participants, parameters, attendance_history " +
                 "WHERE remuneration_history.participant_id = participants.participant_id " +
                 "AND participants.participant_id = attendance_history.participant_id " +
@@ -75,7 +75,7 @@ public class AuthorizeRepository {
                 "remuneration_history.bonus_amount, remuneration_history.bonus_reason, " +
                 "remuneration_history.deduction_amount, remuneration_history.deduction_reason," +
                 " remuneration_history.participant_id, participants.firstname, participants.lastname, " +
-                "parameters.rate_per_day, attendance_history.days_worked " +
+                "parameters.rate_per_day, attendance_history.days_worked, participants.identity_number " +
                 "FROM remuneration_history, participants, parameters, attendance_history " +
                 "WHERE (participants.firstname LIKE '%"+agentNames+"%' " +
                 "OR participants.lastname LIKE '%"+agentNames+"%') " +
@@ -140,4 +140,29 @@ public class AuthorizeRepository {
 
     }
 
+    public void approveByStatus(String date,
+                                List<String> statusToApprove, List<AuthorizeModel> authorizeModelList) {
+        try {
+
+            for (int i = 0; i < authorizeModelList.size(); i++) {
+
+                if (statusToApprove.contains(authorizeModelList.get(i).getStatus())) {
+                    String approveAllRemunerationSQL = "UPDATE remuneration_history SET" +
+                            " status = 'Approved'" +
+                            " WHERE remuneration_history_id = '"
+                            + authorizeModelList.get(i).getRemunerationHistoryId() + "' " +
+                            "AND month = '"+date+"'";
+
+                    Query approveAllRemunerationQuery = entityManager
+                            .createNativeQuery(approveAllRemunerationSQL);
+                    approveAllRemunerationQuery.executeUpdate();
+                }
+
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
 }

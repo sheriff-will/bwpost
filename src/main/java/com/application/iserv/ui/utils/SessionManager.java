@@ -13,10 +13,11 @@ public class SessionManager {
 
     }
 
-    public void saveApplicationUser(String district, String village, String service) {
-        preferences.put("district", district);
-        preferences.put("village", village);
-        preferences.put("service", service);
+    public void saveApplicationUser(String username, String district, String village, String service) {
+        preferences.put(USER_NAME, username);
+        preferences.put(DISTRICT, district);
+        preferences.put(VILLAGE, village);
+        preferences.put(SERVICE, service);
 
     }
 
@@ -31,12 +32,14 @@ public class SessionManager {
     public ApplicationUserDataModel getApplicationUserData() {
 
         ApplicationUserDataModel applicationUserDataModel = new ApplicationUserDataModel(
+                preferences.get(USER_NAME, null),
                 preferences.get(DISTRICT, null),
                 preferences.get(VILLAGE, null),
                 preferences.get(SERVICE, null)
         );
 
-        if (applicationUserDataModel.getDistrict() == null
+        if (applicationUserDataModel.getUsername() == null
+                || applicationUserDataModel.getDistrict() == null
                 || applicationUserDataModel.getVillage() == null
                 || applicationUserDataModel.getService() == null) {
             throw new RuntimeException("application user is null");

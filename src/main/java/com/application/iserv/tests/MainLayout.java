@@ -1,5 +1,7 @@
 package com.application.iserv.tests;
 
+import com.application.iserv.backend.services.ParametersService;
+import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.security.services.SecurityService;
 import com.application.iserv.tests.components.FlexBoxLayout;
 import com.application.iserv.tests.components.navigation.bar.AppBar;
@@ -67,9 +69,16 @@ public class MainLayout extends FlexBoxLayout
 	private AppBar appBar;
 
 	private final SecurityService securityService;
+	private final ParametersService parametersService;
+	private final ParticipantsServices participantsServices;
 
-	public MainLayout(SecurityService securityService) {
+
+	public MainLayout(SecurityService securityService,
+					  ParametersService parametersService, ParticipantsServices participantsServices) {
 		this.securityService = securityService;
+		this.parametersService = parametersService;
+		this.participantsServices = participantsServices;
+
 		VaadinSession.getCurrent()
 				.setErrorHandler((ErrorHandler) errorEvent -> {
 					log.error("Uncaught UI exception",
@@ -98,7 +107,7 @@ public class MainLayout extends FlexBoxLayout
 	 * Initialise the required components and containers.
 	 */
 	private void initStructure() {
-		naviDrawer = new NaviDrawer();
+		naviDrawer = new NaviDrawer(parametersService, participantsServices);
 
 		viewContainer = new FlexBoxLayout();
 		viewContainer.addClassName(CLASS_NAME + "__view-container");
@@ -287,17 +296,17 @@ public class MainLayout extends FlexBoxLayout
 			else if (title.contains(AUTHORIZE)) {
 				appBar.showRightTab("Authorize");
 				getAppBar().setTitle("Payments");
-				getAppBar().showTabs(true);
+				getAppBar().showTabs(false);
 			}
 			else if (title.contains(RECONCILE)) {
 				getAppBar().setTitle("Payments");
 				appBar.showRightTab("Reconcile");
-				getAppBar().showTabs(true);
+				getAppBar().showTabs(false);
 			}
 			else if (title.contains(HISTORY)) {
 				getAppBar().setTitle("Payments");
 				appBar.showRightTab("History");
-				getAppBar().showTabs(true);
+				getAppBar().showTabs(false);
 			}
 			else if (title.contains(PARAMETERS)) {
 				getAppBar().showTabs(false);

@@ -5,7 +5,7 @@ public class AuthorizeModel {
     double amount, totalNet;
     Long remunerationHistoryId, participantId;
     String bonusAmount, deductionAmount, status, statusReason,
-            claimed, bonusReason, deductionReason, participant;
+            claimed, bonusReason, deductionReason, participant, identityNumber;
 
     public AuthorizeModel() {
 
@@ -17,7 +17,7 @@ public class AuthorizeModel {
 
     public AuthorizeModel(String bonusAmount, String deductionAmount, Long remunerationHistoryId,
                           Long participantId, String status, String statusReason, String claimed,
-                          String bonusReason, String deductionReason) {
+                          String bonusReason, String deductionReason, String identityNumber) {
         this.bonusAmount = bonusAmount;
         this.deductionAmount = deductionAmount;
         this.remunerationHistoryId = remunerationHistoryId;
@@ -27,11 +27,13 @@ public class AuthorizeModel {
         this.claimed = claimed;
         this.bonusReason = bonusReason;
         this.deductionReason = deductionReason;
+        this.identityNumber = identityNumber;
     }
 
     public AuthorizeModel(double amount, double totalNet, String bonusAmount, String deductionAmount,
                           Long remunerationHistoryId, Long participantId, String status, String statusReason,
-                          String claimed, String bonusReason, String deductionReason, String participant) {
+                          String claimed, String bonusReason, String deductionReason, String participant,
+                          String identityNumber) {
         this.amount = amount;
         this.totalNet = totalNet;
         this.bonusAmount = bonusAmount;
@@ -44,6 +46,7 @@ public class AuthorizeModel {
         this.bonusReason = bonusReason;
         this.deductionReason = deductionReason;
         this.participant = participant;
+        this.identityNumber = identityNumber;
     }
 
     public double getAmount() {
@@ -142,6 +145,14 @@ public class AuthorizeModel {
         this.participant = participant;
     }
 
+    public String getIdentityNumber() {
+        return identityNumber;
+    }
+
+    public void setIdentityNumber(String identityNumber) {
+        this.identityNumber = identityNumber;
+    }
+
     @Override
     public String toString() {
         return "AuthorizeModel{" +
@@ -157,7 +168,7 @@ public class AuthorizeModel {
                 ", bonusReason='" + bonusReason + '\'' +
                 ", deductionReason='" + deductionReason + '\'' +
                 ", participant='" + participant + '\'' +
+                ", identityNumber='" + identityNumber + '\'' +
                 '}';
     }
-
 }

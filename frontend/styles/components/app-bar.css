@@ -33,6 +33,14 @@
   color: #fff;
 }
 
+.app-bar__village__title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff;
+}
+
 .app-bar__title:not(:empty) {
   margin-bottom: calc((var(--app-bar-height) - (var(--lumo-font-size-l) * var(--lumo-line-height-xs))) / 2);
   margin-top: calc((var(--app-bar-height) - (var(--lumo-font-size-l) * var(--lumo-line-height-xs))) / 2);

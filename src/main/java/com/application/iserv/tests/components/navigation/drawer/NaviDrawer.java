@@ -1,10 +1,12 @@
 package com.application.iserv.tests.components.navigation.drawer;
 
+import com.application.iserv.backend.services.ParametersService;
+import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.tests.util.UIUtils;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.ClientCallable;
-import com.vaadin.flow.component.UI;
+import com.application.iserv.ui.participants.views.ParticipantsView;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
@@ -16,6 +18,7 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
+import com.vaadin.flow.shared.Registration;
 import elemental.json.JsonObject;
 
 import static com.application.iserv.ui.utils.Constants.IPELEGENG;
@@ -29,8 +32,9 @@ public class NaviDrawer extends Div
 	private String CLASS_NAME = "navi-drawer";
 	private String RAIL = "rail";
 	private String OPEN = "open";
-
 	private Div scrim;
+
+	ComboBox<String> filter = new ComboBox<>();
 
 	private Div mainContent;
 	private TextField search;
@@ -38,6 +42,11 @@ public class NaviDrawer extends Div
 
 	private Button railButton;
 	private NaviMenu menu;
+
+	private final ParametersService parametersService;
+	private final ParticipantsServices participantsServices;
+
+	ParticipantsView participantsView;
 
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
@@ -53,7 +62,8 @@ public class NaviDrawer extends Div
 		close();
 	}
 
-	public NaviDrawer() {
+	public NaviDrawer(ParametersService parametersService, ParticipantsServices participantsServices) {
+
 		setClassName(CLASS_NAME);
 
 		initScrim();
@@ -66,6 +76,9 @@ public class NaviDrawer extends Div
 		initMenu();
 
 		initFooter();
+
+		this.parametersService = parametersService;
+		this.participantsServices = participantsServices;
 
 	}
 
@@ -131,6 +144,30 @@ public class NaviDrawer extends Div
 		verticalLayout.setMargin(false);
 		verticalLayout.setPadding(false);
 
+		filter.setClearButtonVisible(true);
+		filter.setPlaceholder("Filter by village");
+		filter.setItems("Oodi", "Modipane");
+
+		filter.getStyle()
+				.set("padding-top", "0")
+				.set("padding-left", "var(--lumo-space-m)")
+				.set("padding-right", "var(--lumo-space-m)");
+
+		filter.setValue("Oodi");
+		filter.setLabel("Kgatleng");
+
+		filter.addValueChangeListener(filterValueChangeEvent -> {
+			//fireEvent(new VillageEvent(this));
+		//	EventBus.getDefault().postSticky(new StringModel("Hello"));
+	//		EventBus.getDefault().register(this);
+
+	//		EventBus.getDefault().post(new MessageEvent("Hello"));
+			participantsView = new ParticipantsView(parametersService, participantsServices);
+
+			participantsView.filterParticipantsByPlace(filterValueChangeEvent.getValue());
+
+		});
+
 		mainContent.add(tabs);
 
 	}
@@ -160,6 +197,7 @@ public class NaviDrawer extends Div
 			railButton.setIcon(new Icon(VaadinIcon.CHEVRON_LEFT_SMALL));
 			railButton.setText("Collapse");
 			UIUtils.setAriaLabel("Collapse menu", railButton);
+			filter.setVisible(true);
 
 		} else {
 			getElement().setAttribute(RAIL, true);
@@ -171,6 +209,8 @@ public class NaviDrawer extends Div
 							+ "$0.style.pointerEvents='none';" //
 							+ "setTimeout(function() {$0.style.pointerEvents=originalStyle;}, 170);",
 					getElement());
+			filter.setVisible(false);
+
 		}
 	}
 
@@ -208,6 +248,26 @@ public class NaviDrawer extends Div
 	@Override
 	public void afterNavigation(AfterNavigationEvent afterNavigationEvent) {
 		close();
+	}
+
+	// Events
+	public static abstract class NaviDrawerFormEvent extends ComponentEvent<NaviDrawer> {
+
+		protected NaviDrawerFormEvent(NaviDrawer source) {
+			super(source, false);
+		}
+
+	}
+
+	public static class VillageEvent extends NaviDrawerFormEvent {
+		VillageEvent(NaviDrawer source) {
+			super(source);
+		}
+	}
+
+	public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType,
+																  ComponentEventListener<T> listener) {
+		return getEventBus().addListener(eventType, listener);
 	}
 
 }

@@ -352,7 +352,8 @@ public class AuthorizeForm extends FormLayout {
                     statusReason_str,
                     authorizeModel.getClaimed(),
                     bonusAmountReason_str,
-                    deductionAmountReason_str
+                    deductionAmountReason_str,
+                    authorizeModel.getIdentityNumber()
             ));
 
             save.setEnabled(true);

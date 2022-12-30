@@ -51,7 +51,8 @@ public class AuthorizeService {
                         row[3].toString(),
                         row[5].toString(),
                         row[7].toString(),
-                        row[9].toString()+" "+row[10].toString()
+                        row[9].toString()+" "+row[10].toString(),
+                        row[13].toString()
                 );
 
                 remunerationHistory.add(authorizeModel);
@@ -105,7 +106,8 @@ public class AuthorizeService {
                         row[3].toString(),
                         row[5].toString(),
                         row[7].toString(),
-                        row[9].toString()+" "+row[10].toString()
+                        row[9].toString()+" "+row[10].toString(),
+                        row[13].toString()
                 );
 
                 remunerationHistory.add(authorizeModel);
@@ -161,7 +163,8 @@ public class AuthorizeService {
                     row[3].toString(),
                     row[5].toString(),
                     row[7].toString(),
-                    row[9].toString()+" "+row[10].toString()
+                    row[9].toString()+" "+row[10].toString(),
+                    row[13].toString()
             );
 
             remunerationHistory.add(authorizeModel);
@@ -175,4 +178,8 @@ public class AuthorizeService {
         authorizeRepository.approveAllRemunerationDetails(authorizeModelList);
     }
 
+    public void approveByStatus(String date,
+                                List<String> statusToApprove, List<AuthorizeModel> authorizeModelList) {
+        authorizeRepository.approveByStatus(date, statusToApprove, authorizeModelList);
+    }
 }

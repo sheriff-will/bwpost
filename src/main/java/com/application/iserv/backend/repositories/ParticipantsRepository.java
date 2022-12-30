@@ -1,9 +1,10 @@
 package com.application.iserv.backend.repositories;
 
-import com.application.iserv.ui.participants.models.ParticipantsModel;
 import com.application.iserv.ui.participants.models.NomineesModel;
+import com.application.iserv.ui.participants.models.ParticipantsModel;
 import com.application.iserv.ui.participants.models.ReferenceModel;
 import com.application.iserv.ui.utils.ApplicationUserDataModel;
+import com.application.iserv.ui.utils.Commons;
 import com.application.iserv.ui.utils.SessionManager;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
@@ -112,6 +113,62 @@ public class ParticipantsRepository {
             Query updateAgentQuery = entityManager.createNativeQuery(updateAgentSQL);
             updateAgentQuery.executeUpdate();
 
+            String sql = "SELECT remuneration_history.month " +
+                    "FROM remuneration_history " +
+                    "WHERE remuneration_history.participant_id = '"+participantsModel.getParticipantId()+"'";
+
+            Query query = entityManager.createNativeQuery(sql);
+            List<String> resultList = query.getResultList();
+
+            for (int i = 0; i < resultList.size(); i++) {
+                String[] getDate = resultList.get(i).split("-");
+
+                // TODO 1 is magic number
+                LocalDate remunerationDate = LocalDate.of(
+                        Integer.parseInt(getDate[0]),
+                        Integer.parseInt(getDate[1]),
+                        LocalDate.now().getDayOfMonth()
+                );
+
+                int compare = remunerationDate.compareTo(LocalDate.now());
+
+                if (compare >= 0) {
+
+                    String provider = "";
+                    String paymentMode = "";
+
+                    if (!participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+                        provider = Commons.getPhoneNumberCarrier(participantsModel.getMobileWalletProvider());
+
+                        if (provider.equalsIgnoreCase("")) {
+                            provider = "No Provider";
+                        }
+
+                        paymentMode = "Mobile Wallet";
+                    }
+                    else if (!participantsModel.getBankName().equalsIgnoreCase("null")) {
+                        provider = participantsModel.getBankName();
+                        paymentMode = "Bank";
+                    }
+                    else if (participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")
+                            && participantsModel.getBankName().equalsIgnoreCase("null")) {
+                        provider = "Botswana Post Office"; // TODO Remove hardcoded Botswana Post Office
+                        paymentMode = "Cash";
+                    }
+
+                    String updateRemunerationHistorySQL = "UPDATE remuneration_history SET " +
+                            "payment_method = '" + paymentMode + "', " +
+                            "provider = '" + provider + "' " +
+                            "WHERE participant_id = '" + participantsModel.getParticipantId() + "' " +
+                            "AND remuneration_history.month = '"+resultList.get(i)+"'";
+
+                    Query updateRemunerationHistoryQuery = entityManager
+                            .createNativeQuery(updateRemunerationHistorySQL);
+                    updateRemunerationHistoryQuery.executeUpdate();
+
+                }
+            }
+
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -158,7 +215,7 @@ public class ParticipantsRepository {
 
             // Insert to participants
             String insertAgentSQL = "INSERT INTO participants (firstname, lastname, identity_number, " +
-                    "date_of_birth, gender, marital_status, mobile_number, alternate_mobile_number," +
+                    "date_of_birth, gender, marital_status, mobile_number, alternate_mobile_number, " +
                     "postal_address, residential_address, education, placement_officer, placement_place, " +
                     "placement_date, completion_date, mobile_wallet_provider, bank_name, branch, " +
                     "account_number, timestamp, is_terminated, parameter_id) VALUES(" +
@@ -196,14 +253,37 @@ public class ParticipantsRepository {
 
             }
 
+            String provider = "";
+            String paymentMode = "";
+
+            if (!participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+                provider = Commons.getPhoneNumberCarrier(participantsModel.getMobileWalletProvider());
+
+                if (provider.equalsIgnoreCase("")) {
+                    provider = "No Provider";
+                }
+
+                paymentMode = "Mobile Wallet";
+            }
+            else if (!participantsModel.getBankName().equalsIgnoreCase("null")) {
+                provider = participantsModel.getBankName();
+                paymentMode = "Bank";
+            }
+            else if (participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")
+                    && participantsModel.getBankName().equalsIgnoreCase("null")) {
+                provider = "Botswana Post Office"; // TODO Remove hardcoded Botswana Post Office
+                paymentMode = "Cash";
+            }
+
             // Insert to remuneration_history
             for (int i = 0; i < contractDates.size(); i++) {
                 String month = contractDates.get(i);
 
-                String insertRemunerationSQL = "INSERT INTO remuneration_history (month, status, status_reason, " +
-                        "claimed, bonus_amount, bonus_reason, deduction_amount, deduction_reason, participant_id) " +
+                String insertRemunerationSQL = "INSERT INTO remuneration_history (month, status, " +
+                        "status_reason, claimed, bonus_amount, bonus_reason, deduction_amount, " +
+                        "deduction_reason, payment_method, provider, participant_id) " +
                         "VALUES('"+month+"', 'Pending', 'null', 'No', '0', 'null', '0', 'null', " +
-                        "'"+query.getResultList().get(0)+"')";
+                        "'"+paymentMode+"', '"+provider+"', '"+query.getResultList().get(0)+"')";
 
                 Query insertRemunerationQuery = entityManager.createNativeQuery(insertRemunerationSQL);
                 insertRemunerationQuery.executeUpdate();
@@ -334,7 +414,8 @@ public class ParticipantsRepository {
     }
 
     @Modifying
-    public void reinstateParticipant(Long participantId, List<String> contractDates) {
+    public void reinstateParticipant(Long participantId,
+                                     List<String> contractDates, ParticipantsModel participantsModel) {
         try {
 
             long duration = Long.parseLong(String.valueOf(contractDates.size()));
@@ -361,14 +442,37 @@ public class ParticipantsRepository {
 
             }
 
+            String provider = "";
+            String paymentMode = "";
+
+            if (!participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+                provider = Commons.getPhoneNumberCarrier(participantsModel.getMobileWalletProvider());
+
+                if (provider.equalsIgnoreCase("")) {
+                    provider = "No Provider";
+                }
+
+                paymentMode = "Mobile Wallet";
+            }
+            else if (!participantsModel.getBankName().equalsIgnoreCase("null")) {
+                provider = participantsModel.getBankName();
+                paymentMode = "Bank";
+            }
+            else if (participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")
+                    && participantsModel.getBankName().equalsIgnoreCase("null")) {
+                provider = "Botswana Post Office"; // TODO Remove hardcoded Botswana Post Office
+                paymentMode = "Cash";
+            }
+
             // Insert to remuneration_history
             for (int i = 0; i < contractDates.size(); i++) {
                 String month = contractDates.get(i);
 
-                String insertRemunerationSQL = "INSERT INTO remuneration_history (month, status, status_reason, " +
-                        "claimed, bonus_amount, bonus_reason, deduction_amount, deduction_reason, participant_id) " +
+                String insertRemunerationSQL = "INSERT INTO remuneration_history (month, status, " +
+                        "status_reason, claimed, bonus_amount, bonus_reason, deduction_amount, " +
+                        "deduction_reason, payment_method, provider, participant_id) " +
                         "VALUES('"+month+"', 'Pending', 'null', 'No', '0', 'null', '0', 'null', " +
-                        "'"+ participantId +"')";
+                        "'"+paymentMode+"', '"+provider+"', '"+participantId+"')";
 
                 Query insertRemunerationQuery = entityManager.createNativeQuery(insertRemunerationSQL);
                 insertRemunerationQuery.executeUpdate();
@@ -665,4 +769,23 @@ public class ParticipantsRepository {
         }
     }
 
+    public List<String> getPositions() {
+
+        applicationUserDataModel = sessionManager.getApplicationUserData();
+
+        String sql = "SELECT parameters.position " +
+                "FROM parameters " +
+                "WHERE district = '"+applicationUserDataModel.getDistrict()+"' " +
+                "AND parameters.service = '"+applicationUserDataModel.getService()+"' " +
+                "AND parameters.village = '"+applicationUserDataModel.getVillage()+"'";
+
+        try {
+            Query query = entityManager.createNativeQuery(sql);
+            return (List<String>) query.getResultList();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
 }

@@ -6,12 +6,22 @@ import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.payments.forms.HistoryForm;
 import com.application.iserv.ui.payments.models.HistoryModel;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.contextmenu.HasMenuItems;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -36,7 +46,6 @@ import static com.application.iserv.ui.utils.Constants.*;
 
     // DatePickers
     DatePicker datePicker = new DatePicker();
-    DatePicker datePicker1 = new DatePicker();
 
     // Forms
     HistoryForm historyForm;
@@ -47,8 +56,15 @@ import static com.application.iserv.ui.utils.Constants.*;
     // Grid
     Grid<HistoryModel> historyGrid = new Grid<>(HistoryModel.class);
 
+    // ComboBox
+    ComboBox<String> placementPlaceFilter = new ComboBox<>();
+
     // Services
     private final HistoryService historyService;
+
+    // SplitLayouts
+    SplitLayout menuSplitLayout;
+    SplitLayout searchDateSplitLayout;
 
     // Strings
     String date;
@@ -88,6 +104,29 @@ import static com.application.iserv.ui.utils.Constants.*;
 
     private Component getToolbar() {
 
+        placementPlaceFilter.setPlaceholder("Filter by place");
+        placementPlaceFilter.setClearButtonVisible(true);
+
+        placementPlaceFilter.addValueChangeListener(placeValueChangeEvent -> {
+
+            searchAgent.clear();
+
+            if (placeValueChangeEvent.getValue() == null) {
+                updateAgentsPaymentsList();
+            }
+            else {
+                historyGrid.setItems(
+                        historyService.filterHistoryByPlace(
+                                date,
+                                placeValueChangeEvent.getValue()));
+            }
+
+        });
+
+        // Placement places
+        placementPlaceFilter.setItems(getPlaces());
+        placementPlaceFilter.setItemLabelGenerator(String::toString);
+
         searchAgent.setPlaceholder(SEARCH_AGENT_HINT);
         searchAgent.setClearButtonVisible(true);
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
@@ -125,73 +164,75 @@ import static com.application.iserv.ui.utils.Constants.*;
 
         });
 
-        datePicker1.setI18n(dateFormat);
-        datePicker1.setPlaceholder("Date");
-        datePicker1.addValueChangeListener(datePickerValueChangeEvent -> {
-            isDateSelected = true;
+        MenuBar filterMenuBar = new MenuBar();
+        filterMenuBar.addThemeVariants(MenuBarVariant.LUMO_PRIMARY, MenuBarVariant.LUMO_CONTRAST);
 
-            configureHistoryGrid();
+        MenuItem filter = createIconItem(filterMenuBar, VaadinIcon.FILTER, "Filter", null);
+        SubMenu filterSubMenu = filter.getSubMenu();
+        MenuItem villageMenuItem = filterSubMenu.addItem("Place");
+        SubMenu villageSubMenu = villageMenuItem.getSubMenu();
+        villageSubMenu.addItem(placementPlaceFilter);
 
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
+        HorizontalLayout searchDateMenuLayout = new HorizontalLayout(
+                filterMenuBar,
+                searchAgent);
+        searchDateMenuLayout.setAlignItems(Alignment.BASELINE);
+        searchDateMenuLayout.addClassName(SEARCH_DATE_MENU_LAYOUT);
+        searchDateMenuLayout.setWidthFull();
+        searchDateMenuLayout.getStyle().set("overflow", "hidden");
 
-            String date_str = datePicker1.getValue().format(dateTimeFormatter);
-            String[] getDatePickerDate = date_str.split("-");
+        Div div = new Div();
+        searchDateSplitLayout = new SplitLayout(searchDateMenuLayout, div);
+        searchDateSplitLayout.addClassName(MENU_SLIT_LAYOUT);
 
-            LocalDate datePickerLocalDate = LocalDate.of(
-                    Integer.parseInt(getDatePickerDate[2]),
-                    Integer.parseInt(getDatePickerDate[1]),
-                    Integer.parseInt(getDatePickerDate[0])
-            );
+        HorizontalLayout horizontalLayout = new HorizontalLayout(datePicker);
+        horizontalLayout.setPadding(false);
+        horizontalLayout.setMargin(false);
+        horizontalLayout.getStyle().set("overflow", "hidden");
 
-            date = datePickerLocalDate.format(dateFormatter);
+        Div div1 = new Div();
+        menuSplitLayout = new SplitLayout(horizontalLayout, div1);
+        menuSplitLayout.addClassName(MENU_SLIT_LAYOUT);
 
-            updateAgentsPaymentsList();
-
-        });
-
-        datePicker1.setVisible(false);
-
-        HorizontalLayout searchDateLayout = new HorizontalLayout(searchAgent, datePicker);
-
-        UI.getCurrent().getPage().addBrowserWindowResizeListener(browserWindowResizeEvent -> {
-            if (browserWindowResizeEvent.getWidth() <= 500) {
-                datePicker.setVisible(false);
-                datePicker1.setVisible(true);
-
-                if (datePicker.getValue() != null) {
-                    datePicker1.setValue(datePicker.getValue());
-                }
-
-            }
-            else {
-                datePicker.setVisible(true);
-                datePicker1.setVisible(false);
-
-                if (datePicker1.getValue() != null) {
-                    datePicker.setValue(datePicker1.getValue());
-                }
-
-            }
-
-        });
-
-        UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails -> {
-            if (extendedClientDetails.getScreenWidth() <= 500) {
-                datePicker.setVisible(false);
-                datePicker1.setVisible(true);
-            }
-            else {
-                datePicker.setVisible(true);
-                datePicker1.setVisible(false);
-            }
-        });
-
-        VerticalLayout searchDateTimeLayout = new VerticalLayout(searchDateLayout, datePicker1);
+        VerticalLayout searchDateTimeLayout = new VerticalLayout(
+                menuSplitLayout,
+                searchDateSplitLayout
+        );
         searchDateTimeLayout.addClassName(SEARCH_DATE_TIME_LAYOUT);
+        searchDateTimeLayout.setMargin(false);
+        searchDateTimeLayout.setPadding(false);
 
-        return searchDateTimeLayout;
+        return new HorizontalLayout(searchDateTimeLayout);
 
+    }
+
+    private MenuItem createIconItem(HasMenuItems menu, VaadinIcon iconName,
+                                    String label, String ariaLabel) {
+        return createIconItem(menu, iconName, label, ariaLabel, false);
+    }
+
+    private MenuItem createIconItem(HasMenuItems menu, VaadinIcon iconName,
+                                    String label, String ariaLabel, boolean isChild) {
+        Icon icon = new Icon(iconName);
+
+        if (isChild) {
+            icon.getStyle().set("width", "var(--lumo-icon-size-s)");
+            icon.getStyle().set("height", "var(--lumo-icon-size-s)");
+            icon.getStyle().set("marginRight", "var(--lumo-space-s)");
+        }
+
+        MenuItem item = menu.addItem(icon, e -> {
+        });
+
+        if (ariaLabel != null) {
+            item.getElement().setAttribute("aria-label", ariaLabel);
+        }
+
+        if (label != null) {
+            item.add(new Text(label));
+        }
+
+        return item;
     }
 
     private void configureHistoryGrid() {

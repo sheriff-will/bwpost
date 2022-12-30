@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
 
+import java.text.DecimalFormat;
+
 import static com.application.iserv.ui.utils.Constants.*;
 
 @PageTitle("iServ | Parameters")
@@ -97,14 +99,14 @@ public class ParametersView extends VerticalLayout {
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(browserWindowResizeEvent -> {
             if (browserWindowResizeEvent.getWidth() > 500) {
-                parameterDialog.setWidth("70%");
+                parameterDialog.setWidth("90%");
             }
 
         });
 
         UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails -> {
             if (extendedClientDetails.getScreenWidth() > 500) {
-                parameterDialog.setWidth("70%");
+                parameterDialog.setWidth("90%");
             }
 
         });
@@ -305,9 +307,9 @@ public class ParametersView extends VerticalLayout {
     }
 
     private Component createDailyRateLabel(double dailyRatePerDay) {
-
+        DecimalFormat decimalFormat = new DecimalFormat("P#.00");
         Label label = new Label();
-        label.setText(String.valueOf(dailyRatePerDay));
+        label.setText(decimalFormat.format(dailyRatePerDay));
 
         return label;
     }

@@ -163,8 +163,7 @@ public class Payments extends SplitViewFrame {
 	}
 
 	private Component createDetails(Payment payment) {
-		ListItem status = new ListItem(payment.getStatus().getIcon(),
-				payment.getStatus().getName(), "Status");
+		ListItem status = new ListItem(payment.getStatus().getName(), "Status");
 
 		status.getContent().setAlignItems(FlexComponent.Alignment.BASELINE);
 		status.getContent().setSpacing(Bottom.XS);

@@ -54,6 +54,7 @@ public class ApplicationUserDaoService implements ApplicationUserDao {
             }
 
             sessionManager.saveApplicationUser(
+                    row[0].toString()+" "+row[1].toString(),
                     row[10].toString(),
                     row[11].toString(),
                     row[12].toString()

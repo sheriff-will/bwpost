@@ -18,14 +18,10 @@ public class Payment {
 	private LocalDate date;
 
 	public enum Status {
-		PENDING(VaadinIcon.CLOCK, "Pending",
-				"Payment created, not yet submitted.",
-				BadgeColor.CONTRAST), SUBMITTED(VaadinIcon.QUESTION_CIRCLE,
-				"Submitted", "Payment submitted for processing.",
-				BadgeColor.NORMAL), CONFIRMED(VaadinIcon.CHECK,
-				"Confirmed", "Payment sent successfully.",
+		PENDING(VaadinIcon.CLOCK, "Claimed",
+				"Participant claimed their money.",
 				BadgeColor.SUCCESS), FAILED(VaadinIcon.WARNING,
-				"Failed", "Payment failed.",
+				"Unclaimed", "Participant did not claimed their money.",
 				BadgeColor.ERROR);
 
 		private VaadinIcon icon;
@@ -45,12 +41,6 @@ public class Payment {
 			switch (this) {
 				case PENDING:
 					icon = UIUtils.createSecondaryIcon(this.icon);
-					break;
-				case SUBMITTED:
-					icon = UIUtils.createPrimaryIcon(this.icon);
-					break;
-				case CONFIRMED:
-					icon = UIUtils.createSuccessIcon(this.icon);
 					break;
 				default:
 					icon = UIUtils.createErrorIcon(this.icon);

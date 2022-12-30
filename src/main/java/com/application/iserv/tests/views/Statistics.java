@@ -100,14 +100,6 @@ public class Statistics extends ViewFrame {
 				value = 24;
 				break;
 
-			case SUBMITTED:
-				value = 40;
-				break;
-
-			case CONFIRMED:
-				value = 32;
-				break;
-
 			default:
 				value = 4;
 				break;

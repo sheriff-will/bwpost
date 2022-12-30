@@ -164,6 +164,7 @@ public class Constants {
     public static final String PARAMETER_SUCCESSFULLY_REMOVED = "Parameter Successfully Removed";
     public static final String REFERENCE_SUCCESSFULLY_REMOVED = "Reference Successfully Removed";
     public static final String APPLICATION_USER = "application_user";
+    public static final String USER_NAME = "user name";
     public static final String DISTRICT = "district";
     public static final String VILLAGE = "village";
     public static final String SERVICE = "service";
@@ -193,6 +194,11 @@ public class Constants {
     public static final String PAYMENTS_AUTHORIZE_GRID = "payments-authorize-grid";
     public static final String VIEWING_AUTHORIZE = "viewing-authorize";
     public static final String SEARCH_DATE_MENU_LAYOUT = "search-date-menu-layout";
+    public static final String SLIT_LAYOUT_1 = "slit-layout1";
+    public static final String MENU_SLIT_LAYOUT = "menu-slit-layout";
+    public static final String PARTICIPANT_OPEN = "participant-open";
+    public static final String TOOLBAR_VERTICAL_LAYOUT = "toolbar-vertical-layout";
+
 
     // Badges
     public static final String BADGE_SUCCESSFUL = "badge success";

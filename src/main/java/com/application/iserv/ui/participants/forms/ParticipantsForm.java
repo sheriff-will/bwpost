@@ -117,6 +117,7 @@ public class ParticipantsForm extends VerticalLayout {
     List<String> contractDates = new ArrayList<>();
     List<ParametersModel> parametersModelList = new ArrayList<>();
 
+
     // Buttons
     Button updateAddAgent = new Button();
     Button backButton = new Button(BACK);
@@ -147,6 +148,8 @@ public class ParticipantsForm extends VerticalLayout {
 
     // Models
     private ParticipantsModel participantsModel;
+
+    // Services
     private final ParticipantsServices participantsServices;
 
     // Longs
@@ -743,7 +746,7 @@ public class ParticipantsForm extends VerticalLayout {
         placementPlace.setItemLabelGenerator(String::toString);
 
         // Positions
-        position.setItems(getPositions());
+        position.setItems(participantsServices.getPositions());
         position.setItemLabelGenerator(String::toString);
 
         // Relationships
@@ -1570,7 +1573,7 @@ public class ParticipantsForm extends VerticalLayout {
                     contractDates.add(LocalDate.now().plusMonths(i).format(dateFormatter));
                 }
 
-                participantsServices.reinstateParticipant(participantId, contractDates);
+                participantsServices.reinstateParticipant(participantId, contractDates, participantsModel);
 
                 Notification notification = new Notification("Reinstated");
                 notification.setPosition(Notification.Position.BOTTOM_CENTER);

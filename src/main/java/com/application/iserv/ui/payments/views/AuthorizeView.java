@@ -4,36 +4,48 @@ import com.application.iserv.backend.services.AuthorizeService;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.payments.forms.AuthorizeForm;
 import com.application.iserv.ui.payments.models.AuthorizeModel;
+import com.opencsv.CSVWriter;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.contextmenu.HasMenuItems;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Hr;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.RolesAllowed;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +68,10 @@ public class AuthorizeView extends VerticalLayout {
 
     // DatePickers
     DatePicker datePicker = new DatePicker();
-    DatePicker datePicker1 = new DatePicker();
+
+    // SplitLayouts
+    SplitLayout menuSplitLayout;
+    SplitLayout searchDateSplitLayout;
 
     // Forms
     AuthorizeForm authorizeForm;
@@ -140,28 +155,22 @@ public class AuthorizeView extends VerticalLayout {
         placementPlaceFilter.setItems(getPlaces());
         placementPlaceFilter.setItemLabelGenerator(String::toString);
 
+        DateTimeFormatter paymentDateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm  dd MMMM yyyy");
+
+        StreamResource resource = new StreamResource(
+                "Payment "+ LocalDateTime.now().format(paymentDateTimeFormatter)+".csv",
+                () -> new ByteArrayInputStream(getParticipantsFile()));
+
+        Anchor link = new Anchor(resource, "Download");
+
         MenuBar menuBar = new MenuBar();
         menuBar.setOpenOnHover(true);
 
-        MenuItem options = menuBar.addItem(VaadinIcon.OPTIONS.create());
+        MenuItem options = createIconItem(menuBar, VaadinIcon.OPTIONS, "Options", null);
         SubMenu subMenu = options.getSubMenu();
-        subMenu.addItem("Download");
+        subMenu.addItem(link);
         subMenu.add(new Hr());
         subMenu.addItem("Approve Menu").addClickListener(click -> {
-
-            /*if (!authorizeModelList.isEmpty()) {
-                authorizeService.approveAllRemuneration(authorizeModelList);
-
-                updateAgentsPaymentsList();
-
-                Notification notification = new Notification(SUCCESSFULLY_APPROVED_ALL);
-                notification.setPosition(Notification.Position.BOTTOM_CENTER);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                notification.setDuration(5000);
-                notification.open();
-
-            }
-            */
             approveAllDialog.open();
         });
 
@@ -171,6 +180,7 @@ public class AuthorizeView extends VerticalLayout {
         searchAgent.setClearButtonVisible(true);
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
         searchAgent.addClassName(SEARCH_AGENT);
+        searchAgent.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchAgent.addValueChangeListener(searchAgentValueChanged -> authorizeGrid.setItems(
                 authorizeService.searchAuthorize(searchAgent.getValue(), date)
         ));
@@ -218,94 +228,110 @@ public class AuthorizeView extends VerticalLayout {
 
         });
 
-        datePicker1.setI18n(dateFormat);
-        datePicker1.setPlaceholder(DATE);
-        datePicker1.addValueChangeListener(datePickerValueChangeEvent -> {
-            isDateSelected = true;
+        MenuBar filterMenuBar = new MenuBar();
+        filterMenuBar.addThemeVariants(MenuBarVariant.LUMO_PRIMARY, MenuBarVariant.LUMO_CONTRAST);
 
-            searchAgent.clear();
-
-            menuBar.setEnabled(true);
-            configureAuthorizeGrid();
-
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
-
-            String date_str = datePicker1.getValue().format(dateTimeFormatter);
-            String[] getDatePickerDate = date_str.split("-");
-
-            LocalDate datePickerLocalDate = LocalDate.of(
-                    Integer.parseInt(getDatePickerDate[2]),
-                    Integer.parseInt(getDatePickerDate[1]),
-                    Integer.parseInt(getDatePickerDate[0])
-            );
-
-            date = datePickerLocalDate.format(dateFormatter);
-
-            if (placementPlaceFilter.getValue() != null) {
-                authorizeGrid.asSingleSelect().clear();
-
-                authorizeModelList = authorizeService
-                        .filterRemunerationHistoryByPlace(
-                                date,
-                                placementPlaceFilter.getValue());
-                authorizeGrid.setItems(authorizeModelList);
-
-            }
-            else {
-                updateAgentsPaymentsList();
-            }
-
-        });
-
-        datePicker1.setVisible(false);
-
-        UI.getCurrent().getPage().addBrowserWindowResizeListener(browserWindowResizeEvent -> {
-            if (browserWindowResizeEvent.getWidth() <= 500) {
-                datePicker.setVisible(false);
-                datePicker1.setVisible(true);
-
-                if (datePicker.getValue() != null) {
-                    datePicker1.setValue(datePicker.getValue());
-                }
-
-            }
-            else {
-                datePicker.setVisible(true);
-                datePicker1.setVisible(false);
-
-                if (datePicker1.getValue() != null) {
-                    datePicker.setValue(datePicker1.getValue());
-                }
-
-            }
-
-        });
-
-        UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails -> {
-            if (extendedClientDetails.getScreenWidth() <= 500) {
-                datePicker.setVisible(false);
-                datePicker1.setVisible(true);
-            }
-            else {
-                datePicker.setVisible(true);
-                datePicker1.setVisible(false);
-            }
-        });
+        MenuItem filter = createIconItem(filterMenuBar, VaadinIcon.FILTER, "Filter", null);
+        SubMenu filterSubMenu = filter.getSubMenu();
+        MenuItem villageMenuItem = filterSubMenu.addItem("Place");
+        SubMenu villageSubMenu = villageMenuItem.getSubMenu();
+        villageSubMenu.addItem(placementPlaceFilter);
 
         HorizontalLayout searchDateMenuLayout = new HorizontalLayout(
-                searchAgent,
-                datePicker,
-                placementPlaceFilter,
-                menuBar);
+                filterMenuBar,
+                searchAgent);
         searchDateMenuLayout.setAlignItems(Alignment.BASELINE);
         searchDateMenuLayout.addClassName(SEARCH_DATE_MENU_LAYOUT);
+        searchDateMenuLayout.setWidthFull();
+        searchDateMenuLayout.getStyle().set("overflow", "hidden");
 
-        VerticalLayout searchDateTimeLayout = new VerticalLayout(searchDateMenuLayout, datePicker1);
+        Div div = new Div();
+        searchDateSplitLayout = new SplitLayout(searchDateMenuLayout, div);
+        searchDateSplitLayout.addClassName(MENU_SLIT_LAYOUT);
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout(datePicker, menuBar);
+        horizontalLayout.setPadding(false);
+        horizontalLayout.setMargin(false);
+        horizontalLayout.getStyle().set("overflow", "hidden");
+
+        Div div1 = new Div();
+        menuSplitLayout = new SplitLayout(horizontalLayout, div1);
+        menuSplitLayout.addClassName(MENU_SLIT_LAYOUT);
+
+        VerticalLayout searchDateTimeLayout = new VerticalLayout(
+                menuSplitLayout,
+                searchDateSplitLayout
+                );
         searchDateTimeLayout.addClassName(SEARCH_DATE_TIME_LAYOUT);
+        searchDateTimeLayout.setMargin(false);
+        searchDateTimeLayout.setPadding(false);
 
         return new HorizontalLayout(searchDateTimeLayout);
 
+    }
+
+    private byte[] getParticipantsFile() {
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        OutputStreamWriter streamWriter = new OutputStreamWriter(stream);
+
+        try {
+
+            CSVWriter csvWriter = new CSVWriter(streamWriter);
+
+            List<String[]> data = new ArrayList<>();
+            data.add(new String[]{"Name", "Identity Number", "Amount", "Total Net", "Status", "Claimed"});
+
+            for (int i = 0; i < authorizeModelList.size(); i++) {
+                data.add(new String[] {
+                        authorizeModelList.get(i).getParticipant(),
+                        authorizeModelList.get(i).getIdentityNumber(),
+                        String.valueOf(authorizeModelList.get(i).getAmount()),
+                        String.valueOf(authorizeModelList.get(i).getTotalNet()),
+                        authorizeModelList.get(i).getStatus(),
+                        "no"
+                });
+            }
+
+            streamWriter.flush();
+            csvWriter.writeAll(data);
+
+            csvWriter.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return stream.toByteArray();
+    }
+
+    private MenuItem createIconItem(HasMenuItems menu, VaadinIcon iconName,
+                                    String label, String ariaLabel) {
+        return createIconItem(menu, iconName, label, ariaLabel, false);
+    }
+
+    private MenuItem createIconItem(HasMenuItems menu, VaadinIcon iconName,
+                                    String label, String ariaLabel, boolean isChild) {
+        Icon icon = new Icon(iconName);
+
+        if (isChild) {
+            icon.getStyle().set("width", "var(--lumo-icon-size-s)");
+            icon.getStyle().set("height", "var(--lumo-icon-size-s)");
+            icon.getStyle().set("marginRight", "var(--lumo-space-s)");
+        }
+
+        MenuItem item = menu.addItem(icon, e -> {
+        });
+
+        if (ariaLabel != null) {
+            item.getElement().setAttribute("aria-label", ariaLabel);
+        }
+
+        if (label != null) {
+            item.add(new Text(label));
+        }
+
+        return item;
     }
 
     private void configureDialogs() {
@@ -313,17 +339,10 @@ public class AuthorizeView extends VerticalLayout {
         approveAllDialog = new Dialog();
 
         CheckboxGroup<String> checkboxGroup = new CheckboxGroup<>();
-        checkboxGroup.setLabel("Approve");
+        checkboxGroup.setLabel("Select status to approve");
         checkboxGroup.setItems(HOLD, DENIED, PENDING);
         checkboxGroup.select(HOLD, PENDING);
         checkboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-
-
-        approveAllDialog.getHeader().add(
-                new Button(new Icon("lumo", "cross"), (e) -> {
-                    approveAllDialog.close();
-                })
-        );
 
         approveAllDialog.addDialogCloseActionListener(dialogCloseActionEvent -> {
             approveAllDialog.close();
@@ -331,20 +350,55 @@ public class AuthorizeView extends VerticalLayout {
 
         approveAllDialog.add(checkboxGroup);
 
+        Button approveBtn = new Button(APPROVE);
+        approveBtn.addThemeVariants(
+                ButtonVariant.LUMO_PRIMARY,
+                ButtonVariant.LUMO_SUCCESS);
+
+        approveBtn.setDisableOnClick(true);
+
+        approveBtn.addClickListener(click -> {
+
+            List<String> statusToApprove = new ArrayList<>();
+
+            if (checkboxGroup.isSelected(HOLD)) {
+                statusToApprove.add(HOLD);
+            }
+
+            if (checkboxGroup.isSelected(DENIED)) {
+                statusToApprove.add(DENIED);
+            }
+
+            if (checkboxGroup.isSelected(PENDING)) {
+                statusToApprove.add(PENDING);
+            }
+
+            authorizeService.approveByStatus(date, statusToApprove, authorizeModelList);
+
+            approveAllDialog.close();
+
+            updateAgentsPaymentsList();
+
+            approveBtn.setEnabled(true);
+
+        });
+
+        approveAllDialog.getFooter().add(approveBtn);
+
     }
 
     private void checkScreenSize() {
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(browserWindowResizeEvent -> {
             if (browserWindowResizeEvent.getWidth() > 500) {
-                approveAllDialog.setWidth("70%");
+                approveAllDialog.setWidth("50%");
             }
 
         });
 
         UI.getCurrent().getPage().retrieveExtendedClientDetails(extendedClientDetails -> {
             if (extendedClientDetails.getScreenWidth() > 500) {
-                approveAllDialog.setWidth("70%");
+                approveAllDialog.setWidth("50%");
             }
 
         });
@@ -357,7 +411,13 @@ public class AuthorizeView extends VerticalLayout {
             authorizeGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
             authorizeGrid.setSizeFull();
 
-            authorizeGrid.setColumns(PARTICIPANT, AMOUNT, TOTAL_NET_CAMEL_CASE);
+            authorizeGrid.setColumns(PARTICIPANT);
+
+            authorizeGrid.addComponentColumn(
+                    amount -> createLabel(amount.getAmount())).setHeader(CAPS_AMOUNT);
+
+            authorizeGrid.addComponentColumn(
+                    totalNet -> createLabel(totalNet.getTotalNet())).setHeader(TOTAL_NET);
 
             authorizeGrid.addComponentColumn(
                     status -> createBadge(status.getStatus())).setHeader(STATUS);
@@ -372,10 +432,10 @@ public class AuthorizeView extends VerticalLayout {
             authorizeGrid.setColumns(PARTICIPANT);
 
             authorizeGrid.addComponentColumn(
-                    status -> createBadge("-")).setHeader(CAPS_AMOUNT);
+                    amount -> createBadge("-")).setHeader(CAPS_AMOUNT);
 
             authorizeGrid.addComponentColumn(
-                    status -> createBadge("-")).setHeader(TOTAL_NET);
+                    totalNet -> createBadge("-")).setHeader(TOTAL_NET);
 
             authorizeGrid.addComponentColumn(
                     status -> createBadge("-")).setHeader(STATUS);
@@ -391,6 +451,16 @@ public class AuthorizeView extends VerticalLayout {
             }
         });
 
+    }
+
+    private Component createLabel(double value) {
+
+        Label label = new Label();
+        DecimalFormat decimalFormat = new DecimalFormat("P#.00");
+
+        label.setText(decimalFormat.format(value));
+
+        return label;
     }
 
     private Component createBadge(String approval) {

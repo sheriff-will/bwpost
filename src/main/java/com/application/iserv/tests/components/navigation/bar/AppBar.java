@@ -9,19 +9,24 @@ import com.application.iserv.tests.components.navigation.tab.NaviTabs;
 import com.application.iserv.tests.util.LumoStyles;
 import com.application.iserv.tests.util.UIUtils;
 import com.application.iserv.tests.views.Home;
+import com.application.iserv.ui.utils.ApplicationUserDataModel;
+import com.application.iserv.ui.utils.SessionManager;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -34,6 +39,12 @@ import static com.application.iserv.ui.utils.Constants.*;
 
 @CssImport("./styles/components/app-bar.css")
 public class AppBar extends FlexBoxLayout {
+
+	// SessionManager
+	SessionManager sessionManager = new SessionManager();
+
+	// ApplicationUser
+	ApplicationUserDataModel applicationUserDataModel;
 
 	Tabs viewTabs;
 	Tab authorize = new Tab(AUTHORIZE);
@@ -144,11 +155,37 @@ public class AppBar extends FlexBoxLayout {
 	}
 
 	private void initContainer() {
-		container = new FlexBoxLayout(menuIcon, contextIcon, this.title, search,
-				actionItems, avatar);
+
+		ComboBox<String> filter = new ComboBox<>();
+		filter.setPlaceholder("Filter by place");
+		filter.setItems("Oodi", "Modipane");
+		filter.getElement().getStyle().set("color", "white");
+		filter.getElement().getStyle().set("-webkit-text-fill-color", "white");
+
+		applicationUserDataModel = sessionManager.getApplicationUserData();
+
+		String[] getFirstAndLastName = applicationUserDataModel.getUsername().split(" ");
+
+		String[] getFirstnameChar = getFirstAndLastName[0].split("");
+		String lastname = getFirstAndLastName[1];
+
+		String usernameWithAbbreviation = getFirstnameChar[0]+"."+lastname;
+
+		H5 village = new H5(usernameWithAbbreviation);
+		village.setClassName(CLASS_NAME + "__village__title");
+
+		village.addClickListener(click -> {
+			Notification notification = new Notification(applicationUserDataModel.getUsername());
+			notification.setPosition(Notification.Position.BOTTOM_CENTER);
+			notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+			notification.setDuration(5000);
+			notification.open();
+		});
+
+		container = new FlexBoxLayout(menuIcon, contextIcon, this.title,
+				actionItems, village, avatar);
 		container.addClassName(CLASS_NAME + "__container");
 		container.setAlignItems(Alignment.CENTER);
-		container.setFlexGrow(1, search);
 		add(container);
 	}
 

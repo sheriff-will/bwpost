@@ -59,16 +59,16 @@ public class ReportsView extends Main {
                 "Payment status for "+date
         );
 
-        double approvedPercentage = Double.parseDouble(paymentStatusModel.getApproved())
+        int approvedPercentage = Integer.parseInt(paymentStatusModel.getApproved())
                 / paymentStatusModel.getStatusSize() * 100;
 
-        double deniedPercentage = Double.parseDouble(paymentStatusModel.getDenied())
+        int deniedPercentage = Integer.parseInt(paymentStatusModel.getDenied())
                 / paymentStatusModel.getStatusSize() * 100;
 
-        double pendingPercentage = Double.parseDouble(paymentStatusModel.getPending())
+        int pendingPercentage = Integer.parseInt(paymentStatusModel.getPending())
                 / paymentStatusModel.getStatusSize() * 100;
 
-        double onHoldPercentage = Double.parseDouble(paymentStatusModel.getOnHold())
+        int onHoldPercentage = Integer.parseInt(paymentStatusModel.getOnHold())
                 / paymentStatusModel.getStatusSize() * 100;
 
         Board board = new Board();
@@ -76,15 +76,15 @@ public class ReportsView extends Main {
                 createHighlight(
                         "Approved Payments",
                         paymentStatusModel.getApproved(),
-                        approvedPercentage,
+                        Double.valueOf(approvedPercentage),
                         true),
                 createHighlight("Denied Payments",
                         paymentStatusModel.getDenied(),
-                        -deniedPercentage,
+                        Double.valueOf(-deniedPercentage),
                         true),
                 createHighlight("Pending Payments",
                         paymentStatusModel.getPending(),
-                        pendingPercentage,
+                        Double.valueOf(pendingPercentage),
                         false)
         );
         board.addRow(createViewEvents());

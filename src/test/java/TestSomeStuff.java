@@ -1,4 +1,5 @@
-import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.utils.ApplicationUserDataModel;
+import com.application.iserv.ui.utils.SessionManager;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberToCarrierMapper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -18,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -98,7 +100,11 @@ public class TestSomeStuff {
 
         int b = (int) a;
 
-        System.err.println(b);
+       // System.err.println(b);
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm - dd MMMM yyyy");
+        System.err.println(LocalDateTime.now().format(dateFormatter));
+
     }
 
     @Test
@@ -170,6 +176,98 @@ public class TestSomeStuff {
     }
 
     @Test
+    public void readParticipantsCSVFile() {
+
+        Path path = Path.of("src", "main", "resources", "CSV Test Files/sample_participants.csv");
+
+        try {
+
+            List<ParticipantsModel> participantsModelList = Files.lines(path)
+                    .skip(1)
+                    .map(TestSomeStuff::getParticipants).toList();
+
+            System.err.println(participantsModelList);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private static ParticipantsModel getParticipants(String line) {
+
+        // SessionManager
+        SessionManager sessionManager = new SessionManager();
+
+        // ApplicationUser
+        ApplicationUserDataModel applicationUserDataModel = sessionManager.getApplicationUserData();
+
+        String[] fields = line.split(",");
+        if (fields.length != 20) {
+            throw new RuntimeException("Invalid csv line: "+line);
+        }
+
+        String [] getDateOfBirth = fields[3].split("-");
+        LocalDate dateOfBirth = LocalDate.of(
+                Integer.parseInt(getDateOfBirth[0]),
+                Integer.parseInt(getDateOfBirth[1]),
+                Integer.parseInt(getDateOfBirth[2])
+        );
+
+        String [] getPlacementDate = fields[14].split("-");
+        LocalDate placementDate = LocalDate.of(
+                Integer.parseInt(getPlacementDate[0]),
+                Integer.parseInt(getPlacementDate[1]),
+                Integer.parseInt(getPlacementDate[2])
+        );
+
+        String [] getCompletionDate = fields[15].split("-");
+        LocalDate completionDate = LocalDate.of(
+                Integer.parseInt(getCompletionDate[0]),
+                Integer.parseInt(getCompletionDate[1]),
+                Integer.parseInt(getCompletionDate[2])
+        );
+
+        long monthsDifference = ChronoUnit.MONTHS.between(placementDate, completionDate);
+
+        List<String> contractDates = new ArrayList<>();
+        for (int i = 1; i < Integer.parseInt(String.valueOf(monthsDifference)) + 1; i++) {
+            contractDates.add(i+" Months");
+        }
+
+        System.err.println(contractDates);
+
+        return new ParticipantsModel(
+                LocalDateTime.now(),
+                dateOfBirth,
+                placementDate,
+                completionDate,
+                fields[0],
+                fields[1],
+                fields[2],
+                fields[4],
+                fields[5],
+                fields[6],
+                fields[7],
+                fields[8],
+                fields[9],
+                fields[10],
+                fields[11],
+                fields[12],
+                fields[13],
+                fields[16],
+                fields[17],
+                fields[18],
+                fields[19],
+                applicationUserDataModel.getDistrict(),
+                applicationUserDataModel.getVillage(),
+                applicationUserDataModel.getService(),
+                String.valueOf(monthsDifference)
+        );
+    }
+
+
+    @Test
     public void readCSVFileParticipants() {
 
         Path path = Path.of("src", "main", "resources", "CSV Test Files/participants.csv");
@@ -188,7 +286,7 @@ public class TestSomeStuff {
 
     }
 
-    private static ParticipantsModel getParticipants(String line) {
+    private static ParticipantsModel getParticipants1(String line) {
         String[] fields = line.split(",");
         if (fields.length != 23) {
             throw new RuntimeException("Invalid csv line: "+line);
@@ -311,15 +409,25 @@ public class TestSomeStuff {
     @Test
     public void compareDates() {
 
-        LocalDate completionDate = LocalDate.of(
-                2022,
-                10,
-                18
+        LocalDate placementDate = LocalDate.of(
+                2023,
+                11,
+                23
         );
 
-        int compare = completionDate.compareTo(LocalDate.now());
+        LocalDate completionDate = LocalDate.of(
+                2023,
+                8,
+                23
+        );
+
+        long monthsDifference = ChronoUnit.MONTHS.between(placementDate, completionDate);
+
+        int compare = placementDate.compareTo(completionDate);
 
         System.err.println(compare);
+
+        System.err.println(Math.abs(-monthsDifference)+ " Months");
 
     }
 
@@ -424,7 +532,7 @@ public class TestSomeStuff {
     @Test
     public void testWriteCsv() {
 
-        String path = "participants.csv";
+        String path = "participantsd.csv";
 
         try {
          //   Path path1 = Paths.get(ClassLoader.getSystemResource("csv/participants.csv").toURI());
@@ -450,8 +558,13 @@ public class TestSomeStuff {
 
     }
 
-    public void getPath() {
+    @Test
+    public void testStrings() {
+        String s = "no";
 
+        if (s.contains("No")) {
+            System.err.println("true");
+        }
     }
 
 }
