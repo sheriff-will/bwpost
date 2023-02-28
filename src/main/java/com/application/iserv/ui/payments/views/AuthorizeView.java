@@ -43,12 +43,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.application.iserv.ui.utils.Constants.*;
 
@@ -176,7 +177,7 @@ public class AuthorizeView extends VerticalLayout {
 
         menuBar.setEnabled(false);
 
-        searchAgent.setPlaceholder(SEARCH_AGENT_HINT);
+        searchAgent.setPlaceholder(SEARCH_EMPLOYEE_HINT);
         searchAgent.setClearButtonVisible(true);
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
         searchAgent.addClassName(SEARCH_AGENT);
@@ -284,7 +285,7 @@ public class AuthorizeView extends VerticalLayout {
 
             for (int i = 0; i < authorizeModelList.size(); i++) {
                 data.add(new String[] {
-                        authorizeModelList.get(i).getParticipant(),
+                        authorizeModelList.get(i).getEmployee(),
                         authorizeModelList.get(i).getIdentityNumber(),
                         String.valueOf(authorizeModelList.get(i).getAmount()),
                         String.valueOf(authorizeModelList.get(i).getTotalNet()),
@@ -411,7 +412,7 @@ public class AuthorizeView extends VerticalLayout {
             authorizeGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
             authorizeGrid.setSizeFull();
 
-            authorizeGrid.setColumns(PARTICIPANT);
+            authorizeGrid.setColumns(EMPLOYEE);
 
             authorizeGrid.addComponentColumn(
                     amount -> createLabel(amount.getAmount())).setHeader(CAPS_AMOUNT);
@@ -429,7 +430,7 @@ public class AuthorizeView extends VerticalLayout {
             authorizeGrid.addClassName(PAYMENTS_AUTHORIZE_GRID);
             authorizeGrid.setSizeFull();
 
-            authorizeGrid.setColumns(PARTICIPANT);
+            authorizeGrid.setColumns(EMPLOYEE);
 
             authorizeGrid.addComponentColumn(
                     amount -> createBadge("-")).setHeader(CAPS_AMOUNT);
@@ -455,10 +456,12 @@ public class AuthorizeView extends VerticalLayout {
 
     private Component createLabel(double value) {
 
-        Label label = new Label();
-        DecimalFormat decimalFormat = new DecimalFormat("P#.00");
+        Locale locale = new Locale("en", "BW");
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
 
-        label.setText(decimalFormat.format(value));
+        Label label = new Label();
+
+        label.setText(currencyFormatter.format(value));
 
         return label;
     }

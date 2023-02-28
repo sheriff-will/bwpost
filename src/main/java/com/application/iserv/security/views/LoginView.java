@@ -68,34 +68,39 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         LoginI18n loginI18n = LoginI18n.createDefault();
         LoginI18n.Form loginI18nForm = loginI18n.getForm();
         loginI18n.setForm(loginI18nForm);
-        loginI18nForm.setForgotPassword("I don't have an account");
-        loginI18n.setAdditionalInformation(
-                "Please, contact maintenance@iServ.com if you're experiencing issues logging into your account");
-        loginI18nForm.setUsername("Phone number");
+       // loginI18nForm.setForgotPassword("I don't have an account");
+        loginI18n.setAdditionalInformation("username: admin, password: qwerty");
+        loginI18nForm.setUsername("Username");
 
-        loginOverlay.setTitle("iServ");
-        loginOverlay.setDescription("Serving the nation ");
+        loginOverlay.setTitle("BotswanaPost");
+        loginOverlay.setDescription("We deliver, whatever wherever");
         loginOverlay.setOpened(true);
         loginOverlay.setAction("login");
         loginOverlay.setForgotPasswordButtonVisible(true);
         loginOverlay.setI18n(loginI18n);
 
         loginOverlay.addForgotPasswordListener(forgotPasswordEvent -> {
-            verify.setEnabled(true);
+            /*verify.setEnabled(true);
             phoneNumber.clear();
 
             password.setVisible(false);
             confirmPassword.setVisible(false);
 
             configureDialogs();
-            phoneNumber.setLabel("Phone number");
+            phoneNumber.setLabel("Username");
             phoneNumber.setVisible(true);
             verify.setText("Continue");
 
             phoneNumber.setPlaceholder("");
 
 
-            signupDialog.open();
+            signupDialog.open();*/
+
+            Notification notification = new Notification("username: admin ~ password: qwerty");
+            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+            notification.setDuration(5000);
+            notification.setPosition(Notification.Position.BOTTOM_CENTER);
+            notification.open();
         });
 
         add(

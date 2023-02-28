@@ -1,0 +1,11 @@
+[Unit]
+Description=BotswanaPost Prototype
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=sheriff
+ExecStart=/usr/bin/java -jar /artifact/iserv-1.0-SNAPSHOT.jar[Install]
+WantedBy=multi-user.target

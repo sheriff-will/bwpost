@@ -27,11 +27,11 @@ public class Constants {
     public static final String BANKING = "Banking";
     public static final String NOMINEES = "Nominees";
     public static final String REFERENCES = "References";
-    public static final String PARTICIPANTS = "Participants";
+    public static final String EMPLOYEES = "Employees";
     public static final String PAYMENTS = "Payments";
     public static final String PARAMETERS = "Parameters";
     public static final String REPORTS = "Reports";
-    public static final String ADD_PARTICIPANT = "Add Participant";
+    public static final String ADD_EMPLOYEE = "Add employee";
     public static final String SAVE = "Save";
     public static final String BACK = "Back";
     public static final String UPDATE = "Update";
@@ -54,7 +54,7 @@ public class Constants {
     public static final String ACCOUNT_NUMBER = "Account Number";
 
     public static final String NON_BINARY = "Non - Binary";
-    public static final String SEARCH_AGENT_HINT = "Search participant...";
+    public static final String SEARCH_EMPLOYEE_HINT = "Search employee...";
     public static final String ACTIVE = "Active";
     public static final String TERMINATED = "Terminated";
     public static final String EXPIRED = "Expired";
@@ -70,7 +70,7 @@ public class Constants {
     public static final String DATE = "Date";
     public static final String DATE_OF_BIRTH = "Date Of Birth";
     public static final String AGENT_ATTENDANCE = "agent_attendance";
-    public static final String PARTICIPANT = "participant";
+    public static final String EMPLOYEE = "employee";
     public static final String POSITION = "position";
     public static final String RELATIONSHIP = "Relationship";
     public static final String CONTRACT_DURATION = "Contract Duration";
@@ -104,7 +104,7 @@ public class Constants {
     public static final String AUTHORIZE_LOWER_CASE = "authorize";
     public static final String RECONCILE_LOWER_CASE = "reconcile";
     public static final String HISTORY_LOWER_CASE = "history";
-    public static final String PARTICIPANTS_LOWER_CASE = "participants";
+    public static final String EMPLOYEES_LOWER_CASE = "employees";
     public static final String CSV_ERROR_MESSAGE = "Upload a csv file.";
     public static final String CSV_FORMAT = ".csv";
     public static final String DATE_TO_RECONCILE = "Select date to reconcile";
@@ -610,7 +610,7 @@ public class Constants {
         HistoryStatementModel h1 = new HistoryStatementModel(
                29.95,
                 "August 2022",
-                "300",
+                "300.0",
                 "Amogelang Mosane",
                 "743820931",
                 8,
@@ -621,7 +621,7 @@ public class Constants {
         HistoryStatementModel h2 = new HistoryStatementModel(
                 39.95,
                 "September 2022",
-                "560",
+                "560.0",
                 "Thabang Dithupa",
                 "910013265",
                 8,

@@ -2,7 +2,7 @@ package com.application.iserv.backend.services;
 
 import com.application.iserv.backend.repositories.ParticipantsRepository;
 import com.application.iserv.ui.participants.models.NomineesModel;
-import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.participants.models.EmployeesModel;
 import com.application.iserv.ui.participants.models.ReferenceModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,11 +26,11 @@ public class ParticipantsServices {
     }
 
     // Agents
-    public List<ParticipantsModel> getAllAgents() {
+    public List<EmployeesModel> getAllAgents() {
 
         List<Object[]> allAgents = participantsRepository.retrieveAllAgents();
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -75,7 +75,7 @@ public class ParticipantsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference <= 0) {
-                ParticipantsModel participantsModel = new ParticipantsModel(
+                EmployeesModel employeesModel = new EmployeesModel(
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
                         dateOfBirth,
@@ -105,7 +105,7 @@ public class ParticipantsServices {
                         row[1].toString()+" "+row[2].toString()
                         );
 
-                agents.add(participantsModel);
+                agents.add(employeesModel);
 
             }
 
@@ -114,9 +114,9 @@ public class ParticipantsServices {
         return agents;
     }
 
-    public String updateAgent(ParticipantsModel participantsModel) {
+    public String updateAgent(EmployeesModel employeesModel) {
         String response = SUCCESSFUL;
-        List<Object[]> checkAgentList = participantsRepository.checkForAgent(participantsModel);
+        List<Object[]> checkAgentList = participantsRepository.checkForAgent(employeesModel);
 
         List<String> recordAgent = new ArrayList<>();
 
@@ -127,7 +127,7 @@ public class ParticipantsServices {
                 String bigIntegerStr = bigInteger.toString();
                 Long participantId = Long.parseLong(bigIntegerStr);
 
-                if (participantsModel.getParticipantId() != participantId) {
+                if (employeesModel.getParticipantId() != participantId) {
                     recordAgent.add(PARTICIPANT_ALREADY_EXIST);
                 }
 
@@ -138,7 +138,7 @@ public class ParticipantsServices {
             response = PARTICIPANT_ALREADY_EXIST;
         }
         else {
-            participantsRepository.updateAgentDetails(participantsModel);
+            participantsRepository.updateAgentDetails(employeesModel);
         }
 
         return response;
@@ -148,13 +148,13 @@ public class ParticipantsServices {
         participantsRepository.terminateAgentDetails(participantId);
     }
 
-    public String addAgent(ParticipantsModel participantsModel, List<String> contractDates) {
+    public String addAgent(EmployeesModel employeesModel, List<String> contractDates) {
         String response;
-        List<Object[]> checkAgent = participantsRepository.checkForAgent(participantsModel);
+        List<Object[]> checkAgent = participantsRepository.checkForAgent(employeesModel);
 
         if (checkAgent.isEmpty()) {
-            BigInteger parameterId = getParameterId(participantsModel.getPosition());
-            participantsRepository.addNewAgent(participantsModel, contractDates, parameterId);
+            BigInteger parameterId = getParameterId(employeesModel.getPosition());
+            participantsRepository.addNewAgent(employeesModel, contractDates, parameterId);
             response = SUCCESSFUL;
         }
         else {
@@ -164,10 +164,10 @@ public class ParticipantsServices {
         return response;
     }
 
-    public List<ParticipantsModel> getAllTerminatedAgents() {
+    public List<EmployeesModel> getAllTerminatedAgents() {
         List<Object[]> allAgents = participantsRepository.retrieveAllTerminatedAgents();
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -198,7 +198,7 @@ public class ParticipantsServices {
                     Integer.parseInt(getCompletionDate[2])
             );
 
-            ParticipantsModel participantsModel = new ParticipantsModel(
+            EmployeesModel employeesModel = new EmployeesModel(
                     Long.parseLong(row[0].toString()),
                     LocalDateTime.parse(row[20].toString()),
                     dateOfBirth,
@@ -228,17 +228,17 @@ public class ParticipantsServices {
                     row[1].toString()+" "+row[2].toString()
             );
 
-            agents.add(participantsModel);
+            agents.add(employeesModel);
 
         }
 
         return agents;
     }
 
-    public List<ParticipantsModel> filterTerminatedAgentsByPlace(String place) {
+    public List<EmployeesModel> filterTerminatedAgentsByPlace(String place) {
         List<Object[]> allAgents = participantsRepository.filterTerminatedAgentsByPlace(place);
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -269,7 +269,7 @@ public class ParticipantsServices {
                     Integer.parseInt(getCompletionDate[2])
             );
 
-            ParticipantsModel participantsModel = new ParticipantsModel(
+            EmployeesModel employeesModel = new EmployeesModel(
                     Long.parseLong(row[0].toString()),
                     LocalDateTime.parse(row[20].toString()),
                     dateOfBirth,
@@ -299,18 +299,18 @@ public class ParticipantsServices {
                     row[1].toString()+" "+row[2].toString()
             );
 
-            agents.add(participantsModel);
+            agents.add(employeesModel);
 
         }
 
         return agents;
     }
 
-    public List<ParticipantsModel> filterAgentsByPlace(String place) {
+    public List<EmployeesModel> filterAgentsByPlace(String place) {
 
         List<Object[]> allAgents = participantsRepository.filterAgentsByPlace(place);
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -355,7 +355,7 @@ public class ParticipantsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference <= 0) {
-                ParticipantsModel participantsModel = new ParticipantsModel(
+                EmployeesModel employeesModel = new EmployeesModel(
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
                         dateOfBirth,
@@ -385,7 +385,7 @@ public class ParticipantsServices {
                         row[1].toString()+" "+row[2].toString()
                 );
 
-                agents.add(participantsModel);
+                agents.add(employeesModel);
 
             }
 
@@ -394,10 +394,10 @@ public class ParticipantsServices {
         return agents;
     }
 
-    public List<ParticipantsModel> searchAgents(String agentNames, Long statusValue, boolean isExpired) {
+    public List<EmployeesModel> searchAgents(String agentNames, Long statusValue, boolean isExpired) {
         List<Object[]> allAgents = participantsRepository.searchForAgents(agentNames, statusValue);
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -443,7 +443,7 @@ public class ParticipantsServices {
 
             if (isExpired) {
                 if (dateDifference > 0) {
-                    ParticipantsModel participantsModel = new ParticipantsModel(
+                    EmployeesModel employeesModel = new EmployeesModel(
                             Long.parseLong(row[0].toString()),
                             LocalDateTime.parse(row[20].toString()),
                             dateOfBirth,
@@ -473,13 +473,13 @@ public class ParticipantsServices {
                             row[1].toString()+" "+row[2].toString()
                     );
 
-                    agents.add(participantsModel);
+                    agents.add(employeesModel);
 
                 }
             }
             else {
                 if (dateDifference <= 0) {
-                    ParticipantsModel participantsModel = new ParticipantsModel(
+                    EmployeesModel employeesModel = new EmployeesModel(
                             Long.parseLong(row[0].toString()),
                             LocalDateTime.parse(row[20].toString()),
                             dateOfBirth,
@@ -509,7 +509,7 @@ public class ParticipantsServices {
                             row[1].toString()+" "+row[2].toString()
                     );
 
-                    agents.add(participantsModel);
+                    agents.add(employeesModel);
 
                 }
             }
@@ -523,11 +523,11 @@ public class ParticipantsServices {
         return participantsRepository.retrieveDuration(district);
     }
 
-    public List<ParticipantsModel> getAllExpiredAgents() {
+    public List<EmployeesModel> getAllExpiredAgents() {
 
         List<Object[]> allAgents = participantsRepository.retrieveAllAgents();
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -572,7 +572,7 @@ public class ParticipantsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference > 0) {
-                ParticipantsModel participantsModel = new ParticipantsModel(
+                EmployeesModel employeesModel = new EmployeesModel(
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
                         dateOfBirth,
@@ -602,7 +602,7 @@ public class ParticipantsServices {
                         row[1].toString()+" "+row[2].toString()
                 );
 
-                agents.add(participantsModel);
+                agents.add(employeesModel);
 
             }
 
@@ -611,11 +611,11 @@ public class ParticipantsServices {
         return agents;
     }
 
-    public List<ParticipantsModel> filterExpiredAgentsByPlace(String place) {
+    public List<EmployeesModel> filterExpiredAgentsByPlace(String place) {
 
         List<Object[]> allAgents = participantsRepository.filterAgentsByPlace(place);
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -660,7 +660,7 @@ public class ParticipantsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference > 0) {
-                ParticipantsModel participantsModel = new ParticipantsModel(
+                EmployeesModel employeesModel = new EmployeesModel(
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
                         dateOfBirth,
@@ -690,7 +690,7 @@ public class ParticipantsServices {
                         row[1].toString()+" "+row[2].toString()
                 );
 
-                agents.add(participantsModel);
+                agents.add(employeesModel);
 
             }
 
@@ -700,8 +700,8 @@ public class ParticipantsServices {
     }
 
     public void reinstateParticipant(Long participantId,
-                                     List<String> contractDates, ParticipantsModel participantsModel) {
-        participantsRepository.reinstateParticipant(participantId, contractDates, participantsModel);
+                                     List<String> contractDates, EmployeesModel employeesModel) {
+        participantsRepository.reinstateParticipant(participantId, contractDates, employeesModel);
     }
 
 
@@ -794,12 +794,13 @@ public class ParticipantsServices {
 
             ReferenceModel referenceModel = new ReferenceModel(
                     Long.parseLong(row[0].toString()),
-                    Long.parseLong(row[6].toString()),
+                    Long.parseLong(row[7].toString()),
                     row[1].toString(),
                     row[2].toString(),
                     row[3].toString(),
                     row[4].toString(),
                     row[5].toString(),
+                    row[6].toString(),
                     row[1].toString()+" "+row[2].toString()
             );
 
@@ -862,10 +863,10 @@ public class ParticipantsServices {
     }
 
     // Attendance
-    public List<ParticipantsModel> getAttendance(String date) {
+    public List<EmployeesModel> getAttendance(String date) {
         List<Object[]> allAgents = participantsRepository.retrieveAttendance(date);
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -910,7 +911,7 @@ public class ParticipantsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference <= 0) {
-                ParticipantsModel participantsModel = new ParticipantsModel(
+                EmployeesModel employeesModel = new EmployeesModel(
                         Integer.parseInt(row[29].toString()),
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
@@ -941,7 +942,7 @@ public class ParticipantsServices {
                         row[1].toString()+" "+row[2].toString()
                 );
 
-                agents.add(participantsModel);
+                agents.add(employeesModel);
 
             }
 
@@ -950,10 +951,10 @@ public class ParticipantsServices {
         return agents;
     }
 
-    public List<ParticipantsModel> getAttendanceByPlace(String date, String place) {
+    public List<EmployeesModel> getAttendanceByPlace(String date, String place) {
         List<Object[]> allAgents = participantsRepository.getAttendanceByPlace(date, place);
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -998,7 +999,7 @@ public class ParticipantsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference <= 0) {
-                ParticipantsModel participantsModel = new ParticipantsModel(
+                EmployeesModel employeesModel = new EmployeesModel(
                         Integer.parseInt(row[29].toString()),
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
@@ -1029,7 +1030,7 @@ public class ParticipantsServices {
                         row[1].toString()+" "+row[2].toString()
                 );
 
-                agents.add(participantsModel);
+                agents.add(employeesModel);
 
             }
 
@@ -1038,10 +1039,10 @@ public class ParticipantsServices {
         return agents;
     }
 
-    public List<ParticipantsModel> searchAttendance(String date, String agentNames, Long statusValue) {
+    public List<EmployeesModel> searchAttendance(String date, String agentNames, Long statusValue) {
         List<Object[]> allAgents = participantsRepository.searchAttendance(date, agentNames, statusValue);
 
-        List<ParticipantsModel> agents = new ArrayList<>();
+        List<EmployeesModel> agents = new ArrayList<>();
 
         for(Object[] row : allAgents) {
 
@@ -1086,7 +1087,7 @@ public class ParticipantsServices {
                     - Integer.parseInt(compareCompletionDate_str);
 
             if (dateDifference <= 0) {
-                ParticipantsModel participantsModel = new ParticipantsModel(
+                EmployeesModel employeesModel = new EmployeesModel(
                         Integer.parseInt(row[29].toString()),
                         Long.parseLong(row[0].toString()),
                         LocalDateTime.parse(row[20].toString()),
@@ -1117,7 +1118,7 @@ public class ParticipantsServices {
                         row[1].toString() + " " + row[2].toString()
                 );
 
-                agents.add(participantsModel);
+                agents.add(employeesModel);
 
             }
         }

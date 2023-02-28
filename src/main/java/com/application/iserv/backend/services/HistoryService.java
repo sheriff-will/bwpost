@@ -4,21 +4,19 @@ import com.application.iserv.backend.repositories.HistoryRepository;
 import com.application.iserv.ui.payments.models.HistoryModel;
 import com.application.iserv.ui.payments.models.HistoryStatementModel;
 import com.application.iserv.ui.utils.Commons;
+import com.vaadin.flow.server.StreamResource;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.application.iserv.ui.utils.Constants.SIMPLE_MONTH_DATE_FORMAT;
 
@@ -78,6 +76,9 @@ public class HistoryService {
                 paymentMode = "Cash";
             }
 
+            Locale locale = new Locale("en", "BW");
+            NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
+
             HistoryModel historyModel = new HistoryModel(
                     Long.parseLong(row[0].toString()),
                     Long.parseLong(row[8].toString()),
@@ -89,15 +90,15 @@ public class HistoryService {
                     row[6].toString(),
                     row[7].toString(),
                     row[9].toString()+" "+row[10].toString(),
-                    String.valueOf(amount),
+                    currencyFormatter.format(amount),
                     row[11].toString(),
                     row[12].toString(),
                     row[13].toString(),
                     row[14].toString(),
-                    row[15].toString(),
+                    currencyFormatter.format(Double.parseDouble(row[15].toString())),
                     row[16].toString(),
-                    String.valueOf(baseSalary),
-                    String.valueOf(totalSalary),
+                    currencyFormatter.format(baseSalary),
+                    currencyFormatter.format(totalSalary),
                     paymentMode,
                     provider
             );
@@ -109,8 +110,8 @@ public class HistoryService {
         return historyModelList;
     }
 
-    public void exportReport(String names, Long participantId)
-            throws FileNotFoundException, JRException {
+    public StreamResource exportReport(String names, Long participantId)
+            throws IOException, JRException {
         List<Object[]> allHistory = historyRepository.exportStatements(participantId);
 
         List<HistoryStatementModel> historyStatementModelList = new ArrayList<>();
@@ -133,9 +134,9 @@ public class HistoryService {
 
             Double amount = Double.parseDouble(row[3].toString()) * Integer.parseInt(row[4].toString());
 
-            amount = amount + Integer.parseInt(row[1].toString());
+            amount = amount + Double.parseDouble(row[1].toString());
 
-            amount = amount - Integer.parseInt(row[2].toString());
+            amount = amount - Double.parseDouble(row[2].toString());
 
             HistoryStatementModel historyStatementModel = new HistoryStatementModel(
                     Double.parseDouble(row[3].toString()),
@@ -143,8 +144,8 @@ public class HistoryService {
                     String.valueOf(amount),
                     "Name: "+row[5].toString()+" "+row[6].toString(),
                     "Omang: "+row[7].toString(),
-                    Integer.parseInt(row[1].toString()),
-                    Integer.parseInt(row[2].toString()),
+                    Double.parseDouble(row[1].toString()),
+                    Double.parseDouble(row[2].toString()),
                     Integer.parseInt(row[4].toString())
             );
 
@@ -161,7 +162,7 @@ public class HistoryService {
                 = new JRBeanCollectionDataSource(historyStatementModelList);
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("createdBy", "iServ");
+        parameters.put("createdBy", "Botswana Post");
 
         JasperPrint jasperPrint = JasperFillManager.fillReport(
                 jasperReport,
@@ -169,15 +170,23 @@ public class HistoryService {
                 jrBeanCollectionDataSource
         );
 
-        // TODO Make constant but again user should choose where to save to.
-        String path = "/home/sheriff-will/Documents/iServ Documents/Statements/";
+        File reportFile = File.createTempFile("report", ".pdf");
+        JasperExportManager.exportReportToPdfFile(jasperPrint, reportFile.getAbsolutePath());
+
+        FileInputStream fileInputStream;
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm - dd MMMM yyyy");
+        StreamResource resource = new StreamResource(
+                names+" Statement "+LocalDateTime.now().format(dateFormatter)+".pdf",
+                () -> {
+                    try {
+                        return new FileInputStream(reportFile);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
-        String saveAs = path+LocalDateTime.now().format(dateFormatter)+".pdf"+" "+names;
-
-        JasperExportManager.exportReportToPdfFile(jasperPrint, saveAs);
-
+        return resource;
     }
 
     public List<HistoryModel> searchHistory(String agentNames, String date) {
@@ -225,6 +234,9 @@ public class HistoryService {
                 paymentMode = "Cash";
             }
 
+            Locale locale = new Locale("en", "BW");
+            NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
+
             HistoryModel historyModel = new HistoryModel(
                     Long.parseLong(row[0].toString()),
                     Long.parseLong(row[8].toString()),
@@ -236,18 +248,19 @@ public class HistoryService {
                     row[6].toString(),
                     row[7].toString(),
                     row[9].toString()+" "+row[10].toString(),
-                    String.valueOf(amount),
+                    currencyFormatter.format(amount),
                     row[11].toString(),
                     row[12].toString(),
                     row[13].toString(),
                     row[14].toString(),
-                    row[15].toString(),
+                    currencyFormatter.format(Double.parseDouble(row[15].toString())),
                     row[16].toString(),
-                    String.valueOf(baseSalary),
-                    String.valueOf(totalSalary),
+                    currencyFormatter.format(baseSalary),
+                    currencyFormatter.format(totalSalary),
                     paymentMode,
                     provider
             );
+
 
             historyModelList.add(historyModel);
 
@@ -302,6 +315,9 @@ public class HistoryService {
                 paymentMode = "Cash";
             }
 
+            Locale locale = new Locale("en", "BW");
+            NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
+
             HistoryModel historyModel = new HistoryModel(
                     Long.parseLong(row[0].toString()),
                     Long.parseLong(row[8].toString()),
@@ -313,15 +329,15 @@ public class HistoryService {
                     row[6].toString(),
                     row[7].toString(),
                     row[9].toString()+" "+row[10].toString(),
-                    String.valueOf(amount),
+                    currencyFormatter.format(amount),
                     row[11].toString(),
                     row[12].toString(),
                     row[13].toString(),
                     row[14].toString(),
-                    row[15].toString(),
+                    currencyFormatter.format(Double.parseDouble(row[15].toString())),
                     row[16].toString(),
-                    String.valueOf(baseSalary),
-                    String.valueOf(totalSalary),
+                    currencyFormatter.format(baseSalary),
+                    currencyFormatter.format(totalSalary),
                     paymentMode,
                     provider
             );
@@ -331,6 +347,51 @@ public class HistoryService {
         }
 
         return historyModelList;
+    }
+
+    public List<HistoryStatementModel> exportReports(Long participantId) {
+        List<Object[]> allHistory = historyRepository.exportStatements(participantId);
+
+        List<HistoryStatementModel> historyStatementModelList = new ArrayList<>();
+
+        for(Object[] row : allHistory) {
+
+            String month_str = row[0].toString();
+            String[] getMonth = month_str.split("-");
+
+            // TODO 1 in the magic number
+            LocalDate monthDate = LocalDate.of(
+                    Integer.parseInt(getMonth[0]),
+                    Integer.parseInt(getMonth[1]),
+                    1
+            );
+
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(SIMPLE_MONTH_DATE_FORMAT);
+
+            String date = monthDate.format(dateFormatter);
+
+            Double amount = Double.parseDouble(row[3].toString()) * Integer.parseInt(row[4].toString());
+
+            amount = amount + Double.parseDouble(row[1].toString());
+
+            amount = amount - Double.parseDouble(row[2].toString());
+
+            HistoryStatementModel historyStatementModel = new HistoryStatementModel(
+                    Double.parseDouble(row[3].toString()),
+                    date,
+                    String.valueOf(amount),
+                    "Name: "+row[5].toString()+" "+row[6].toString(),
+                    "Omang: "+row[7].toString(),
+                    Double.parseDouble(row[1].toString()),
+                    Double.parseDouble(row[2].toString()),
+                    Integer.parseInt(row[4].toString())
+            );
+
+            historyStatementModelList.add(historyStatementModel);
+
+        }
+
+        return historyStatementModelList;
     }
 
 }

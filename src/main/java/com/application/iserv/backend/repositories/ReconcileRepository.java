@@ -41,8 +41,11 @@ public class ReconcileRepository {
 
                 // TODO Make sure participant id is not null encase those jokers tried to add someone
 
+                char quote = '"';
+                String claimed = reconcileModels.get(i).getClaimed().replace(quote, ' ');
+
                 String updateRemunerationSQL = "UPDATE remuneration_history SET " +
-                        "claimed = '" +reconcileModels.get(i).getClaimed()+ "' " +
+                        "claimed = '" +claimed.trim()+ "' " +
                         "WHERE participant_id = '"+query.getResultList().get(0)+"' " +
                         "AND month = '"+date+"'";
 

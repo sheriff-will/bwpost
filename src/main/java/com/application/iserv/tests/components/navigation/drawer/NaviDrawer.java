@@ -15,14 +15,12 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.shared.Registration;
 import elemental.json.JsonObject;
-
-import static com.application.iserv.ui.utils.Constants.IPELEGENG;
-import static com.application.iserv.ui.utils.Constants.TIRELO_SECHABA;
 
 @CssImport("./styles/components/navi-drawer.css")
 @JsModule("./styles/swipe-away.js")
@@ -97,7 +95,7 @@ public class NaviDrawer extends Div
 	}
 
 	private void initHeader() {
-		mainContent.add(new BrandExpression("iServ"));
+		mainContent.add(new BrandExpression("BotswanaPost"));
 	}
 
 	private void initSearch() {
@@ -109,8 +107,8 @@ public class NaviDrawer extends Div
 		search.setPlaceholder("Search");
 		search.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
 */
-		Tab ipelegeng = new Tab(IPELEGENG);
-		Tab tireloSechaba = new Tab(TIRELO_SECHABA);
+		Tab botswanaPost = new Tab("BotswanaPost");
+		Tab posoMoney = new Tab("PosoMoney");
 
 		TextField names = new TextField();
 		names.setValue("Will Mangwa");
@@ -128,15 +126,18 @@ public class NaviDrawer extends Div
 				.set("padding-top", "0")
 				.set("padding-bottom", "0");
 
-		ipelegeng.getStyle()
+		botswanaPost.getStyle()
 				.set("font-weight", "400");
 
-		tireloSechaba.getStyle()
+		posoMoney.getStyle()
 				.set("font-weight", "400");
 
 
-		tireloSechaba.setEnabled(false);
-		Tabs tabs = new Tabs(ipelegeng, tireloSechaba);
+		posoMoney.setEnabled(false);
+		Tabs tabs = new Tabs(botswanaPost, posoMoney);
+		tabs.addThemeVariants(
+				TabsVariant.LUMO_SMALL
+		);
 		tabs.getStyle()
 				.set("margin-bottom", "var(--lumo-space-l)");
 

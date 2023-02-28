@@ -5,14 +5,14 @@ public class AuthorizeModel {
     double amount, totalNet;
     Long remunerationHistoryId, participantId;
     String bonusAmount, deductionAmount, status, statusReason,
-            claimed, bonusReason, deductionReason, participant, identityNumber;
+            claimed, bonusReason, deductionReason, employee, identityNumber;
 
     public AuthorizeModel() {
 
     }
 
-    public AuthorizeModel(String participant) {
-        this.participant = participant;
+    public AuthorizeModel(String employee) {
+        this.employee = employee;
     }
 
     public AuthorizeModel(String bonusAmount, String deductionAmount, Long remunerationHistoryId,
@@ -32,7 +32,7 @@ public class AuthorizeModel {
 
     public AuthorizeModel(double amount, double totalNet, String bonusAmount, String deductionAmount,
                           Long remunerationHistoryId, Long participantId, String status, String statusReason,
-                          String claimed, String bonusReason, String deductionReason, String participant,
+                          String claimed, String bonusReason, String deductionReason, String employee,
                           String identityNumber) {
         this.amount = amount;
         this.totalNet = totalNet;
@@ -45,7 +45,7 @@ public class AuthorizeModel {
         this.claimed = claimed;
         this.bonusReason = bonusReason;
         this.deductionReason = deductionReason;
-        this.participant = participant;
+        this.employee = employee;
         this.identityNumber = identityNumber;
     }
 
@@ -137,12 +137,12 @@ public class AuthorizeModel {
         this.deductionReason = deductionReason;
     }
 
-    public String getParticipant() {
-        return participant;
+    public String getEmployee() {
+        return employee;
     }
 
-    public void setParticipant(String participant) {
-        this.participant = participant;
+    public void setEmployee(String employee) {
+        this.employee = employee;
     }
 
     public String getIdentityNumber() {
@@ -167,7 +167,7 @@ public class AuthorizeModel {
                 ", claimed='" + claimed + '\'' +
                 ", bonusReason='" + bonusReason + '\'' +
                 ", deductionReason='" + deductionReason + '\'' +
-                ", participant='" + participant + '\'' +
+                ", participant='" + employee + '\'' +
                 ", identityNumber='" + identityNumber + '\'' +
                 '}';
     }

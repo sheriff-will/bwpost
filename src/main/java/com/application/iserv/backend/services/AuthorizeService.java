@@ -5,8 +5,10 @@ import com.application.iserv.ui.payments.models.AuthorizeModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class AuthorizeService {
@@ -94,6 +96,9 @@ public class AuthorizeService {
                     netTotal = netTotal - Double.parseDouble(row[6].toString());
                 }
 
+                Locale locale = new Locale("en", "BW");
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
+
                 AuthorizeModel authorizeModel = new AuthorizeModel(
                         amount,
                         netTotal,
@@ -150,6 +155,9 @@ public class AuthorizeService {
             else if (Double.parseDouble(row[6].toString()) != 0) {
                 netTotal = netTotal - Double.parseDouble(row[6].toString());
             }
+
+            Locale locale = new Locale("en", "BW");
+            NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
 
             AuthorizeModel authorizeModel = new AuthorizeModel(
                     amount,

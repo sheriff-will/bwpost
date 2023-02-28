@@ -141,8 +141,8 @@ public class ReportsView extends Main {
     private Component createViewEvents() {
         // Header
         Select year = new Select();
-        year.setItems("2022");
-        year.setValue("2022");
+        year.setItems("2023");
+        year.setValue("2023");
         year.setWidth("100px");
 
         HorizontalLayout header = createHeader("Payments History", "Transactions");

@@ -3,7 +3,7 @@ package com.application.iserv.ui.participants.forms;
 import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.ui.parameters.models.ParametersModel;
 import com.application.iserv.ui.participants.models.NomineesModel;
-import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.participants.models.EmployeesModel;
 import com.application.iserv.ui.participants.models.ReferenceModel;
 import com.application.iserv.ui.utils.ApplicationUserDataModel;
 import com.application.iserv.ui.utils.Commons;
@@ -64,7 +64,8 @@ public class ParticipantsForm extends VerticalLayout {
     ComboBox<String> education = new ComboBox<>(EDUCATION);
     ComboBox<String> placementPlace = new ComboBox<>(PLACEMENT_PLACE);
     ComboBox<String> position = new ComboBox<>(POSITION_UPPER_CASE);
-    ComboBox<String> relationship = new ComboBox<>(RELATIONSHIP);
+    ComboBox<String> nomineeRelationship = new ComboBox<>(RELATIONSHIP);
+    ComboBox<String> referenceRelationship = new ComboBox<>(RELATIONSHIP);
     ComboBox<String> paymentMethod = new ComboBox<>(PAYMENT_METHOD);
     ComboBox<String> mobileWalletProvider = new ComboBox<>(PRIMARY_MOBILE);
 
@@ -133,7 +134,7 @@ public class ParticipantsForm extends VerticalLayout {
 
 
     // Binder
-    Binder<ParticipantsModel> agentsModelBinder = new Binder<>(ParticipantsModel.class);
+    Binder<EmployeesModel> agentsModelBinder = new Binder<>(EmployeesModel.class);
 
     // Layouts
     HorizontalLayout buttonsLayout;
@@ -147,7 +148,7 @@ public class ParticipantsForm extends VerticalLayout {
     Dialog referenceDialog = new Dialog();
 
     // Models
-    private ParticipantsModel participantsModel;
+    private EmployeesModel employeesModel;
 
     // Services
     private final ParticipantsServices participantsServices;
@@ -439,26 +440,26 @@ public class ParticipantsForm extends VerticalLayout {
 
     }
 
-    private void configureNullValues(ParticipantsModel participantsModel) {
+    private void configureNullValues(EmployeesModel employeesModel) {
         if (alternateMobileNumber != null
                 && alternateMobileNumber.getValue().equalsIgnoreCase("null")) {
             alternateMobileNumber.clear();
         }
 
-        if (participantsModel.getMobileWalletProvider() != null) {
-            if (!participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+        if (employeesModel.getMobileWalletProvider() != null) {
+            if (!employeesModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
                 paymentMethod.setValue(MOBILE_WALLET);
                 bankName.clear();
                 branch.clear();
                 accountNumber.clear();
 
             }
-            else if (!participantsModel.getBankName().equalsIgnoreCase("null")) {
+            else if (!employeesModel.getBankName().equalsIgnoreCase("null")) {
                 paymentMethod.setValue(BANK_EFT);
                 mobileWalletProvider.clear();
             }
-            else if (participantsModel.getBankName().equalsIgnoreCase("null")
-                    && participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+            else if (employeesModel.getBankName().equalsIgnoreCase("null")
+                    && employeesModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
                 paymentMethod.setValue(CASH);
                 bankName.clear();
                 branch.clear();
@@ -538,7 +539,7 @@ public class ParticipantsForm extends VerticalLayout {
                 nomineeFirstname,
                 nomineeLastname,
                 nomineeIdentityNumber,
-                relationship,
+                nomineeRelationship,
                 nomineeMobileNumber,
                 nomineePostalAddress
         );
@@ -597,12 +598,11 @@ public class ParticipantsForm extends VerticalLayout {
                 referenceFirstname,
                 referenceLastname,
                 referenceIdentityNumber,
+                referenceRelationship,
                 referenceMobileNumber,
                 referencePostalAddress
 
         );
-
-        addReferencesForm.setColspan(referenceIdentityNumber, 2);
 
         referenceDialog.getHeader().add(
                 new Button(new Icon("lumo", "cross"), (e) -> {
@@ -662,7 +662,7 @@ public class ParticipantsForm extends VerticalLayout {
 
         nomineesGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
-        referenceGrid.setColumns("reference", "identityNumber", "primaryMobile", "postalAddress");
+        referenceGrid.setColumns("reference", "identityNumber", "relationship", "primaryMobile", "postalAddress");
 
         referenceGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
@@ -750,8 +750,11 @@ public class ParticipantsForm extends VerticalLayout {
         position.setItemLabelGenerator(String::toString);
 
         // Relationships
-        relationship.setItems(getRelationships());
-        relationship.setItemLabelGenerator(String::toString);
+        nomineeRelationship.setItems(getRelationships());
+        nomineeRelationship.setItemLabelGenerator(String::toString);
+        referenceRelationship.setItems(getRelationships());
+        referenceRelationship.setItemLabelGenerator(String::toString);
+
 
         // Payment method
         paymentMethod.setItems(getPaymentMethods());
@@ -759,38 +762,38 @@ public class ParticipantsForm extends VerticalLayout {
 
     }
 
-    public void setAgent(ParticipantsModel participantsModel,
+    public void setAgent(EmployeesModel employeesModel,
                          String monthDate, List<ParametersModel> parametersModels) {
-        this.participantsModel = participantsModel;
+        this.employeesModel = employeesModel;
 
         parametersModelList = parametersModels;
 
         boolean addAlternateNumber = false;
-        if (participantsModel.getAlternateMobileNumber() != null
-                && !participantsModel.getAlternateMobileNumber().equalsIgnoreCase("null")) {
+        if (employeesModel.getAlternateMobileNumber() != null
+                && !employeesModel.getAlternateMobileNumber().equalsIgnoreCase("null")) {
             addAlternateNumber = true;
         }
 
         if (addAlternateNumber) {
             mobileWalletProvider.setItems(
-                    participantsModel.getMobileNumber(),
-                    participantsModel.getAlternateMobileNumber());
+                    employeesModel.getMobileNumber(),
+                    employeesModel.getAlternateMobileNumber());
         }
         else {
-            if (participantsModel.getMobileNumber() != null) {
-                mobileWalletProvider.setItems(participantsModel.getMobileNumber());
+            if (employeesModel.getMobileNumber() != null) {
+                mobileWalletProvider.setItems(employeesModel.getMobileNumber());
             }
         }
 
-        if (participantsModel.getFirstname() == null) {
+        if (employeesModel.getFirstname() == null) {
             mobileWalletProvider.setItems();
         }
 
-        agentsModelBinder.readBean(participantsModel);
+        agentsModelBinder.readBean(employeesModel);
 
-        if (participantsModel.getPlacementDate() != null && participantsModel.getCompletionDate() != null) {
+        if (employeesModel.getPlacementDate() != null && employeesModel.getCompletionDate() != null) {
             long monthsDifference = ChronoUnit.MONTHS.between(
-                    participantsModel.getPlacementDate(), participantsModel.getCompletionDate());
+                    employeesModel.getPlacementDate(), employeesModel.getCompletionDate());
 
             duration.setValue(Math.abs(-monthsDifference)+" Months");
         }
@@ -798,9 +801,9 @@ public class ParticipantsForm extends VerticalLayout {
             duration.clear();
         }
 
-        configureNullValues(participantsModel);
+        configureNullValues(employeesModel);
 
-        participantId = participantsModel.getParticipantId();
+        participantId = employeesModel.getParticipantId();
 
         configureNominees();
         configureReferences();
@@ -1039,7 +1042,7 @@ public class ParticipantsForm extends VerticalLayout {
         nomineeFirstname.setValue(nomineesModel.getFirstname());
         nomineeLastname.setValue(nomineesModel.getLastname());
         nomineeIdentityNumber.setValue(nomineesModel.getIdentityNumber());
-        relationship.setValue(nomineesModel.getRelationship());
+        nomineeRelationship.setValue(nomineesModel.getRelationship());
         nomineeMobileNumber.setValue(nomineesModel.getPrimaryMobile());
         nomineePostalAddress.setValue(nomineesModel.getPostalAddress());
     }
@@ -1048,6 +1051,7 @@ public class ParticipantsForm extends VerticalLayout {
         referenceFirstname.setValue(referenceModel.getFirstname());
         referenceLastname.setValue(referenceModel.getLastname());
         referenceIdentityNumber.setValue(referenceModel.getIdentityNumber());
+        referenceRelationship.setValue(referenceModel.getRelationship());
         referenceMobileNumber.setValue(referenceModel.getPrimaryMobile());
         referencePostalAddress.setValue(referenceModel.getPostalAddress());
     }
@@ -1090,6 +1094,7 @@ public class ParticipantsForm extends VerticalLayout {
                                 allReferencesList.get(i).getFirstname(),
                                 allReferencesList.get(i).getLastname(),
                                 allReferencesList.get(i).getIdentityNumber(),
+                                allReferencesList.get(i).getRelationship(),
                                 allReferencesList.get(i).getPrimaryMobile(),
                                 allReferencesList.get(i).getPostalAddress(),
                                 allReferencesList.get(i).getFirstname()
@@ -1472,7 +1477,7 @@ public class ParticipantsForm extends VerticalLayout {
     }
 
     private void configureTabs() {
-        tabs = new Tabs(identification, educationTab, service, banking, nominees, references);
+        tabs = new Tabs(identification, educationTab, service, banking);
         tabs.addThemeVariants(TabsVariant.LUMO_SMALL);
         tabs.setWidthFull();
 
@@ -1490,6 +1495,7 @@ public class ParticipantsForm extends VerticalLayout {
             referenceFirstname.clear();
             referenceLastname.clear();
             referenceIdentityNumber.clear();
+            referenceRelationship.clear();
             referenceMobileNumber.clear();
             referencePostalAddress.clear();
 
@@ -1511,11 +1517,11 @@ public class ParticipantsForm extends VerticalLayout {
             nomineeFirstname.clear();
             nomineeLastname.clear();
             nomineeIdentityNumber.clear();
-            relationship.clear();
+            nomineeRelationship.clear();
             nomineeMobileNumber.clear();
             nomineePostalAddress.clear();
 
-            relationship.setItems(getRelationships());
+            nomineeRelationship.setItems(getRelationships());
 
             isUpdateNominee = false;
 
@@ -1533,7 +1539,7 @@ public class ParticipantsForm extends VerticalLayout {
             if (daysWorked.getValue() != null && !daysWorked.isInvalid()) {
                 participantsServices.updateAttendance(
                         daysWorked.getValue(),
-                        participantsModel.getParticipantId(),
+                        employeesModel.getParticipantId(),
                         date
                 );
 
@@ -1573,7 +1579,7 @@ public class ParticipantsForm extends VerticalLayout {
                     contractDates.add(LocalDate.now().plusMonths(i).format(dateFormatter));
                 }
 
-                participantsServices.reinstateParticipant(participantId, contractDates, participantsModel);
+                participantsServices.reinstateParticipant(participantId, contractDates, employeesModel);
 
                 Notification notification = new Notification("Reinstated");
                 notification.setPosition(Notification.Position.BOTTOM_CENTER);
@@ -1616,8 +1622,8 @@ public class ParticipantsForm extends VerticalLayout {
 
     private void configureNomineesForm() {
 
-        if (relationship.getValue() != null) {
-            relationship.setInvalid(false);
+        if (nomineeRelationship.getValue() != null) {
+            nomineeRelationship.setInvalid(false);
         }
 
         if (nomineeFirstname.getValue().isEmpty()) {
@@ -1651,8 +1657,8 @@ public class ParticipantsForm extends VerticalLayout {
 
             saveNominee.setEnabled(true);
         }
-        else if (relationship.getValue() == null) {
-            relationship.setInvalid(true);
+        else if (nomineeRelationship.getValue() == null) {
+            nomineeRelationship.setInvalid(true);
             Notification notification = new Notification("Enter relationship");
             notification.setPosition(Notification.Position.BOTTOM_CENTER);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -1690,7 +1696,7 @@ public class ParticipantsForm extends VerticalLayout {
                         nomineeFirstname.getValue(),
                         nomineeLastname.getValue(),
                         nomineeIdentityNumber.getValue(),
-                        relationship.getValue(),
+                        nomineeRelationship.getValue(),
                         nomineeMobileNumber.getValue(),
                         nomineePostalAddress.getValue()
                 ));
@@ -1722,7 +1728,7 @@ public class ParticipantsForm extends VerticalLayout {
                         nomineeFirstname.getValue(),
                         nomineeLastname.getValue(),
                         nomineeIdentityNumber.getValue(),
-                        relationship.getValue(),
+                        nomineeRelationship.getValue(),
                         nomineeMobileNumber.getValue(),
                         nomineePostalAddress.getValue()
                 ));
@@ -1788,6 +1794,16 @@ public class ParticipantsForm extends VerticalLayout {
 
             saveReference.setEnabled(true);
         }
+        else if (referenceRelationship.getValue() == null) {
+            referenceRelationship.setInvalid(true);
+            Notification notification = new Notification("Enter relationship");
+            notification.setPosition(Notification.Position.BOTTOM_CENTER);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            notification.setDuration(5000);
+            notification.open();
+
+            saveReference.setEnabled(true);
+        }
         else if (referenceMobileNumber.getValue().isEmpty()) {
             referenceMobileNumber.setInvalid(true);
             Notification notification = new Notification("Enter mobile number");
@@ -1817,6 +1833,7 @@ public class ParticipantsForm extends VerticalLayout {
                         referenceFirstname.getValue(),
                         referenceLastname.getValue(),
                         referenceIdentityNumber.getValue(),
+                        referenceRelationship.getValue(),
                         referenceMobileNumber.getValue(),
                         referencePostalAddress.getValue()
                 ));
@@ -1848,6 +1865,7 @@ public class ParticipantsForm extends VerticalLayout {
                         referenceFirstname.getValue(),
                         referenceLastname.getValue(),
                         referenceIdentityNumber.getValue(),
+                        referenceRelationship.getValue(),
                         referenceMobileNumber.getValue(),
                         referencePostalAddress.getValue()
                 ));
@@ -1955,7 +1973,7 @@ public class ParticipantsForm extends VerticalLayout {
         }
 
 
-        String response = participantsServices.addAgent(new ParticipantsModel(
+        String response = participantsServices.addAgent(new EmployeesModel(
                 LocalDateTime.now(),
                 dateOfBirthLocalDate,
                 placementDateLocalDate,
@@ -2075,7 +2093,7 @@ public class ParticipantsForm extends VerticalLayout {
         }
 
 
-        String response = participantsServices.updateAgent(new ParticipantsModel(
+        String response = participantsServices.updateAgent(new EmployeesModel(
                 participantId,
                 LocalDateTime.now(),
                 dateOfBirthLocalDate,
@@ -2135,6 +2153,12 @@ public class ParticipantsForm extends VerticalLayout {
             alternateMobileNumber.setVisible(false);
             mobileNumber.setVisible(false);
             addAgentButtonsLayout.setVisible(false);
+
+            paymentMethod.setVisible(false);
+            mobileWalletProvider.setVisible(false);
+            bankName.setVisible(false);
+            branch.setVisible(false);
+            accountNumber.setVisible(false);
         }
         else {
             daysWorked.setVisible(false);
@@ -2159,15 +2183,15 @@ public class ParticipantsForm extends VerticalLayout {
     // Events
     public static abstract class AddAgentFormEvent extends ComponentEvent<ParticipantsForm> {
 
-        private ParticipantsModel participantsModel;
+        private EmployeesModel employeesModel;
 
-        protected AddAgentFormEvent(ParticipantsForm source, ParticipantsModel participantsModel) {
+        protected AddAgentFormEvent(ParticipantsForm source, EmployeesModel employeesModel) {
             super(source, false);
-            this.participantsModel = participantsModel;
+            this.employeesModel = employeesModel;
         }
 
-        public ParticipantsModel getAgents() {
-            return participantsModel;
+        public EmployeesModel getAgents() {
+            return employeesModel;
         }
 
     }

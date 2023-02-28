@@ -1,6 +1,6 @@
 package Repositories;
 
-import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.participants.models.EmployeesModel;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ public class TestRepository {
     EntityManager entityManager;
 
     @Modifying
-    public void addNewAgent(ParticipantsModel participantsModel, List<String> contractDates) {
+    public void addNewAgent(EmployeesModel employeesModel, List<String> contractDates) {
         try {
 
             // Insert to participants
@@ -27,17 +27,17 @@ public class TestRepository {
                     "postal_address, residential_address, education, placement_officer, placement_place, " +
                     "placement_date, completion_date, mobile_wallet_provider, bank_name, branch, " +
                     "account_number, timestamp, is_terminated, parameter_id) VALUES(" +
-                    "'" + participantsModel.getFirstname() + "','" + participantsModel.getLastname() + "'," +
-                    "'" + participantsModel.getIdentityNumber() + "','" + participantsModel.getDateOfBirth() + "'," +
-                    "'" + participantsModel.getGender() + "','" + participantsModel.getMaritalStatus() + "'," +
-                    "'" + participantsModel.getMobileNumber() + "','" + participantsModel.getAlternateMobileNumber() + "'," +
-                    "'" + participantsModel.getPostalAddress() + "','" + participantsModel.getResidentialAddress() + "'," +
-                    "'" + participantsModel.getEducation() + "','" + participantsModel.getPlacementOfficer() + "'," +
-                    "'" + participantsModel.getPlacementPlace() + "'," +
-                    "'" + participantsModel.getPlacementDate() + "','" + participantsModel.getCompletionDate() + "'," +
-                    "'" + participantsModel.getMobileWalletProvider() + "','" + participantsModel.getBankName() + "'," +
-                    "'" + participantsModel.getBranch() + "','" + participantsModel.getAccountNumber() + "'," +
-                    "'" + participantsModel.getTimestamp() + "','0', '1')";
+                    "'" + employeesModel.getFirstname() + "','" + employeesModel.getLastname() + "'," +
+                    "'" + employeesModel.getIdentityNumber() + "','" + employeesModel.getDateOfBirth() + "'," +
+                    "'" + employeesModel.getGender() + "','" + employeesModel.getMaritalStatus() + "'," +
+                    "'" + employeesModel.getMobileNumber() + "','" + employeesModel.getAlternateMobileNumber() + "'," +
+                    "'" + employeesModel.getPostalAddress() + "','" + employeesModel.getResidentialAddress() + "'," +
+                    "'" + employeesModel.getEducation() + "','" + employeesModel.getPlacementOfficer() + "'," +
+                    "'" + employeesModel.getPlacementPlace() + "'," +
+                    "'" + employeesModel.getPlacementDate() + "','" + employeesModel.getCompletionDate() + "'," +
+                    "'" + employeesModel.getMobileWalletProvider() + "','" + employeesModel.getBankName() + "'," +
+                    "'" + employeesModel.getBranch() + "','" + employeesModel.getAccountNumber() + "'," +
+                    "'" + employeesModel.getTimestamp() + "','0', '1')";
 
             Query insertAgentQuery = entityManager.createNativeQuery(insertAgentSQL);
             insertAgentQuery.executeUpdate();
@@ -45,7 +45,7 @@ public class TestRepository {
             // Select participantId
             String sql = "SELECT participants.participant_id " +
                     "FROM participants " +
-                    "WHERE participants.identity_number = '"+ participantsModel.getIdentityNumber()+"'";
+                    "WHERE participants.identity_number = '"+ employeesModel.getIdentityNumber()+"'";
 
             Query query = entityManager.createNativeQuery(sql);
 

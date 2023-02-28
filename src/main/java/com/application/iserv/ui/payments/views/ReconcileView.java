@@ -140,11 +140,13 @@ public class ReconcileView extends VerticalLayout {
                 String claimedValue = reconcileModelList[0].get(i).getClaimed();
 
                 if (claimedValue.contains("y") || claimedValue.contains("Y")) {
-                    claimed.add(reconcileModelList[0].get(i).getClaimed());
+                    claimed.add("Yes");
                 }
                 else if (claimedValue.contains("n") || claimedValue.contains("N")) {
-                    unClaimed.add(reconcileModelList[0].get(i).getClaimed());
+                    unClaimed.add("No");
                 }
+
+                Notification.show(claimedValue);
             }
 
             double claimedPercentage = (double) claimed.size()

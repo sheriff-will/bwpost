@@ -1,6 +1,5 @@
 package com.application.iserv.ui.payments.views;
 
-
 import com.application.iserv.backend.services.HistoryService;
 import com.application.iserv.tests.MainLayout;
 import com.application.iserv.ui.payments.forms.HistoryForm;
@@ -127,7 +126,7 @@ import static com.application.iserv.ui.utils.Constants.*;
         placementPlaceFilter.setItems(getPlaces());
         placementPlaceFilter.setItemLabelGenerator(String::toString);
 
-        searchAgent.setPlaceholder(SEARCH_AGENT_HINT);
+        searchAgent.setPlaceholder(SEARCH_EMPLOYEE_HINT);
         searchAgent.setClearButtonVisible(true);
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
         searchAgent.addClassName(SEARCH_AGENT);
@@ -241,7 +240,7 @@ import static com.application.iserv.ui.utils.Constants.*;
         historyGrid.setSizeFull();
 
         if (isDateSelected) {
-            historyGrid.setColumns(PARTICIPANT, AMOUNT);
+            historyGrid.setColumns(EMPLOYEE, AMOUNT);
 
             historyGrid.addComponentColumn(
                     claimed -> createBadge(claimed.getClaimed())).setHeader(CLAIMED);
@@ -249,7 +248,7 @@ import static com.application.iserv.ui.utils.Constants.*;
             historyGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
         } else {
-            historyGrid.setColumns(PARTICIPANT);
+            historyGrid.setColumns(EMPLOYEE);
 
             historyGrid.addComponentColumn(
                     claimed -> createBadge("-")).setHeader(CAPS_AMOUNT);

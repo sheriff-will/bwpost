@@ -31,7 +31,7 @@ public class ApplicationSecurityConfig extends VaadinWebSecurityConfigurerAdapte
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         setLoginView(http, LoginView.class);
-        http.formLogin().defaultSuccessUrl("/participants", true);
+        http.formLogin().defaultSuccessUrl("/employees", true);
     }
 
     @Override

@@ -26,21 +26,21 @@
 		<band height="206" splitType="Stretch">
 			<image>
 				<reportElement x="236" y="0" width="83" height="80" uuid="ddc15723-2728-421f-b95e-2df9faf64ce1"/>
-				<imageExpression><![CDATA["/home/sheriff-will/IdeaProjects/iserv/src/main/resources/META-INF/resources/images/logo.png"]]></imageExpression>
+				<imageExpression><![CDATA["/home/sheriff/IdeaProjects/bwpost/src/main/resources/META-INF/resources/images/logo.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement style="Title" x="146" y="70" width="263" height="62" uuid="1a652692-054a-40f3-ade5-68d8da36626d"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="45"/>
+					<font size="25"/>
 				</textElement>
-				<text><![CDATA[iServ]]></text>
+				<text><![CDATA[BotswanaPost]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="SubTitle" x="179" y="132" width="196" height="22" uuid="88d4231e-f014-4b0d-b871-1737ba63a1ae"/>
-				<textElement textAlignment="Center">
-					<font size="1" isBold="true"/>
+				<reportElement style="SubTitle" x="179" y="132" width="280" height="22" uuid="88d4231e-f014-4b0d-b871-1737ba63a1ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="0" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Statement]]></text>
+				<text><![CDATA[We deliver, whatever wherever]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="0" y="170" width="277" height="20" uuid="f0bfb1ea-a85a-47cd-a1a4-43f22b45e80f"/>

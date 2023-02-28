@@ -3,7 +3,7 @@ package com.application.iserv.ui.participants.models;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class ParticipantsModel {
+public class EmployeesModel {
 
     Integer daysWorked;
     Long participantId;
@@ -12,19 +12,19 @@ public class ParticipantsModel {
     String firstname, lastname, identityNumber, gender, maritalStatus, mobileNumber,
             alternateMobileNumber, postalAddress, residentialAddress, education, placementOfficer,
             placementPlace, position, mobileWalletProvider, bankName,
-            branch, accountNumber, district, village, service, duration, participant;
+            branch, accountNumber, district, village, service, duration, employee;
 
-    public ParticipantsModel() {
+    public EmployeesModel() {
 
     }
 
-    public ParticipantsModel(LocalDateTime timestamp, LocalDate dateOfBirth, LocalDate placementDate,
-                             LocalDate completionDate, String firstname, String lastname,
-                             String identityNumber, String gender, String maritalStatus, String mobileNumber,
-                             String alternateMobileNumber, String postalAddress, String residentialAddress,
-                             String education, String placementOfficer, String placementPlace, String position,
-                             String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                             String district, String village, String service, String duration) {
+    public EmployeesModel(LocalDateTime timestamp, LocalDate dateOfBirth, LocalDate placementDate,
+                          LocalDate completionDate, String firstname, String lastname,
+                          String identityNumber, String gender, String maritalStatus, String mobileNumber,
+                          String alternateMobileNumber, String postalAddress, String residentialAddress,
+                          String education, String placementOfficer, String placementPlace, String position,
+                          String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                          String district, String village, String service, String duration) {
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
         this.placementDate = placementDate;
@@ -52,13 +52,13 @@ public class ParticipantsModel {
         this.duration = duration;
     }
 
-    public ParticipantsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
-                             LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
-                             String identityNumber, String gender, String maritalStatus, String mobileNumber,
-                             String alternateMobileNumber, String postalAddress, String residentialAddress,
-                             String education, String placementOfficer, String placementPlace, String position,
-                             String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                             String district, String village, String service, String duration) {
+    public EmployeesModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
+                          LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
+                          String identityNumber, String gender, String maritalStatus, String mobileNumber,
+                          String alternateMobileNumber, String postalAddress, String residentialAddress,
+                          String education, String placementOfficer, String placementPlace, String position,
+                          String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                          String district, String village, String service, String duration) {
         this.participantId = participantId;
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
@@ -87,13 +87,13 @@ public class ParticipantsModel {
         this.duration = duration;
     }
 
-    public ParticipantsModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
-                             LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
-                             String identityNumber, String gender, String maritalStatus, String mobileNumber,
-                             String alternateMobileNumber, String postalAddress, String residentialAddress,
-                             String education, String placementOfficer, String placementPlace, String position,
-                             String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                             String district, String village, String service, String duration, String participant) {
+    public EmployeesModel(Long participantId, LocalDateTime timestamp, LocalDate dateOfBirth,
+                          LocalDate placementDate, LocalDate completionDate, String firstname, String lastname,
+                          String identityNumber, String gender, String maritalStatus, String mobileNumber,
+                          String alternateMobileNumber, String postalAddress, String residentialAddress,
+                          String education, String placementOfficer, String placementPlace, String position,
+                          String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                          String district, String village, String service, String duration, String employee) {
         this.participantId = participantId;
         this.timestamp = timestamp;
         this.dateOfBirth = dateOfBirth;
@@ -120,17 +120,17 @@ public class ParticipantsModel {
         this.village = village;
         this.service = service;
         this.duration = duration;
-        this.participant = participant;
+        this.employee = employee;
     }
 
-    public ParticipantsModel(Integer daysWorked, Long participantId, LocalDateTime timestamp,
-                             LocalDate dateOfBirth, LocalDate placementDate, LocalDate completionDate,
-                             String firstname, String lastname, String identityNumber, String gender,
-                             String maritalStatus, String mobileNumber, String alternateMobileNumber,
-                             String postalAddress, String residentialAddress, String education,
-                             String placementOfficer, String placementPlace, String position,
-                             String mobileWalletProvider, String bankName, String branch, String accountNumber,
-                             String district, String village, String service, String duration, String participant) {
+    public EmployeesModel(Integer daysWorked, Long participantId, LocalDateTime timestamp,
+                          LocalDate dateOfBirth, LocalDate placementDate, LocalDate completionDate,
+                          String firstname, String lastname, String identityNumber, String gender,
+                          String maritalStatus, String mobileNumber, String alternateMobileNumber,
+                          String postalAddress, String residentialAddress, String education,
+                          String placementOfficer, String placementPlace, String position,
+                          String mobileWalletProvider, String bankName, String branch, String accountNumber,
+                          String district, String village, String service, String duration, String employee) {
         this.daysWorked = daysWorked;
         this.participantId = participantId;
         this.timestamp = timestamp;
@@ -158,7 +158,7 @@ public class ParticipantsModel {
         this.village = village;
         this.service = service;
         this.duration = duration;
-        this.participant = participant;
+        this.employee = employee;
     }
 
     public Integer getDaysWorked() {
@@ -377,12 +377,12 @@ public class ParticipantsModel {
         this.duration = duration;
     }
 
-    public String getParticipant() {
-        return participant;
+    public String getEmployee() {
+        return employee;
     }
 
-    public void setParticipant(String participant) {
-        this.participant = participant;
+    public void setEmployee(String employee) {
+        this.employee = employee;
     }
 
     @Override
@@ -415,7 +415,7 @@ public class ParticipantsModel {
                 ", village='" + village + '\'' +
                 ", service='" + service + '\'' +
                 ", duration='" + duration + '\'' +
-                ", participant='" + participant + '\'' +
+                ", participant='" + employee + '\'' +
                 '}';
     }
 

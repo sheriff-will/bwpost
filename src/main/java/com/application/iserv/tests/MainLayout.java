@@ -132,7 +132,7 @@ public class MainLayout extends FlexBoxLayout
 	 */
 	private void initNaviItems() {
 		NaviMenu menu = naviDrawer.getMenu();
-		menu.addNaviItem(VaadinIcon.USERS, PARTICIPANTS, ParticipantsView.class);
+		menu.addNaviItem(VaadinIcon.USERS, EMPLOYEES, ParticipantsView.class);
 
 		NaviItem payments = menu.addNaviItem(VaadinIcon.CREDIT_CARD, PAYMENTS, null);
 		menu.addNaviItem(payments, AUTHORIZE, AuthorizeView.class);
@@ -290,7 +290,7 @@ public class MainLayout extends FlexBoxLayout
 			String title = active.getText();
 			getAppBar().setTitle(active.getText());
 
-			if (title.contains(PARTICIPANTS)) {
+			if (title.contains(EMPLOYEES)) {
 				getAppBar().showTabs(false);
 			}
 			else if (title.contains(AUTHORIZE)) {

@@ -3,14 +3,12 @@ package com.application.iserv.ui.participants.views;
 import com.application.iserv.backend.services.ParametersService;
 import com.application.iserv.backend.services.ParticipantsServices;
 import com.application.iserv.tests.MainLayout;
-import com.application.iserv.tests.StringModel;
 import com.application.iserv.tests.components.navigation.drawer.NaviDrawer;
 import com.application.iserv.ui.parameters.models.ParametersModel;
 import com.application.iserv.ui.participants.forms.ParticipantsForm;
-import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.participants.models.EmployeesModel;
 import com.application.iserv.ui.utils.ApplicationUserDataModel;
 import com.application.iserv.ui.utils.SessionManager;
-import com.google.common.eventbus.Subscribe;
 import com.opencsv.CSVWriter;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
@@ -57,12 +55,12 @@ import java.util.List;
 import static com.application.iserv.ui.utils.Constants.*;
 
 @PermitAll
-@PageTitle("iServ | Participants")
-@Route(value = PARTICIPANTS_LOWER_CASE, layout = MainLayout.class)
+@PageTitle("BotswanaPost | Employees")
+@Route(value = EMPLOYEES_LOWER_CASE, layout = MainLayout.class)
 public class ParticipantsView extends VerticalLayout {
 
     // Grid
-    Grid<ParticipantsModel> agentsGrid = new Grid<>(ParticipantsModel.class);
+    Grid<EmployeesModel> agentsGrid = new Grid<>(EmployeesModel.class);
 
     // booleans
     boolean isCsvUploaded = false;
@@ -109,7 +107,7 @@ public class ParticipantsView extends VerticalLayout {
 
     // ArrayList
     List<ParametersModel> parametersModelList = new ArrayList<>();
-    List<ParticipantsModel> participantsModelList = new ArrayList<>();
+    List<EmployeesModel> employeesModelList = new ArrayList<>();
 
     // Strings
     String date = "";
@@ -301,7 +299,7 @@ public class ParticipantsView extends VerticalLayout {
     private Component getToolbar() {
 
         // Search Agent
-        searchAgent.setPlaceholder(SEARCH_AGENT_HINT);
+        searchAgent.setPlaceholder(SEARCH_EMPLOYEE_HINT);
         searchAgent.setClearButtonVisible(true);
         searchAgent.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchAgent.setValueChangeMode(ValueChangeMode.LAZY);
@@ -310,12 +308,12 @@ public class ParticipantsView extends VerticalLayout {
             if (status.getValue() != null) {
                 if (status.getValue().equalsIgnoreCase(ACTIVE)) {
                     statusValue = 0L;
-                    participantsModelList = new ArrayList<>();
+                    employeesModelList = new ArrayList<>();
 
                     if (isAttendanceOpen && datePicker.getValue() != null) {
                         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT);
 
-                        participantsModelList = participantsServices.searchAttendance(
+                        employeesModelList = participantsServices.searchAttendance(
                                 datePicker.getValue().format(dateTimeFormatter),
                                 searchAgent.getValue(),
                                 statusValue
@@ -323,7 +321,7 @@ public class ParticipantsView extends VerticalLayout {
 
                     }
                     else {
-                        participantsModelList = participantsServices
+                        employeesModelList = participantsServices
                                 .searchAgents(
                                         searchAgent.getValue(),
                                         statusValue,
@@ -331,30 +329,30 @@ public class ParticipantsView extends VerticalLayout {
                                 );
                     }
 
-                    agentsGrid.setItems(participantsModelList);
+                    agentsGrid.setItems(employeesModelList);
 
                 }
                 else if (status.getValue().equalsIgnoreCase(EXPIRED)) {
                     statusValue = 0L;
-                    participantsModelList = new ArrayList<>();
-                    participantsModelList = participantsServices.
+                    employeesModelList = new ArrayList<>();
+                    employeesModelList = participantsServices.
                             searchAgents(
                                     searchAgent.getValue(),
                                     statusValue,
                                     true
                             );
-                    agentsGrid.setItems(participantsModelList);
+                    agentsGrid.setItems(employeesModelList);
                 }
                 else if (status.getValue().equalsIgnoreCase(TERMINATED)) {
                     statusValue = 1L;
-                    participantsModelList = new ArrayList<>();
-                    participantsModelList = participantsServices.
+                    employeesModelList = new ArrayList<>();
+                    employeesModelList = participantsServices.
                             searchAgents(
                                     searchAgent.getValue(),
                                     statusValue,
                                     false
                             );
-                    agentsGrid.setItems(participantsModelList);
+                    agentsGrid.setItems(employeesModelList);
                 }
             }
         });
@@ -418,16 +416,16 @@ public class ParticipantsView extends VerticalLayout {
         MenuItem addParticipant = createIconItem(
                 menuBar,
                 VaadinIcon.FILE_ADD,
-                "Add Participant",
+                "Add Employee",
                 null);
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm  dd MMMM yyyy");
 
         StreamResource resource = new StreamResource(
-                "Participants "+LocalDateTime.now().format(dateFormatter)+".csv",
+                "Employees "+LocalDateTime.now().format(dateFormatter)+".csv",
                 () -> new ByteArrayInputStream(getParticipantsFile()));
 
-        Anchor link = new Anchor(resource, "Export Participants");
+        Anchor link = new Anchor(resource, "Export Employees");
 
         SubMenu addParticipantSubMenu = addParticipant.getSubMenu();
         addParticipantSubMenu.addItem("Add Manually").addClickListener(click -> {
@@ -689,12 +687,12 @@ public class ParticipantsView extends VerticalLayout {
             List<String[]> data = new ArrayList<>();
             data.add(new String[]{"Name", "Gender", "Mobile Number", "Education"});
 
-            for (int i = 0; i < participantsModelList.size(); i++) {
+            for (int i = 0; i < employeesModelList.size(); i++) {
                 data.add(new String[] {
-                        participantsModelList.get(i).getParticipant(),
-                        participantsModelList.get(i).getGender(),
-                        participantsModelList.get(i).getMobileNumber(),
-                        participantsModelList.get(i).getEducation()
+                        employeesModelList.get(i).getEmployee(),
+                        employeesModelList.get(i).getGender(),
+                        employeesModelList.get(i).getMobileNumber(),
+                        employeesModelList.get(i).getEducation()
                 });
             }
 
@@ -797,10 +795,10 @@ public class ParticipantsView extends VerticalLayout {
         agentsGrid.addClassName(AGENTS_GRID);
 
         if (columns.equalsIgnoreCase(AGENT_POSITION)) {
-            agentsGrid.setColumns(PARTICIPANT, POSITION);
+            agentsGrid.setColumns(EMPLOYEE, POSITION);
         }
         else if (columns.equalsIgnoreCase(AGENT_ATTENDANCE)) {
-            agentsGrid.setColumns(PARTICIPANT, DAYS_WORKED_CAMEL_CASE);
+            agentsGrid.setColumns(EMPLOYEE, DAYS_WORKED_CAMEL_CASE);
         }
 
         agentsGrid.getColumns().forEach(column -> column.setAutoWidth(true));
@@ -808,8 +806,8 @@ public class ParticipantsView extends VerticalLayout {
     }
 
     private void updateAgents() {
-        participantsModelList = participantsServices.getAllAgents();
-        agentsGrid.setItems(participantsModelList);
+        employeesModelList = participantsServices.getAllAgents();
+        agentsGrid.setItems(employeesModelList);
 
     }
 
@@ -822,24 +820,24 @@ public class ParticipantsView extends VerticalLayout {
 
     }
 
-    private void editAgent(ParticipantsModel participantsModel) {
+    private void editAgent(EmployeesModel employeesModel) {
         addClassNames(
                 EDITING_AGENTS,
                 PARTICIPANT_OPEN
         );
 
-        if (participantsModel == null) {
+        if (employeesModel == null) {
             closeComponents();
         }
         else {
             if (isAttendanceOpen) {
-                participantsForm.setAgent(participantsModel, date, parametersModelList);
+                participantsForm.setAgent(employeesModel, date, parametersModelList);
                 participantsForm.changeLayout(true);
                 participantsForm.setVisible(true);
             }
             else {
                 participantsForm.setButtonText(false);
-                participantsForm.setAgent(participantsModel, date, parametersModelList);
+                participantsForm.setAgent(employeesModel, date, parametersModelList);
                 participantsForm.setVisible(true);
             }
         }
@@ -847,7 +845,7 @@ public class ParticipantsView extends VerticalLayout {
 
     private void openAddAgentForm() {
         agentsGrid.asSingleSelect().clear();
-        editAgent(new ParticipantsModel());
+        editAgent(new EmployeesModel());
         participantsForm.setButtonText(true);
     }
 
@@ -883,7 +881,7 @@ public class ParticipantsView extends VerticalLayout {
 
         upload.setMaxFiles(1);
 
-        final List<ParticipantsModel>[] participantsModelList = new List[]{new ArrayList<>()};
+        final List<EmployeesModel>[] participantsModelList = new List[]{new ArrayList<>()};
 
         upload.addSucceededListener(event -> {
             isCsvUploaded = true;
@@ -919,7 +917,7 @@ public class ParticipantsView extends VerticalLayout {
                         String[] fields = line.split(",");
                         if (fields.length != 20) {
 
-                            Notification notification = new Notification("Invalid csv");
+                            Notification notification = new Notification("Invalid csv format");
                             notification.setPosition(Notification.Position.BOTTOM_CENTER);
                             notification.addThemeVariants(
                                     NotificationVariant.LUMO_PRIMARY,
@@ -961,7 +959,7 @@ public class ParticipantsView extends VerticalLayout {
                                 contractDates.add(LocalDate.now().plusMonths(k).format(dateFormatter));
                             }
 
-                            ParticipantsModel participantsModel = new ParticipantsModel(
+                            EmployeesModel employeesModel = new EmployeesModel(
                                     LocalDateTime.now(),
                                     dateOfBirth,
                                     placementDate,
@@ -989,9 +987,9 @@ public class ParticipantsView extends VerticalLayout {
                                     String.valueOf(monthsDifference)
                             );
 
-                            participantsModelList[0].add(participantsModel);
+                            participantsModelList[0].add(employeesModel);
 
-                            String response = participantsServices.addAgent(participantsModel, contractDates);
+                            String response = participantsServices.addAgent(employeesModel, contractDates);
                             System.err.println("response: "+response);
                         }
 
@@ -1064,8 +1062,8 @@ public class ParticipantsView extends VerticalLayout {
 
                         agentsGrid.setItems(participantsServices.getAllTerminatedAgents());
 
-                        participantsModelList = participantsServices.getAllTerminatedAgents();
-                        agentsGrid.setItems(participantsModelList);
+                        employeesModelList = participantsServices.getAllTerminatedAgents();
+                        agentsGrid.setItems(employeesModelList);
                         searchAgent.clear();
 
                         System.err.println(participantsServices.getAllTerminatedAgents());

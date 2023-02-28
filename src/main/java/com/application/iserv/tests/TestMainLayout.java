@@ -257,7 +257,7 @@ public class TestMainLayout extends AppLayout implements AfterNavigationObserver
     }
 
     private void initHeader() {
-        mainContent.add(new BrandExpression("iServ"));
+        mainContent.add(new BrandExpression("BotswanaPost"));
     }
 
     private void initSearch() {
@@ -270,11 +270,11 @@ public class TestMainLayout extends AppLayout implements AfterNavigationObserver
 		search.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
 */
 
-        Tab ipelegeng = new Tab(IPELEGENG);
-        Tab tireloSechaba = new Tab(TIRELO_SECHABA);
+        Tab botswanaPost = new Tab("BotswanaPost");
+        Tab posoMoney = new Tab("PosoMoney");
 
-        tireloSechaba.setEnabled(false);
-        Tabs services = new Tabs(ipelegeng, tireloSechaba);
+        posoMoney.setEnabled(false);
+        Tabs services = new Tabs(botswanaPost, posoMoney);
 
         mainContent.add(services);
     }

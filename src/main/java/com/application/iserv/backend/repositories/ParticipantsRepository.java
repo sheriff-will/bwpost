@@ -1,7 +1,7 @@
 package com.application.iserv.backend.repositories;
 
 import com.application.iserv.ui.participants.models.NomineesModel;
-import com.application.iserv.ui.participants.models.ParticipantsModel;
+import com.application.iserv.ui.participants.models.EmployeesModel;
 import com.application.iserv.ui.participants.models.ReferenceModel;
 import com.application.iserv.ui.utils.ApplicationUserDataModel;
 import com.application.iserv.ui.utils.Commons;
@@ -80,42 +80,42 @@ public class ParticipantsRepository {
     }
 
     @Modifying
-    public void updateAgentDetails(ParticipantsModel participantsModel) {
+    public void updateAgentDetails(EmployeesModel employeesModel) {
         try {
 
-            List<BigInteger> parameterId = getParameterId(participantsModel.getPosition());
+            List<BigInteger> parameterId = getParameterId(employeesModel.getPosition());
 
             String updateAgentSQL = "UPDATE participants SET " +
-                    "firstname = '" + participantsModel.getFirstname() + "'," +
-                    " lastname = '" + participantsModel.getLastname() + "'," +
-                    " identity_number = '" + participantsModel.getIdentityNumber() + "'," +
-                    " date_of_birth = '" + participantsModel.getDateOfBirth() + "'," +
-                    " gender = '" + participantsModel.getGender() + "'," +
-                    " marital_status = '" + participantsModel.getMaritalStatus() + "'," +
-                    " mobile_number = '" + participantsModel.getMobileNumber() + "'," +
-                    " alternate_mobile_number = '" + participantsModel.getAlternateMobileNumber() + "'," +
-                    " postal_address = '" + participantsModel.getPostalAddress() + "'," +
-                    " residential_address = '" + participantsModel.getResidentialAddress() + "'," +
-                    " education = '" + participantsModel.getEducation() + "'," +
-                    " placement_officer = '" + participantsModel.getPlacementOfficer() + "'," +
-                    " placement_place = '" + participantsModel.getPlacementPlace() + "'," +
-                    " placement_date = '" + participantsModel.getPlacementDate() + "'," +
-                    " completion_date = '" + participantsModel.getCompletionDate() + "'," +
-                    " mobile_wallet_provider = '" + participantsModel.getMobileWalletProvider() + "'," +
-                    " bank_name = '" + participantsModel.getBankName() + "'," +
-                    " branch = '" + participantsModel.getBranch() + "'," +
-                    " account_number = '" + participantsModel.getAccountNumber() + "'," +
-                    " timestamp = '" + participantsModel.getTimestamp() + "'," +
+                    "firstname = '" + employeesModel.getFirstname() + "'," +
+                    " lastname = '" + employeesModel.getLastname() + "'," +
+                    " identity_number = '" + employeesModel.getIdentityNumber() + "'," +
+                    " date_of_birth = '" + employeesModel.getDateOfBirth() + "'," +
+                    " gender = '" + employeesModel.getGender() + "'," +
+                    " marital_status = '" + employeesModel.getMaritalStatus() + "'," +
+                    " mobile_number = '" + employeesModel.getMobileNumber() + "'," +
+                    " alternate_mobile_number = '" + employeesModel.getAlternateMobileNumber() + "'," +
+                    " postal_address = '" + employeesModel.getPostalAddress() + "'," +
+                    " residential_address = '" + employeesModel.getResidentialAddress() + "'," +
+                    " education = '" + employeesModel.getEducation() + "'," +
+                    " placement_officer = '" + employeesModel.getPlacementOfficer() + "'," +
+                    " placement_place = '" + employeesModel.getPlacementPlace() + "'," +
+                    " placement_date = '" + employeesModel.getPlacementDate() + "'," +
+                    " completion_date = '" + employeesModel.getCompletionDate() + "'," +
+                    " mobile_wallet_provider = '" + employeesModel.getMobileWalletProvider() + "'," +
+                    " bank_name = '" + employeesModel.getBankName() + "'," +
+                    " branch = '" + employeesModel.getBranch() + "'," +
+                    " account_number = '" + employeesModel.getAccountNumber() + "'," +
+                    " timestamp = '" + employeesModel.getTimestamp() + "'," +
                     " is_terminated = '0'," +
                     " parameter_id = '"+parameterId.get(0) + "' "+
-                    " WHERE participant_id = '" + participantsModel.getParticipantId() + "'";
+                    " WHERE participant_id = '" + employeesModel.getParticipantId() + "'";
 
             Query updateAgentQuery = entityManager.createNativeQuery(updateAgentSQL);
             updateAgentQuery.executeUpdate();
 
             String sql = "SELECT remuneration_history.month " +
                     "FROM remuneration_history " +
-                    "WHERE remuneration_history.participant_id = '"+participantsModel.getParticipantId()+"'";
+                    "WHERE remuneration_history.participant_id = '"+ employeesModel.getParticipantId()+"'";
 
             Query query = entityManager.createNativeQuery(sql);
             List<String> resultList = query.getResultList();
@@ -137,8 +137,8 @@ public class ParticipantsRepository {
                     String provider = "";
                     String paymentMode = "";
 
-                    if (!participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
-                        provider = Commons.getPhoneNumberCarrier(participantsModel.getMobileWalletProvider());
+                    if (!employeesModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+                        provider = Commons.getPhoneNumberCarrier(employeesModel.getMobileWalletProvider());
 
                         if (provider.equalsIgnoreCase("")) {
                             provider = "No Provider";
@@ -146,12 +146,12 @@ public class ParticipantsRepository {
 
                         paymentMode = "Mobile Wallet";
                     }
-                    else if (!participantsModel.getBankName().equalsIgnoreCase("null")) {
-                        provider = participantsModel.getBankName();
+                    else if (!employeesModel.getBankName().equalsIgnoreCase("null")) {
+                        provider = employeesModel.getBankName();
                         paymentMode = "Bank";
                     }
-                    else if (participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")
-                            && participantsModel.getBankName().equalsIgnoreCase("null")) {
+                    else if (employeesModel.getMobileWalletProvider().equalsIgnoreCase("null")
+                            && employeesModel.getBankName().equalsIgnoreCase("null")) {
                         provider = "Botswana Post Office"; // TODO Remove hardcoded Botswana Post Office
                         paymentMode = "Cash";
                     }
@@ -159,7 +159,7 @@ public class ParticipantsRepository {
                     String updateRemunerationHistorySQL = "UPDATE remuneration_history SET " +
                             "payment_method = '" + paymentMode + "', " +
                             "provider = '" + provider + "' " +
-                            "WHERE participant_id = '" + participantsModel.getParticipantId() + "' " +
+                            "WHERE participant_id = '" + employeesModel.getParticipantId() + "' " +
                             "AND remuneration_history.month = '"+resultList.get(i)+"'";
 
                     Query updateRemunerationHistoryQuery = entityManager
@@ -175,11 +175,11 @@ public class ParticipantsRepository {
 
     }
 
-    public List<Object[]> checkForAgent(ParticipantsModel participantsModel) {
+    public List<Object[]> checkForAgent(EmployeesModel employeesModel) {
 
         String sql = "SELECT participants.participant_id " +
                 "FROM participants " +
-                "WHERE participants.identity_number = '" + participantsModel.getIdentityNumber() + "' " +
+                "WHERE participants.identity_number = '" + employeesModel.getIdentityNumber() + "' " +
                 "AND participants.is_terminated = '0'";
 
         try {
@@ -209,7 +209,7 @@ public class ParticipantsRepository {
     }
 
     @Modifying
-    public void addNewAgent(ParticipantsModel participantsModel,
+    public void addNewAgent(EmployeesModel employeesModel,
                             List<String> contractDates, BigInteger parameterId) {
         try {
 
@@ -219,17 +219,17 @@ public class ParticipantsRepository {
                     "postal_address, residential_address, education, placement_officer, placement_place, " +
                     "placement_date, completion_date, mobile_wallet_provider, bank_name, branch, " +
                     "account_number, timestamp, is_terminated, parameter_id) VALUES(" +
-                    "'" + participantsModel.getFirstname() + "','" + participantsModel.getLastname() + "'," +
-                    "'" + participantsModel.getIdentityNumber() + "','" + participantsModel.getDateOfBirth() + "'," +
-                    "'" + participantsModel.getGender() + "','" + participantsModel.getMaritalStatus() + "'," +
-                    "'" + participantsModel.getMobileNumber() + "','" + participantsModel.getAlternateMobileNumber() + "'," +
-                    "'" + participantsModel.getPostalAddress() + "','" + participantsModel.getResidentialAddress() + "'," +
-                    "'" + participantsModel.getEducation() + "','" + participantsModel.getPlacementOfficer() + "'," +
-                    "'" + participantsModel.getPlacementPlace() + "'," +
-                    "'" + participantsModel.getPlacementDate() + "','" + participantsModel.getCompletionDate() + "'," +
-                    "'" + participantsModel.getMobileWalletProvider() + "','" + participantsModel.getBankName() + "'," +
-                    "'" + participantsModel.getBranch() + "','" + participantsModel.getAccountNumber() + "'," +
-                    "'" + participantsModel.getTimestamp() + "','0', '"+parameterId+"')";
+                    "'" + employeesModel.getFirstname() + "','" + employeesModel.getLastname() + "'," +
+                    "'" + employeesModel.getIdentityNumber() + "','" + employeesModel.getDateOfBirth() + "'," +
+                    "'" + employeesModel.getGender() + "','" + employeesModel.getMaritalStatus() + "'," +
+                    "'" + employeesModel.getMobileNumber() + "','" + employeesModel.getAlternateMobileNumber() + "'," +
+                    "'" + employeesModel.getPostalAddress() + "','" + employeesModel.getResidentialAddress() + "'," +
+                    "'" + employeesModel.getEducation() + "','" + employeesModel.getPlacementOfficer() + "'," +
+                    "'" + employeesModel.getPlacementPlace() + "'," +
+                    "'" + employeesModel.getPlacementDate() + "','" + employeesModel.getCompletionDate() + "'," +
+                    "'" + employeesModel.getMobileWalletProvider() + "','" + employeesModel.getBankName() + "'," +
+                    "'" + employeesModel.getBranch() + "','" + employeesModel.getAccountNumber() + "'," +
+                    "'" + employeesModel.getTimestamp() + "','0', '"+parameterId+"')";
 
             Query insertAgentQuery = entityManager.createNativeQuery(insertAgentSQL);
             insertAgentQuery.executeUpdate();
@@ -237,7 +237,7 @@ public class ParticipantsRepository {
             // Select participantId
             String sql = "SELECT participants.participant_id " +
                     "FROM participants " +
-                    "WHERE participants.identity_number = '"+ participantsModel.getIdentityNumber()+"'";
+                    "WHERE participants.identity_number = '"+ employeesModel.getIdentityNumber()+"'";
 
             Query query = entityManager.createNativeQuery(sql);
 
@@ -256,8 +256,8 @@ public class ParticipantsRepository {
             String provider = "";
             String paymentMode = "";
 
-            if (!participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
-                provider = Commons.getPhoneNumberCarrier(participantsModel.getMobileWalletProvider());
+            if (!employeesModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+                provider = Commons.getPhoneNumberCarrier(employeesModel.getMobileWalletProvider());
 
                 if (provider.equalsIgnoreCase("")) {
                     provider = "No Provider";
@@ -265,12 +265,12 @@ public class ParticipantsRepository {
 
                 paymentMode = "Mobile Wallet";
             }
-            else if (!participantsModel.getBankName().equalsIgnoreCase("null")) {
-                provider = participantsModel.getBankName();
+            else if (!employeesModel.getBankName().equalsIgnoreCase("null")) {
+                provider = employeesModel.getBankName();
                 paymentMode = "Bank";
             }
-            else if (participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")
-                    && participantsModel.getBankName().equalsIgnoreCase("null")) {
+            else if (employeesModel.getMobileWalletProvider().equalsIgnoreCase("null")
+                    && employeesModel.getBankName().equalsIgnoreCase("null")) {
                 provider = "Botswana Post Office"; // TODO Remove hardcoded Botswana Post Office
                 paymentMode = "Cash";
             }
@@ -415,7 +415,7 @@ public class ParticipantsRepository {
 
     @Modifying
     public void reinstateParticipant(Long participantId,
-                                     List<String> contractDates, ParticipantsModel participantsModel) {
+                                     List<String> contractDates, EmployeesModel employeesModel) {
         try {
 
             long duration = Long.parseLong(String.valueOf(contractDates.size()));
@@ -445,8 +445,8 @@ public class ParticipantsRepository {
             String provider = "";
             String paymentMode = "";
 
-            if (!participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
-                provider = Commons.getPhoneNumberCarrier(participantsModel.getMobileWalletProvider());
+            if (!employeesModel.getMobileWalletProvider().equalsIgnoreCase("null")) {
+                provider = Commons.getPhoneNumberCarrier(employeesModel.getMobileWalletProvider());
 
                 if (provider.equalsIgnoreCase("")) {
                     provider = "No Provider";
@@ -454,12 +454,12 @@ public class ParticipantsRepository {
 
                 paymentMode = "Mobile Wallet";
             }
-            else if (!participantsModel.getBankName().equalsIgnoreCase("null")) {
-                provider = participantsModel.getBankName();
+            else if (!employeesModel.getBankName().equalsIgnoreCase("null")) {
+                provider = employeesModel.getBankName();
                 paymentMode = "Bank";
             }
-            else if (participantsModel.getMobileWalletProvider().equalsIgnoreCase("null")
-                    && participantsModel.getBankName().equalsIgnoreCase("null")) {
+            else if (employeesModel.getMobileWalletProvider().equalsIgnoreCase("null")
+                    && employeesModel.getBankName().equalsIgnoreCase("null")) {
                 provider = "Botswana Post Office"; // TODO Remove hardcoded Botswana Post Office
                 paymentMode = "Cash";
             }
@@ -571,10 +571,11 @@ public class ParticipantsRepository {
         try {
 
             String insertReferenceSQL = "INSERT INTO reference (firstname, lastname, identity_number, " +
-                    "primary_number, postal_address, participant_id, removed) VALUES(" +
+                    "relationship, primary_number, postal_address, participant_id, removed) VALUES(" +
                     "'" + referenceModel.getFirstname() + "'," +
                     "'" + referenceModel.getLastname() + "'," +
                     "'" + referenceModel.getIdentityNumber() + "'," +
+                    "'" + referenceModel.getRelationship() + "'," +
                     "'" + referenceModel.getPrimaryMobile() + "'," +
                     "'" + referenceModel.getPostalAddress() + "'," +
                     "'" + referenceModel.getParticipantId() + "'," +
@@ -614,6 +615,7 @@ public class ParticipantsRepository {
                     "firstname = '" + referenceModel.getFirstname() + "'," +
                     " lastname = '" + referenceModel.getLastname() + "'," +
                     " identity_number = '" + referenceModel.getIdentityNumber() + "'," +
+                    " relationship = '" + referenceModel.getRelationship() + "'," +
                     " primary_number = '" + referenceModel.getPrimaryMobile() + "'," +
                     " postal_address = '" + referenceModel.getPostalAddress() + "'," +
                     " participant_id = '" + referenceModel.getParticipantId() + "'," +
