@@ -61,7 +61,7 @@ import static com.application.iserv.ui.utils.Constants.*;
     // Services
     private final HistoryService historyService;
 
-    // SplitLayouts
+    // SplitLayout
     SplitLayout menuSplitLayout;
     SplitLayout searchDateSplitLayout;
 
