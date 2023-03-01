@@ -26,7 +26,7 @@
 		<band height="206" splitType="Stretch">
 			<image>
 				<reportElement x="236" y="0" width="83" height="80" uuid="ddc15723-2728-421f-b95e-2df9faf64ce1"/>
-				<imageExpression><![CDATA["/root/projects/p4/bwpost/src/main/resources/META-INF/resources/images/logo.png"]]></imageExpression>
+				<imageExpression><![CDATA["/root/projects/p6/bwpost/src/main/resources/META-INF/resources/images/logo.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement style="Title" x="146" y="70" width="263" height="62" uuid="1a652692-054a-40f3-ade5-68d8da36626d"/>
